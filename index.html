@@ -8,7 +8,38 @@
       name="description"
       content="limitcast measures the ~100k tokens every Claude Code session loads before you type, shows what you never use, and stops runaway subagents before they burn your window. Runs locally."
     >
+    <link rel="canonical" href="https://limitcast.dev/">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://limitcast.dev/">
+    <meta property="og:title" content="limitcast: stop getting locked out of Claude Code">
+    <meta
+      property="og:description"
+      content="Forecasts when each usage limit runs out, stops runaway subagents, and shows what drains your plan. Local only, free tier."
+    >
+    <meta property="og:image" content="https://limitcast.dev/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="limitcast: Stop getting locked out of Claude Code. A gauge with the forecast runout dashed to the limit.">
+    <meta name="twitter:card" content="summary_large_image">
+    <script
+      data-goatcounter="https://limitcast.goatcounter.com/count"
+      async
+      src="https://gc.zgo.at/count.v4.js"
+      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+      crossorigin="anonymous"
+    ></script>
     <style>
+    .demo {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+      background: var(--code-bg);
+      margin: 1.5rem 0 0.4rem;
+    }
     .table-wrap {
       overflow-x: auto;
     }
@@ -236,6 +267,12 @@ limitcast trim --apply</pre>
         <a class="btn" href="#install">Install free</a>
       </div>
 
+      <video class="demo" autoplay muted loop playsinline preload="metadata" poster="/demo-poster.png" width="1200" height="800">
+        <source src="/demo.mp4" type="video/mp4">
+        <img src="/demo.gif" alt="limitcast status, trim and results running in a terminal" width="1200" height="800">
+      </video>
+      <p><small>Recorded on the author's machine: <code>status</code>, <code>trim --share</code> and <code>results</code>, unedited.</small></p>
+
       <pre>$ limitcast trim
 Every Claude Code session starts at <b>102.7k tokens</b> before your first message.
 
@@ -404,8 +441,8 @@ limitcast doctor</pre>
             <li>Email support</li>
           </ul>
           <div class="cta">
-            <a class="btn primary" data-checkout="annual" href="#pricing">Start free trial: $79/yr</a>
-            <a class="btn" data-checkout="monthly" href="#pricing">Monthly: $9/mo</a>
+            <a class="btn primary" data-checkout="annual" data-goatcounter-click="checkout-annual" href="#pricing">Start free trial: $79/yr</a>
+            <a class="btn" data-checkout="monthly" data-goatcounter-click="checkout-monthly" href="#pricing">Monthly: $9/mo</a>
           </div>
           <p><small>Not ready to enter a card? <code>limitcast trial</code> gives you Pro for 7 days, no card.</small></p>
         </div>
@@ -418,7 +455,7 @@ limitcast doctor</pre>
             <li>Each teammate claims a seat and gets their own key</li>
             <li>Add or remove seats any time</li>
           </ul>
-          <a class="btn" data-checkout="team" href="#pricing">Start team trial</a>
+          <a class="btn" data-checkout="team" data-goatcounter-click="checkout-team" href="#pricing">Start team trial</a>
         </div>
       </div>
       <p>
@@ -484,7 +521,10 @@ limitcast doctor</pre>
         </p>
       </details>
 
-      <footer>limitcast is an independent tool and is not affiliated with Anthropic or OpenAI.</footer>
+      <footer>
+        limitcast is an independent tool and is not affiliated with Anthropic or OpenAI. This site counts visits with GoatCounter: no cookies, no
+        personal data.
+      </footer>
     </main>
     <script>
     // Polar checkout links (Products → Checkout Links).
@@ -500,6 +540,9 @@ limitcast doctor</pre>
     // Polar returns buyers to ?purchase=success: show how to activate.
     if (new URLSearchParams(location.search).get('purchase') === 'success') {
       document.getElementById('thanks').hidden = false;
+      const count = () => window.goatcounter.count({ path: 'purchase-success', event: true });
+      if (window.goatcounter?.count) count();
+      else addEventListener('load', () => window.goatcounter?.count && count());
     }
     </script>
   </body>
