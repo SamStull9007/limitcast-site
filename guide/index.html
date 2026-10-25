@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>limitcast feature guide</title>
+<meta name="description" content="Every limitcast feature for Claude Code, Codex and Grok users: runout forecast, trim advisor, subagent guard, burn report, results, privacy, and Free vs Pro.">
+<link rel="canonical" href="https://limitcast.dev/guide/">
+<style>
+body { margin: 0; }
+/* Layout: one reading column; each feature is a ruled row with a tier tag and the command it runs. Palette and type follow limitcast.dev. */
+:root {
+	--bg: #fbfaf7;
+	--fg: #1d1c1a;
+	--muted: #5f5c55;
+	--line: #e4e0d8;
+	--card: #ffffff;
+	--accent: #c2410c;
+	--accent-soft: #fbe9df;
+	--code-bg: #1d1c1a;
+	--code-fg: #f3efe6;
+	--code-dim: #a8a399;
+	--ok: #15803d;
+	--font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme="light"]) {
+		--bg: #141312;
+		--fg: #eeeae2;
+		--muted: #a8a399;
+		--line: #2c2a27;
+		--card: #1b1a18;
+		--accent: #f97316;
+		--accent-soft: #2e1d12;
+		--code-bg: #0c0b0a;
+		--code-fg: #eeeae2;
+		--code-dim: #8a857c;
+		--ok: #4ade80;
+		color-scheme: dark;
+	}
+}
+:root[data-theme="dark"] {
+	--bg: #141312;
+	--fg: #eeeae2;
+	--muted: #a8a399;
+	--line: #2c2a27;
+	--card: #1b1a18;
+	--accent: #f97316;
+	--accent-soft: #2e1d12;
+	--code-bg: #0c0b0a;
+	--code-fg: #eeeae2;
+	--code-dim: #8a857c;
+	--ok: #4ade80;
+	color-scheme: dark;
+}
+* {
+	box-sizing: border-box;
+}
+body {
+	background: var(--bg);
+	color: var(--fg);
+	font: 17px / 1.6 var(--font-body);
+}
+main {
+	max-width: 820px;
+	margin: 0 auto;
+	padding-left: max(16px, env(safe-area-inset-left, 0px));
+	padding-right: max(16px, env(safe-area-inset-right, 0px));
+	padding-block: 32px 72px;
+}
+.brand {
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.brand a {
+	color: var(--muted);
+	font-weight: 400;
+	font-size: 0.95rem;
+}
+h1 {
+	font-size: clamp(2rem, 5.5vw, 3rem);
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+	margin: 40px 0 16px;
+	text-wrap: balance;
+}
+h2 {
+	font-size: 1.5rem;
+	letter-spacing: -0.02em;
+	margin: 64px 0 8px;
+	text-wrap: balance;
+}
+h3 {
+	font-size: 1.15rem;
+	letter-spacing: -0.01em;
+	margin: 0;
+}
+p {
+	margin: 0 0 12px;
+	max-width: 65ch;
+}
+.lede {
+	font-size: 1.2rem;
+	color: var(--muted);
+}
+.muted {
+	color: var(--muted);
+}
+a {
+	color: var(--accent);
+}
+a:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 2px;
+}
+code {
+	font: 0.9em var(--font-mono);
+	background: var(--accent-soft);
+	padding: 1px 5px;
+	border-radius: 4px;
+}
+pre {
+	background: var(--code-bg);
+	color: var(--code-fg);
+	padding: 18px 20px;
+	border-radius: 10px;
+	overflow-x: auto;
+	font: 14px / 1.55 var(--font-mono);
+	margin: 24px 0;
+}
+pre code {
+	background: none;
+	padding: 0;
+	font: inherit;
+}
+.dim {
+	color: var(--code-dim);
+}
+.problem {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 16px;
+	margin-top: 20px;
+}
+.problem div {
+	border: 1px solid var(--line);
+	background: var(--card);
+	border-radius: 10px;
+	padding: 18px 20px;
+	min-width: 0;
+}
+.problem p {
+	margin: 6px 0 0;
+	color: var(--muted);
+}
+.feature {
+	border-top: 1px solid var(--line);
+	padding-block: 28px;
+	display: grid;
+	gap: 10px;
+}
+.feature:last-of-type {
+	border-bottom: 1px solid var(--line);
+}
+.feature-head {
+	display: flex;
+	gap: 10px 14px;
+	align-items: baseline;
+	flex-wrap: wrap;
+}
+.tier {
+	font: 600 0.72rem / 1 var(--font-body);
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	padding: 4px 8px;
+	border-radius: 999px;
+	border: 1px solid var(--line);
+	color: var(--muted);
+}
+.tier.pro {
+	border-color: var(--accent);
+	color: var(--accent);
+}
+.cmd {
+	font: 0.88rem var(--font-mono);
+	color: var(--muted);
+	overflow-wrap: anywhere;
+}
+.feature ul {
+	margin: 0;
+	padding-left: 20px;
+	max-width: 65ch;
+}
+.feature li {
+	margin-bottom: 4px;
+}
+.gain {
+	margin: 4px 0 0;
+	padding-left: 14px;
+	border-left: 3px solid var(--accent);
+}
+.gain strong {
+	color: var(--accent);
+}
+.table-wrap {
+	overflow-x: auto;
+	margin-top: 16px;
+}
+table {
+	border-collapse: collapse;
+	width: 100%;
+	min-width: 520px;
+	font-size: 0.95rem;
+}
+th,
+td {
+	text-align: left;
+	padding: 10px 12px;
+	border-bottom: 1px solid var(--line);
+	vertical-align: top;
+}
+th {
+	font-size: 0.8rem;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--muted);
+	font-weight: 600;
+}
+td.yes {
+	color: var(--ok);
+	font-weight: 600;
+}
+.price {
+	font-variant-numeric: tabular-nums;
+	font-weight: 700;
+}
+.facts {
+	display: grid;
+	gap: 8px;
+	margin-top: 16px;
+	padding-left: 20px;
+	max-width: 65ch;
+}
+footer {
+	margin-top: 56px;
+	color: var(--muted);
+	font-size: 0.92rem;
+}
+</style>
+</head>
+<body>
+
+<main>
+	<div class="brand">
+		<span>limitcast</span>
+		<a href="/"
+			>limitcast.dev</a
+		>
+	</div>
+
+	<h1>Stretch your Claude Code plan</h1>
+	<p class="lede">
+		limitcast is a command-line tool that shows what fills your context, warns
+		you before a usage window runs out, and stops new subagents that would use
+		up the rest of it. Then it shows you what that saved. It reads data already
+		on your machine. No logins.
+	</p>
+
+	<pre><code><span class="dim">$</span> limitcast trim
+Every Claude Code session starts at 102.7k tokens before your first message.
+
+## Measured savings: ~6.2k tokens per session (6% of your starting context)
+- Disable 9 MCP servers you haven't used in 14 days (~0.9k): postman, context7, ...
+- Hide 66 skills from the model (~5.3k): dataviz, block-kit, ...</code></pre>
+
+	<h2>Where your plan goes</h2>
+	<p class="muted">
+		Claude Code and Codex plans meter usage in rolling windows, such as a 5-hour
+		window and a weekly one. Two things use them up faster than most people
+		notice.
+	</p>
+	<div class="problem">
+		<div>
+			<h3>Starting context</h3>
+			<p>
+				Every session loads about 100k tokens before you type: hook output, MCP
+				server instructions and tool lists, skill listings, agent lists and
+				CLAUDE.md files. That block is sent again on every turn and to every
+				subagent.
+			</p>
+		</div>
+		<div>
+			<h3>Subagents</h3>
+			<p>
+				Each subagent starts with its own copy of that context. A few parallel
+				subagents late in a window can use up the rest of it, and you find out
+				when you're locked out.
+			</p>
+		</div>
+	</div>
+
+	<h2>What limitcast does</h2>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Runout forecast</h3>
+			<span class="tier">Free</span>
+			<span class="cmd">limitcast status</span>
+		</div>
+		<ul>
+			<li>
+				For each limit window: percent used, burn rate, the clock time it runs
+				out, and when it resets.
+			</li>
+			<li>
+				Claude Code passes its own limit readings to your status line; limitcast
+				records them as they change. Codex is read from its session logs with no
+				setup.
+			</li>
+			<li>
+				The burn rate is a straight-line fit over the last hour of the window.
+				<strong>AT_RISK</strong>
+				means you'll hit 100% before the reset;
+				<strong>NEAR</strong>
+				means 95% or more is used, even before there's a burn rate.
+			</li>
+			<li>
+				The weekly window is paced over the last full day, nights and idle time
+				included, so one busy hour on Monday doesn't predict a runout by
+				Wednesday. A burst that would use up the week within the next hour still
+				triggers the warning and the guard.
+			</li>
+			<li>
+				Sessions of the same account share one history, so a short session still
+				gets a forecast. Two accounts used in parallel never mix.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			you see the lockout coming while there's still time to slow down, switch
+			tools, or move heavy work past the reset.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Trim advisor</h3>
+			<span class="tier">Free totals</span>
+			<span class="tier pro">Pro names and cuts</span>
+			<span class="cmd">limitcast trim [--days N] [--share] [--apply]</span>
+		</div>
+		<ul>
+			<li>
+				Reads your latest session's transcript and counts the tokens each
+				startup item actually loaded: SessionStart hook output, each MCP
+				server's instructions and tool names, each skill, the agent list, and
+				instruction files.
+			</li>
+			<li>
+				Compares that with what you used over the last N days (default 7): skill
+				calls, slash commands and MCP tool calls.
+			</li>
+			<li>
+				<strong>Free</strong>
+				shows your starting-context total and how much of it you haven't used.
+			</li>
+			<li>
+				<strong>Pro</strong>
+				names each server, skill and hook to cut and what it costs.
+			</li>
+			<li>
+				<code>--apply</code>
+				(Pro) makes the cuts through Claude Code's own settings: unused skills
+				are hidden from the model (<code>/name</code>
+				still works) and unused MCP servers are turned off for that project.
+				Both files are backed up, and
+				<code>--undo</code>
+				reverses exactly what changed. Plugin skills, and servers whose exact
+				name it can't confirm, are listed for <code>/plugin</code> and
+				<code>/mcp</code>.
+			</li>
+			<li>
+				<code>--share</code>
+				prints totals with no project, file, skill, server or hook names, so
+				it's safe to post.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			every token you cut is saved on every turn of every session and every
+			subagent. The numbers come from your own transcripts, not estimates.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Subagent guard</h3>
+			<span class="tier">Free preview</span>
+			<span class="tier pro">Pro blocks</span>
+			<span class="cmd">limitcast install --guard</span>
+		</div>
+		<ul>
+			<li>
+				A hook that runs before Claude Code starts a <code>Task</code> or
+				<code>Agent</code>
+				subagent, or Codex starts a
+				<code>spawn_agent</code>.
+			</li>
+			<li>
+				Blocks the spawn only when that tool's own window is on pace to run out
+				within 30 minutes and before it resets. The margin is set by
+				<code>LIMITCAST_GUARD_MINUTES</code>.
+			</li>
+			<li>
+				<strong>Free</strong>
+				installs run it as a preview: it never blocks, and
+				<code>limitcast results</code>
+				shows what it would have stopped and whether those windows then ran out.
+			</li>
+			<li>
+				Built to stay out of your way: if it errors, it allows the call; a
+				window already at 100% is left alone so paid extra usage keeps working;
+				<code>LIMITCAST_ALLOW=1</code>
+				overrides it.
+			</li>
+			<li>
+				In Codex it is added after your existing hooks, so the ones you've
+				already approved keep their approval.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			stops the most common way people lose the end of a window: a burst of
+			subagents started when the window is nearly gone.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Burn report</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast report [--days N] [--out FILE]</span>
+		</div>
+		<ul>
+			<li>
+				Tokens by tool (Claude Code, Codex, Grok), day, project, model and
+				session.
+			</li>
+			<li>The share of tokens that went to subagents.</li>
+			<li>
+				Read from each tool's own local logs, including Grok's per-turn usage
+				records.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			shows which projects, models or habits use up your plan, across all three
+			tools in one report.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Starting-context alerts</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast install --alerts</span>
+		</div>
+		<ul>
+			<li>
+				At the start of each session, tells you when your starting context grew
+				by about 1k tokens or more, and names what grew.
+			</li>
+			<li>
+				The message is shown to you only, never to the model. It runs in about
+				0.3 seconds.
+			</li>
+			<li>
+				Once a week, one line on what limitcast did: limits reached, how far
+				ahead it warned, subagents stopped, tokens not re-sent.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			catches a new plugin, a growing CLAUDE.md or a chatty hook the day it
+			appears, not weeks later.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Results</h3>
+			<span class="tier">Free</span>
+			<span class="cmd">limitcast results [--days N] [--share]</span>
+		</div>
+		<ul>
+			<li>
+				Opens with what happened since limitcast started watching: tokens not
+				re-sent (your smaller starting context times every model call, read from
+				your transcripts), how many of the limits it watched you approach it
+				warned you about and how far ahead, and the subagents the guard stopped.
+			</li>
+			<li>
+				Then the last week in detail: every limit you hit, with the forecast
+				replayed from only the readings it had at the time, and what happened to
+				each window after the guard acted.
+			</li>
+			<li>
+				The totals outlast the 8 days of raw readings: a daily background update
+				keeps them current. <code>--share</code> prints totals only, safe to
+				post.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			you can check that limitcast works, and see what it's worth, from your own
+			data.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Setup and upkeep</h3>
+			<span class="tier">Free</span>
+			<span class="cmd">install · uninstall · doctor</span>
+		</div>
+		<ul>
+			<li>
+				<code>install</code>
+				backs up <code>~/.claude/settings.json</code> and keeps your status line
+				looking exactly the same while it records readings. Running it twice is
+				safe.
+			</li>
+			<li><code>uninstall</code> restores your original settings exactly.</li>
+			<li>
+				<code>doctor</code>
+				checks setup, data freshness and the license, and tells you plainly if
+				Claude Code, Codex or Grok changed the log format limitcast reads.
+			</li>
+		</ul>
+	</section>
+
+	<h2>Privacy</h2>
+	<ul class="facts">
+		<li>
+			Your usage data stays on your machine. Everything is read from files that
+			already exist there.
+		</li>
+		<li>The free version makes no network calls.</li>
+		<li>
+			A Pro license talks to Polar, the payment and licensing service, only to
+			activate, for a weekly background check, and to deactivate. Each call
+			sends the license key and your computer's name.
+		</li>
+		<li>Hooks never wait on the network.</li>
+	</ul>
+
+	<h2>Free and Pro</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th scope="col"></th>
+					<th scope="col">Free</th>
+					<th scope="col">Pro</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Price</td>
+					<td class="price">$0</td>
+					<td>
+						<span class="price">$79</span>/year, or
+						<span class="price">$149</span>
+						once (Lifetime)
+					</td>
+				</tr>
+				<tr>
+					<td>Runout forecast with NEAR warnings, status-line readout</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Starting-context total and how much you never use</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Results: value since install, limits warned about</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Subagent guard</td>
+					<td class="muted">Preview</td>
+					<td class="yes">Blocks</td>
+				</tr>
+				<tr>
+					<td>
+						Names each item to cut, and cuts it (<code>trim --apply</code>)
+					</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Burn report, alerts, weekly summary</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<ul class="facts">
+		<li>
+			One key works on 3 computers. <code>limitcast deactivate</code> frees a
+			slot so you can move it.
+		</li>
+		<li>The key keeps working for up to 30 days offline.</li>
+		<li>
+			14-day refund on Pro and Lifetime: email support@limitcast.dev from your
+			purchase address.
+		</li>
+	</ul>
+
+	<h2>What works with which tool</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr>
+					<th scope="col"></th>
+					<th scope="col">Claude Code</th>
+					<th scope="col">Codex</th>
+					<th scope="col">Grok</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Runout forecast</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+					<td class="muted">No limit data on disk</td>
+				</tr>
+				<tr>
+					<td>Subagent guard</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+					<td class="muted">Never blocks</td>
+				</tr>
+				<tr>
+					<td>Burn report</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Results</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+					<td class="muted">-</td>
+				</tr>
+				<tr>
+					<td>Trim advisor</td>
+					<td class="yes">✓</td>
+					<td class="muted">-</td>
+					<td class="muted">-</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Get started</h2>
+	<pre><code>npm install -g limitcast
+limitcast install            <span class="dim"># free: status-line recorder</span>
+limitcast activate &lt;key&gt;     <span class="dim"># Pro</span>
+limitcast install --guard    <span class="dim"># the subagent guard (free: preview only)</span>
+limitcast doctor
+limitcast results            <span class="dim"># what limitcast did for you</span></code></pre>
+	<p class="muted">
+		Requires Node 20 or later on macOS or Linux. Restart Claude Code after
+		installing.
+	</p>
+
+	<footer>
+		Pricing and checkout:
+		<a href="/#pricing"
+			>limitcast.dev</a
+		>
+		· Support: support@limitcast.dev
+	</footer>
+</main>
+
+</body>
+</html>
