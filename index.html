@@ -263,7 +263,10 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
         </div>
         <div class="card">
           <h3>Runout forecast <small>(free)</small></h3>
-          <p>Burn rate and the clock time each 5-hour and weekly window runs out, for Claude Code and Codex.</p>
+          <p>
+            Burn rate and the clock time each 5-hour and weekly window runs out, for Claude Code and Codex. The weekly window is paced over the last full day, nights
+            included, so one busy hour doesn't cry wolf; a warning at 95% even before there's a rate.
+          </p>
         </div>
       </div>
 
@@ -403,7 +406,18 @@ limitcast doctor</pre>
       </details>
       <details>
         <summary>What if I have two Claude accounts?</summary>
-        <p>Each session is forecast from its own readings, so parallel accounts never mix.</p>
+        <p>
+          Sessions of the same account share one history (matched by their limit reset times and usage that only rises), so even a short session gets a
+          forecast, and two accounts used in parallel never mix.
+        </p>
+      </details>
+      <details>
+        <summary>Will one heavy hour make it say I'll run out of my weekly limit?</summary>
+        <p>
+          No. The 5-hour window is forecast from the last hour's pace. The weekly window uses your average pace over the last full day, idle time included,
+          so a burst on Monday doesn't predict a runout by Wednesday. The exception is a burst that would use up the week within the next hour: that still
+          triggers the warning and the subagent guard.
+        </p>
       </details>
       <details>
         <summary>Can I get a refund?</summary>
