@@ -343,6 +343,7 @@ limitcast doctor</pre>
           <ul>
             <li>Runout forecast for Claude Code and Codex</li>
             <li>Status-line readout</li>
+            <li>Your starting context, and how much of it you never use</li>
           </ul>
           <a class="btn" href="#install">Install</a>
         </div>
@@ -351,7 +352,8 @@ limitcast doctor</pre>
           <div class="price">$79 <small>/ year</small></div>
           <ul>
             <li>Everything in Free</li>
-            <li>Trim advisor: measured savings per session</li>
+            <li>Trim advisor: names what to cut and what each costs</li>
+            <li>Alerts when your starting context grows</li>
             <li>Subagent guard for Claude Code and Codex</li>
             <li>Burn report across Claude Code, Codex and Grok</li>
             <li>Email support</li>
@@ -374,8 +376,10 @@ limitcast doctor</pre>
       <details>
         <summary>Does it send my code or prompts anywhere?</summary>
         <p>
-          No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk.
-          Nothing leaves your machine, and license keys are checked offline.
+          No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk,
+          and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you
+          deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the
+          network, and Pro keeps working offline for 30 days after the last check.
         </p>
       </details>
       <details>
