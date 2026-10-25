@@ -253,14 +253,14 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
           <h3>Trim advisor <small>(Pro)</small></h3>
           <p>
             Measures what your latest session loaded before you typed: hook output, MCP servers, tool names, skills, agents, instruction files. Then
-            names the ones you haven't used, with the tokens each one costs you.
+            names the ones you haven't used, with the tokens each one costs you, and cuts them with one command (undo with another). Codex too.
           </p>
         </div>
         <div class="card">
           <h3>Subagent guard <small>(Pro)</small></h3>
           <p>
-            Blocks a new subagent in Claude Code or Codex when that window is on pace to run out before it resets. Never blocks once you're past 100%,
-            so extra usage keeps working.
+            Blocks a new subagent in Claude Code or Codex when that window is on pace to run out before it resets. While a Claude window is tight,
+            runs new subagents on Sonnet instead of your main model. Never blocks once you're past 100%, so extra usage keeps working.
           </p>
         </div>
         <div class="card">
@@ -271,7 +271,15 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
           <h3>Runout forecast <small>(free)</small></h3>
           <p>
             Burn rate and the clock time each 5-hour and weekly window runs out, for Claude Code and Codex. The weekly window is paced over the last full day, nights
-            included, so one busy hour doesn't cry wolf; a warning at 95% even before there's a rate.
+            included, so one busy hour doesn't cry wolf; a warning at 95% even before there's a rate. Plus today's share of the week:
+            <code>7d 41% · today 6% left</code>.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Acts for you <small>(Pro)</small></h3>
+          <p>
+            A desktop notification before you hit a limit. Queue a heavy job to run after the reset. A pointer to your other account when this one is
+            nearly out, and a <code>/compact</code> nudge when a session gets long. Everything on one dashboard page.
           </p>
         </div>
       </div>
@@ -351,10 +359,11 @@ limitcast doctor</pre>
           <div class="price">$0</div>
           <ul>
             <li>Runout forecast for Claude Code and Codex</li>
+            <li>Daily allowance: today's share of the week</li>
             <li>Status-line readout</li>
-            <li>Your starting context, and how much of it you never use</li>
+            <li>Your starting context, and how much of it you never use (Claude Code and Codex)</li>
             <li>Results: every limit you hit, and how far ahead limitcast warned</li>
-            <li>Guard preview: what Pro would have blocked</li>
+            <li>Guard preview: what Pro would have blocked or switched</li>
           </ul>
           <a class="btn" href="#install">Install</a>
         </div>
@@ -364,10 +373,12 @@ limitcast doctor</pre>
           <ul>
             <li>Everything in Free</li>
             <li>Trim advisor: names what to cut and what each costs</li>
-            <li>One command makes the cuts; one undoes them</li>
+            <li>One command makes the cuts; one undoes them (Claude Code and Codex)</li>
+            <li>Subagent guard: blocks runaway subagents, switches to Sonnet when a window is tight</li>
+            <li>Desktop notifications, and jobs that run after the reset</li>
+            <li>Other-account pointer and a /compact nudge in the status line</li>
             <li>Alerts when your starting context grows, and a weekly summary</li>
-            <li>Subagent guard for Claude Code and Codex</li>
-            <li>Burn report across Claude Code, Codex and Grok</li>
+            <li>Burn report and dashboard across Claude Code, Codex and Grok</li>
             <li>Email support</li>
           </ul>
           <a class="btn primary" data-checkout="annual" href="#pricing">Buy Pro</a>
