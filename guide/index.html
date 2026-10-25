@@ -389,7 +389,9 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				<code>--undo</code>
 				reverses exactly what changed. Plugin skills, and servers whose exact
 				name it can't confirm, are listed for <code>/plugin</code> and
-				<code>/mcp</code>.
+				<code>/mcp</code>. If Claude Code later writes over those settings, the
+				cuts are put back at the next session start; anything you turn back on
+				yourself stays on.
 			</li>
 			<li>
 				<code>--share</code>
@@ -441,7 +443,8 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				installs run it as a preview: it never acts, and
 				<code>limitcast results</code>
 				shows what it would have stopped or switched, and whether those windows
-				then ran out.
+				then ran out. When there's something to show, the status line says so
+				once a week.
 			</li>
 			<li>
 				Built to stay out of your way: if it errors, it allows the call; a
@@ -535,6 +538,13 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				keeps them current. <code>--share</code> prints totals only, safe to
 				post.
 			</li>
+			<li>
+				Shows what a smaller starting context was worth against your 5-hour
+				limit, calibrated from your own readings: how many new tokens, and how
+				many cached ones, move your meter by 1%. Cached tokens count far less,
+				which is why long sessions and subagents, not your CLAUDE.md, are what
+				run you out.
+			</li>
 		</ul>
 		<p class="gain">
 			<strong>Benefit:</strong>
@@ -591,20 +601,37 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 		<div class="feature-head">
 			<h3>Setup and upkeep</h3>
 			<span class="tier">Free</span>
-			<span class="cmd">install · uninstall · doctor</span>
+			<span class="cmd">install · uninstall · doctor [--fix] · trial</span>
 		</div>
 		<ul>
 			<li>
 				<code>install</code>
 				backs up <code>~/.claude/settings.json</code> and keeps your status line
 				looking exactly the same while it records readings. Running it twice is
-				safe.
+				safe. It then shows your starting context right away.
 			</li>
 			<li><code>uninstall</code> restores your original settings exactly.</li>
 			<li>
 				<code>doctor</code>
 				checks setup, data freshness and the license, and tells you plainly if
-				Claude Code, Codex or Grok changed the log format limitcast reads.
+				Claude Code, Codex or Grok changed the log format limitcast reads. It
+				also runs once a day in the background: a problem shows
+				<code>⚠ run limitcast doctor</code> in the status line.
+			</li>
+			<li>
+				Hooks go through a small launcher that survives Node upgrades: if the
+				Node it used is gone, it finds <code>limitcast</code> on your PATH, and
+				if that's gone too, your status line still shows and every hook allows.
+				<code>doctor --fix</code> re-installs with the current Node.
+			</li>
+			<li>
+				<code>limitcast trial</code>
+				turns on Pro for 7 days on this computer, with no card, once.
+			</li>
+			<li>
+				The Claude Code plugin adds <code>/limitcast:status</code>,
+				<code>/limitcast:results</code> and <code>/limitcast:trim</code>
+				inside a session.
 			</li>
 		</ul>
 	</section>
@@ -640,7 +667,8 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 					<td class="price">$0</td>
 					<td>
 						<span class="price">$79</span>/year or
-						<span class="price">$9</span>/month, 14 days free
+						<span class="price">$9</span>/month, 14 days free. Team:
+						<span class="price">$69</span>/seat/year, 3 seats minimum
 					</td>
 				</tr>
 				<tr>
@@ -693,9 +721,11 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 		</li>
 		<li>The key keeps working for up to 30 days offline.</li>
 		<li>
-			14-day free trial on both plans: you're charged only if you keep Pro past
-			day 14. Cancel anytime in Polar's customer portal.
+			14-day free trial on every plan: you're charged only if you keep Pro past
+			day 14. Cancel anytime in Polar's customer portal. Or try it first with
+			<code>limitcast trial</code>: 7 days, no card.
 		</li>
+		<li>Team: each person gets their own key.</li>
 		<li>
 			14-day refund on any charge: email support@limitcast.dev from your
 			purchase address.
@@ -749,15 +779,17 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 	</div>
 
 	<h2>Get started</h2>
-	<pre><code>npm install -g limitcast
+	<pre><code>npm install -g limitcast     <span class="dim"># or: brew install samstull9007/limitcast/limitcast</span>
 limitcast install            <span class="dim"># free: status-line recorder</span>
+limitcast trial              <span class="dim"># Pro free for 7 days, no card</span>
 limitcast activate &lt;key&gt;     <span class="dim"># Pro</span>
 limitcast install --guard    <span class="dim"># the subagent guard (free: preview only)</span>
 limitcast doctor
 limitcast results            <span class="dim"># what limitcast did for you</span></code></pre>
 	<p class="muted">
 		Requires Node 20 or later on macOS or Linux. Restart Claude Code after
-		installing.
+		installing. In Claude Code, add the slash commands with
+		<code>/plugin install limitcast --marketplace SamStull9007/limitcast</code>.
 	</p>
 
 	<footer>
