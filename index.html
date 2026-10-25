@@ -331,7 +331,7 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
       <h2 id="install">Install in 30 seconds</h2>
       <pre>npm install -g limitcast
 limitcast install           # wraps your status line, backs up settings.json
-limitcast install --guard   # Pro: also adds the subagent guard to Claude Code and Codex
+limitcast install --guard   # also the subagent guard for Claude Code and Codex (free: preview, never blocks)
 limitcast doctor</pre>
       <p>Requires Node 20+, macOS or Linux. <code>limitcast uninstall</code> restores your original settings.</p>
 
@@ -344,6 +344,8 @@ limitcast doctor</pre>
             <li>Runout forecast for Claude Code and Codex</li>
             <li>Status-line readout</li>
             <li>Your starting context, and how much of it you never use</li>
+            <li>Results: every limit you hit, and how far ahead limitcast warned</li>
+            <li>Guard preview: what Pro would have blocked</li>
           </ul>
           <a class="btn" href="#install">Install</a>
         </div>
@@ -353,7 +355,8 @@ limitcast doctor</pre>
           <ul>
             <li>Everything in Free</li>
             <li>Trim advisor: names what to cut and what each costs</li>
-            <li>Alerts when your starting context grows</li>
+            <li>One command makes the cuts; one undoes them</li>
+            <li>Alerts when your starting context grows, and a weekly summary</li>
             <li>Subagent guard for Claude Code and Codex</li>
             <li>Burn report across Claude Code, Codex and Grok</li>
             <li>Email support</li>
