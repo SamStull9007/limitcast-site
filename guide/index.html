@@ -340,6 +340,12 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				Sessions of the same account share one history, so a short session still
 				gets a forecast. Two accounts used in parallel never mix.
 			</li>
+			<li>
+				<strong>Daily allowance:</strong>
+				for the weekly window, today's even share of what was left this morning,
+				and how much of it today used: <code>7d 41% · today 6% left</code> in
+				the status line, a <code>today</code> column in <code>status</code>.
+			</li>
 		</ul>
 		<p class="gain">
 			<strong>Benefit:</strong>
@@ -390,6 +396,14 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				prints totals with no project, file, skill, server or hook names, so
 				it's safe to post.
 			</li>
+			<li>
+				<code>--codex</code>
+				does the same for Codex: the AGENTS.md text it loads every session, and
+				the MCP servers in <code>~/.codex/config.toml</code> you haven't used.
+				With Pro, <code>--apply</code> turns them off (<code
+					>enabled = false</code
+				>) and <code>--undo</code> restores the file exactly.
+			</li>
 		</ul>
 		<p class="gain">
 			<strong>Benefit:</strong>
@@ -418,10 +432,16 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				<code>LIMITCAST_GUARD_MINUTES</code>.
 			</li>
 			<li>
+				While a Claude window is tight (NEAR or AT_RISK) but not about to run
+				out, a new subagent that would run on your main model (or Opus) runs on
+				Sonnet instead. An explicit Sonnet or Haiku is left alone.
+			</li>
+			<li>
 				<strong>Free</strong>
-				installs run it as a preview: it never blocks, and
+				installs run it as a preview: it never acts, and
 				<code>limitcast results</code>
-				shows what it would have stopped and whether those windows then ran out.
+				shows what it would have stopped or switched, and whether those windows
+				then ran out.
 			</li>
 			<li>
 				Built to stay out of your way: if it errors, it allows the call; a
@@ -525,6 +545,47 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 
 	<section class="feature">
 		<div class="feature-head">
+			<h3>Acts for you</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">notify · after-reset · results --html</span>
+		</div>
+		<ul>
+			<li>
+				<code>limitcast notify on</code>
+				sends one desktop notification when a Claude window turns NEAR, AT_RISK
+				or HIT, and when it resets after a HIT.
+			</li>
+			<li>
+				<code>limitcast after-reset -- &lt;command&gt;</code>
+				waits for the window to reset, then runs the command (add
+				<code>--detach</code>
+				to run it in the background).
+			</li>
+			<li>
+				When the current Claude account is near its limit, the status line
+				points to your other account with the most room, and
+				<code>status</code>
+				lists every account limitcast has current readings for.
+			</li>
+			<li>
+				Past ~150k tokens re-sent per model call, the status line suggests
+				<code>/compact</code>. If you use your own status line, Pro adds a
+				second line only when there's something to act on.
+			</li>
+			<li>
+				<code>limitcast results --html</code>
+				puts results, your current windows and the burn report on one page.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			you hear about a limit before you hit it, and the heavy work waits for the
+			reset instead of you.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
 			<h3>Setup and upkeep</h3>
 			<span class="tier">Free</span>
 			<span class="cmd">install · uninstall · doctor</span>
@@ -581,12 +642,15 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 					</td>
 				</tr>
 				<tr>
-					<td>Runout forecast with NEAR warnings, status-line readout</td>
+					<td>Runout forecast with NEAR warnings and the daily allowance</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
 				</tr>
 				<tr>
-					<td>Starting-context total and how much you never use</td>
+					<td>
+						Starting-context total and how much you never use (Claude Code and
+						Codex)
+					</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
 				</tr>
@@ -598,7 +662,7 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				<tr>
 					<td>Subagent guard</td>
 					<td class="muted">Preview</td>
-					<td class="yes">Blocks</td>
+					<td class="yes">Blocks, switches to Sonnet</td>
 				</tr>
 				<tr>
 					<td>
@@ -609,6 +673,11 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				</tr>
 				<tr>
 					<td>Burn report, alerts, weekly summary</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Notifications, after-reset jobs, account pointer, dashboard</td>
 					<td></td>
 					<td class="yes">✓</td>
 				</tr>
