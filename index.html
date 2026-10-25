@@ -220,15 +220,16 @@
         <pre>npm install -g limitcast
 limitcast activate LIMITCAST-your-key
 limitcast install --guard --alerts
-limitcast trim</pre>
+limitcast notify on
+limitcast trim --apply</pre>
         <p>One key works on up to 3 computers. <code>limitcast deactivate</code> frees one. Questions: support@limitcast.dev</p>
       </section>
 
       <h1>Stretch your Claude Code plan.</h1>
       <p class="lede">
         Every Claude Code session starts with ~100k tokens of context before you type, re-sent on every turn and to every subagent. limitcast measures
-        exactly what's in it, shows what you never use, and stops runaway subagents before they burn the rest of your window. More work out of the
-        plan you already pay for.
+        exactly what's in it, cuts what you never use, and stops runaway subagents (or moves them to Sonnet) before they burn the rest of your
+        window. More work out of the plan you already pay for.
       </p>
       <div class="cta">
         <a class="btn primary" href="#pricing">Get Pro</a>
@@ -310,19 +311,19 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
             </tr>
             <tr>
               <td>When you'll run out</td>
-              <td>Clock time from your burn rate</td>
+              <td>Clock time from your burn rate, plus today's share of the week</td>
               <td>Pace label (running hot / on track)</td>
               <td>5-hour block tracking</td>
             </tr>
             <tr>
               <td>Stops subagents before you run out</td>
-              <td>Yes, Claude Code and Codex</td>
+              <td>Yes, Claude Code and Codex; on a tight window, moves new Claude subagents to Sonnet</td>
               <td>No (hooks observe only)</td>
               <td>No</td>
             </tr>
             <tr>
-              <td>Measures what loads into every session, and what to cut</td>
-              <td>Yes</td>
+              <td>Measures what loads into every session, and cuts what you don't use</td>
+              <td>Yes, Claude Code and Codex, reversible</td>
               <td>No</td>
               <td>No</td>
             </tr>
