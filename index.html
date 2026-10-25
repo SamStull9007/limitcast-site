@@ -248,6 +248,25 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
 | Agent list             4.9k | MCP instructions    3.1k |</pre>
       <p><small>A real run on a heavy user's setup, names shortened. Your numbers come from your own transcripts.</small></p>
 
+      <h2 id="proof">What it found on its author's machine</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>40 min</h3>
+          <p>warning before a weekly Claude limit ran out, from a forecast that only had the readings it had at the time.</p>
+        </div>
+        <div class="card">
+          <h3>200k vs 10.7M</h3>
+          <p>
+            tokens per 1% of the 5-hour window: new tokens vs cached ones. Cached context is cheap; long sessions and subagents are what run you out.
+          </p>
+        </div>
+        <div class="card">
+          <h3>30%</h3>
+          <p>of Claude tokens went to subagents in a day. That's what the guard watches.</p>
+        </div>
+      </div>
+      <p><small>Day one, from <code>limitcast results</code> and <code>limitcast report</code>. Measure your own: <code>npx limitcast results</code>.</small></p>
+
       <h2 id="how">How it works</h2>
       <div class="grid">
         <div class="card">
@@ -350,6 +369,7 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
       <pre>npm install -g limitcast
 limitcast install           # wraps your status line, backs up settings.json
 limitcast install --guard   # also the subagent guard for Claude Code and Codex (free: preview, never blocks)
+limitcast trial             # Pro free for 7 days, no card
 limitcast doctor</pre>
       <p>Requires Node 20+, macOS or Linux. <code>limitcast uninstall</code> restores your original settings.</p>
 
@@ -387,6 +407,18 @@ limitcast doctor</pre>
             <a class="btn primary" data-checkout="annual" href="#pricing">Start free trial: $79/yr</a>
             <a class="btn" data-checkout="monthly" href="#pricing">Monthly: $9/mo</a>
           </div>
+          <p><small>Not ready to enter a card? <code>limitcast trial</code> gives you Pro for 7 days, no card.</small></p>
+        </div>
+        <div class="card">
+          <h3>Team</h3>
+          <div class="price">$69 <small>/ seat / year</small></div>
+          <p><small>3 seats minimum. 14 days free.</small></p>
+          <ul>
+            <li>Everything in Pro, for each person</li>
+            <li>Each teammate claims a seat and gets their own key</li>
+            <li>Add or remove seats any time</li>
+          </ul>
+          <a class="btn" data-checkout="team" href="#pricing">Start team trial</a>
         </div>
       </div>
       <p>
@@ -459,6 +491,7 @@ limitcast doctor</pre>
     const CHECKOUT = {
       annual: 'https://buy.polar.sh/polar_cl_mODyL2toBGrw6OiIhFW1XrhAnhXkacurfpPpk0aNzJ6',
       monthly: 'https://buy.polar.sh/polar_cl_W4gt2tEe7YBZBq3Lv7P92EKBxHYVUmdoJ6p232iTMqp',
+      team: 'https://buy.polar.sh/polar_cl_8FceCp0kAbBRaz6pn0rN90EuH0CESj9KuuS2w35l5F9',
     };
     for (const a of document.querySelectorAll('[data-checkout]')) {
       const url = CHECKOUT[a.dataset.checkout];
