@@ -299,7 +299,7 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
           <tbody>
             <tr>
               <td>Price</td>
-              <td>Free core, Pro $79/yr</td>
+              <td>Free core; Pro $9/mo or $79/yr, 14 days free</td>
               <td>Free</td>
               <td>Free</td>
             </tr>
@@ -371,6 +371,7 @@ limitcast doctor</pre>
         <div class="card featured">
           <h3>Pro</h3>
           <div class="price">$79 <small>/ year</small></div>
+          <p><small>or $9 / month. 14 days free, then billed; cancel anytime before and you pay nothing.</small></p>
           <ul>
             <li>Everything in Free</li>
             <li>Trim advisor: names what to cut and what each costs</li>
@@ -382,18 +383,16 @@ limitcast doctor</pre>
             <li>Burn report and dashboard across Claude Code, Codex and Grok</li>
             <li>Email support</li>
           </ul>
-          <a class="btn primary" data-checkout="annual" href="#pricing">Buy Pro</a>
-        </div>
-        <div class="card">
-          <h3>Lifetime</h3>
-          <div class="price">$149 <small>once</small></div>
-          <ul>
-            <li>Pro forever, all future updates</li>
-          </ul>
-          <a class="btn" data-checkout="lifetime" href="#pricing">Buy lifetime</a>
+          <div class="cta">
+            <a class="btn primary" data-checkout="annual" href="#pricing">Start free trial: $79/yr</a>
+            <a class="btn" data-checkout="monthly" href="#pricing">Monthly: $9/mo</a>
+          </div>
         </div>
       </div>
-      <p>14-day refund on Pro and Lifetime. Email support@limitcast.dev from your purchase address.</p>
+      <p>
+        Yearly saves 27% over monthly. One key works on 3 computers. Cancel anytime in Polar's customer portal. Charged by mistake? Email
+        support@limitcast.dev within 14 days of a charge for a refund.
+      </p>
 
       <h2 id="faq">FAQ</h2>
       <details>
@@ -438,8 +437,19 @@ limitcast doctor</pre>
         </p>
       </details>
       <details>
+        <summary>How does the free trial work?</summary>
+        <p>
+          Pick yearly or monthly and you get Pro for 14 days at no charge: your license key is ready as soon as you check out, in Polar's customer
+          portal (linked from your confirmation email). Your card is charged when the trial ends. Cancel before then, in the same portal, and you pay
+          nothing and the key stops working.
+        </p>
+      </details>
+      <details>
         <summary>Can I get a refund?</summary>
-        <p>Yes, within 14 days, no questions asked. Email support@limitcast.dev from the address you bought with and we'll refund the order and cancel the license.</p>
+        <p>
+          Yes, within 14 days of any charge, no questions asked. Email support@limitcast.dev from the address you bought with and we'll refund it and
+          cancel the subscription.
+        </p>
       </details>
 
       <footer>limitcast is an independent tool and is not affiliated with Anthropic or OpenAI.</footer>
@@ -448,7 +458,7 @@ limitcast doctor</pre>
     // Polar checkout links (Products → Checkout Links).
     const CHECKOUT = {
       annual: 'https://buy.polar.sh/polar_cl_mODyL2toBGrw6OiIhFW1XrhAnhXkacurfpPpk0aNzJ6',
-      lifetime: 'https://buy.polar.sh/polar_cl_rmyvr52577NJLdK6D3HYUDdwMKAUlG3zPvCDa36ETGH',
+      monthly: 'https://buy.polar.sh/polar_cl_W4gt2tEe7YBZBq3Lv7P92EKBxHYVUmdoJ6p232iTMqp',
     };
     for (const a of document.querySelectorAll('[data-checkout]')) {
       const url = CHECKOUT[a.dataset.checkout];
