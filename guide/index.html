@@ -553,7 +553,10 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 			<li>
 				<code>limitcast notify on</code>
 				sends one desktop notification when a Claude window turns NEAR, AT_RISK
-				or HIT, and when it resets after a HIT.
+				or HIT, and when it resets after a HIT. On macOS they come from a tiny
+				limitcast notifier app (no Dock icon), so "limitcast" has its own entry
+				in System Settings → Notifications; allow it there, and pick Persistent
+				to keep a warning on screen until you dismiss it.
 			</li>
 			<li>
 				<code>limitcast after-reset -- &lt;command&gt;</code>
