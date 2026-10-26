@@ -124,6 +124,9 @@
     .table-wrap {
       overflow-x: auto;
     }
+    table.compare {
+      min-width: 980px;
+    }
     .plans th:nth-child(2),
     .plans td:nth-child(2) {
       background: none;
@@ -586,13 +589,16 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 
       <h2 id="compare">How it compares</h2>
       <div class="table-wrap">
-        <table>
+        <table class="compare">
           <thead>
             <tr>
               <th></th>
               <th>limitcast</th>
-              <th>ClaudeBar</th>
               <th>ccusage</th>
+              <th>ClaudeBar</th>
+              <th>CodexBar</th>
+              <th>CodeBurn</th>
+              <th>agent-usage-guard</th>
             </tr>
           </thead>
           <tbody>
@@ -601,48 +607,73 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
               <td>Free core; Pro $9/mo or $79/yr, 14 days free</td>
               <td>Free</td>
               <td>Free</td>
+              <td>Free</td>
+              <td>Free</td>
+              <td>Free</td>
             </tr>
             <tr>
-              <td>Usage and quota display</td>
+              <td>What it is</td>
+              <td>CLI, status line and hooks</td>
+              <td>CLI reports</td>
+              <td>macOS menu bar app</td>
+              <td>Menu bar app (macOS, Linux)</td>
+              <td>Desktop app and CLI (macOS, Windows, Linux)</td>
+              <td>Claude Code mod</td>
+            </tr>
+            <tr>
+              <td>Tools covered</td>
               <td>Claude Code, Codex, Grok</td>
-              <td>10+ tools, menu bar</td>
-              <td>18 tools, token and cost reports</td>
+              <td>18 tools</td>
+              <td>10+ tools</td>
+              <td>Many providers</td>
+              <td>37 tools</td>
+              <td>Claude Code</td>
             </tr>
             <tr>
               <td>When you'll run out</td>
               <td>Clock time from your burn rate, plus today's share of the week</td>
-              <td>Pace label (running hot / on track)</td>
               <td>5-hour block tracking</td>
+              <td>Pace label (running hot / on track)</td>
+              <td>Countdown to each reset</td>
+              <td>Whether the month is on pace to run past your plan</td>
+              <td>No forecast; asks once a window is 80% used</td>
             </tr>
             <tr>
               <td>Stops subagents before you run out</td>
               <td>Yes, Claude Code and Codex; on a tight window, moves new Claude subagents to Sonnet</td>
+              <td>No</td>
               <td>No (hooks observe only)</td>
               <td>No</td>
+              <td>Spending caps per session ($5 warn, $15 stop by default), not per window</td>
+              <td>Yes, Claude Code: asks before new agents and caps fan-out</td>
             </tr>
             <tr>
               <td>Measures what loads into every session, and cuts what you don't use</td>
-              <td>Yes, Claude Code and Codex, reversible</td>
+              <td>Yes, Claude Code and Codex, with apply and undo</td>
               <td>No</td>
               <td>No</td>
+              <td>No</td>
+              <td>Lists what costs tokens (Optimize)</td>
+              <td>Asks before re-reading a very large context</td>
             </tr>
             <tr>
-              <td>Uses your Claude login token</td>
+              <td>Uses your logins</td>
+              <td>No</td>
               <td>No</td>
               <td>Yes, for its usage API probe</td>
+              <td>Yes, reuses provider sessions (OAuth, cookies)</td>
+              <td>For live limits (<code>codeburn quota</code>)</td>
               <td>No</td>
-            </tr>
-            <tr>
-              <td>Runs on</td>
-              <td>macOS, Linux, over SSH</td>
-              <td>macOS</td>
-              <td>Command line (npx / bunx)</td>
             </tr>
           </tbody>
         </table>
       </div>
       <p>
-        <small>From each project's public README and source, October 2026. If you only want to see your numbers, the free tools are great.</small>
+        <small>
+          From each project's public README, October 2026. If you only want to see your numbers, the free tools are great. If you only want
+          subagent caps in Claude Code, agent-usage-guard is a good free option; limitcast adds the runout forecast, Codex, and the starting-context
+          trim.
+        </small>
       </p>
 
       <h2 id="install">Install in 30 seconds</h2>
