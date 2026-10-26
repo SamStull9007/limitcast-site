@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://limitcast.dev/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://limitcast.dev/guide/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://limitcast.dev/blog/claude-code-usage-limits/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://limitcast.dev/blog/tokens-per-percent/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://limitcast.dev/blog/subagents/</loc><lastmod>2026-10-26</lastmod></url>
+  <url><loc>https://limitcast.dev/blog/prompt-cache-idle/</loc><lastmod>2026-10-26</lastmod></url>
+</urlset>

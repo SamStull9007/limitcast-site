@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Claude Code usage limit reached: how the 5-hour and weekly limits work</title>
+    <meta name="description" content="Hit your Claude Code usage limit? How the 5-hour session limit and the weekly limit reset, which tokens move the meter (new ones, far more than cached ones), and how to see the runout coming.">
+    <link rel="canonical" href="https://limitcast.dev/blog/claude-code-usage-limits/">
+    <link rel="icon" type="image/png" href="/icon.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://limitcast.dev/blog/claude-code-usage-limits/">
+    <meta property="og:title" content="Claude Code usage limit reached: how the 5-hour and weekly limits work">
+    <meta
+      property="og:description"
+      content="The 5-hour limit resets five hours after it starts; the weekly one at a fixed time. New tokens move the meter; cached ones barely do. How to see the runout coming."
+    >
+    <meta property="og:image" content="https://limitcast.dev/og.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="article:published_time" content="2026-10-26">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Claude Code usage limit reached: how the 5-hour and weekly limits work",
+      "datePublished": "2026-10-26",
+      "author": { "@type": "Person", "name": "Sam Stull" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/claude-code-usage-limits/"
+    }
+    </script>
+    <script
+      data-goatcounter="https://limitcast.goatcounter.com/count"
+      async
+      src="https://gc.zgo.at/count.v4.js"
+      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+    :root {
+      --bg: #fbfaf7;
+      --fg: #1d1c1a;
+      --muted: #5f5c55;
+      --line: #e4e0d8;
+      --card: #ffffff;
+      --accent: #c2410c;
+      --cached: #a8a399;
+      --code-bg: #1d1c1a;
+      --code-fg: #f3efe6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #141312;
+        --fg: #eeeae2;
+        --muted: #a8a399;
+        --line: #2c2a27;
+        --card: #1b1a18;
+        --accent: #f97316;
+        --cached: #5f5c55;
+        --code-bg: #0c0b0a;
+        --code-fg: #eeeae2;
+      }
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font:
+        18px / 1.65 ui-sans-serif,
+        system-ui,
+        -apple-system,
+        "Segoe UI",
+        sans-serif;
+    }
+    main {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 16px 72px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px 16px;
+      flex-wrap: wrap;
+      padding: 20px 0;
+      font-size: 0.95rem;
+    }
+    header a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+    header .logo {
+      color: var(--fg);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    h1 {
+      font-size: clamp(1.9rem, 5vw, 2.6rem);
+      line-height: 1.12;
+      letter-spacing: -0.03em;
+      margin: 40px 0 10px;
+      text-wrap: balance;
+    }
+    h2 {
+      font-size: 1.35rem;
+      letter-spacing: -0.02em;
+      margin: 44px 0 10px;
+      text-wrap: balance;
+    }
+    .byline {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin: 0 0 28px;
+    }
+    .answer {
+      border-left: 3px solid var(--accent);
+      padding: 4px 0 4px 16px;
+      font-size: 1.15rem;
+      margin: 24px 0;
+    }
+    a {
+      color: var(--accent);
+    }
+    code {
+      font-family: ui-monospace, Menlo, monospace;
+      font-size: 0.88em;
+    }
+    pre {
+      background: var(--code-bg);
+      color: var(--code-fg);
+      padding: 16px 18px;
+      border-radius: 10px;
+      overflow-x: auto;
+      font:
+        14px / 1.55 ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        monospace;
+    }
+    .table-wrap {
+      overflow-x: auto;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 0.95rem;
+      font-variant-numeric: tabular-nums;
+    }
+    th,
+    td {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--line);
+    }
+    td.n,
+    th.n {
+      text-align: right;
+    }
+    figure {
+      margin: 28px 0;
+      padding: 18px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+    figcaption {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-top: 12px;
+    }
+    .cta {
+      margin-top: 48px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--card);
+    }
+    .cta p {
+      margin: 0 0 10px;
+    }
+    footer {
+      margin-top: 48px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <a class="logo" href="/">limitcast</a>
+        <nav><a href="/#how">Features</a> · <a href="/guide/">Guide</a> · <a href="https://github.com/SamStull9007/limitcast">GitHub</a></nav>
+      </header>
+
+      <article>
+        <h1>Claude Code usage limit reached: how the 5-hour and weekly limits work</h1>
+        <p class="byline">Sam Stull · 26 October 2026</p>
+
+        <p>
+          "You've hit your limit" usually arrives in the middle of something. Here is how Claude Code's limits work on a Pro, Max or Team plan,
+          what actually moves them, and how to see the end of a window coming instead of finding out from the error.
+        </p>
+
+        <p class="answer">
+          <b>There are two limits.</b> A session limit that resets every five hours, and a weekly limit that resets at a fixed time each week.
+          What fills them is mostly <b>new</b> tokens: on my account, 1% of the 5-hour limit was about 166k new tokens but about 11 million
+          cached ones.
+        </p>
+
+        <h2>The two windows</h2>
+        <ul>
+          <li>
+            <b>The 5-hour session limit.</b> Anthropic's help center: paid plans have "a session limit that resets every five hours, and weekly
+            limits that reset once every week"
+            (<a href="https://support.claude.com/en/articles/11647753-how-do-usage-and-length-limits-work">How do usage and length limits work?</a>).
+          </li>
+          <li>
+            <b>The weekly limit.</b> It "reset[s] at a fixed time each week that is assigned to your account", whenever you started using Claude
+            (<a href="https://support.claude.com/en/articles/8325606-what-is-the-pro-plan">What is the Pro plan?</a>).
+          </li>
+          <li>
+            <b>Where to see them.</b> Settings → Usage on claude.ai shows both as progress bars, with the time left in the current session
+            (<a href="https://support.claude.com/en/articles/9797557-usage-limit-best-practices">Usage limit best practices</a>). Claude Code also
+            passes the same readings to your status line, which is how a tool can show them while you work.
+          </li>
+        </ul>
+        <p>
+          When either one is used up you wait for its reset, or keep going on paid extra usage if you've turned that on. A full weekly limit
+          stops you even with room left in the 5-hour window.
+        </p>
+
+        <h2>What fills them: new tokens, not cached ones</h2>
+        <p>
+          The meter is a percentage, and Anthropic doesn't say how many tokens a percent is. I measured it on my own account by comparing each
+          rise of the 5-hour reading with the tokens my sessions used in between (61 observations, two days; the method is in
+          <a href="/blog/tokens-per-percent/">How many tokens is 1% of your Claude Code limit?</a>):
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th></th><th class="n">Tokens per 1% of the 5-hour limit</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>New tokens (input, cache writes, output)</td><td class="n">≈ 166k</td></tr>
+              <tr><td>Cached tokens (cache reads)</td><td class="n">≈ 11.2M</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="byline">One account, one plan. A fit on the previous day gave about 200k and 10.7M, so read these as a range.</p>
+        <p>
+          A cached token counted roughly 1/67 as much as a new one. Claude Code re-sends your whole conversation on every model call, but most
+          of it comes back from the cache, so a long session is cheaper than its size suggests. What runs a window out is anything that sends
+          <b>new</b> tokens:
+        </p>
+        <ul>
+          <li><b>Subagents.</b> Each one writes its own context from scratch. A typical one cost me about 2% of a 5-hour window (<a href="/blog/subagents/">Do subagents burn your limit faster?</a>).</li>
+          <li><b>Coming back after a long pause.</b> Once the prompt cache expires, the next message re-sends the whole context as new tokens (<a href="/blog/prompt-cache-idle/">Why a long idle pause costs you</a>).</li>
+          <li><b>Big tool output and file reads.</b> Everything new that enters the conversation is new tokens once.</li>
+          <li><b>A large starting context.</b> Instructions, tool lists and skills are written once per session and every subagent, then re-read on every call.</li>
+        </ul>
+
+        <h2>How to see the runout coming</h2>
+        <p>
+          The percentage alone doesn't say whether you'll make it to the reset. That depends on your pace: 70% with an hour left is fine at a
+          slow pace and a lockout in twenty minutes during a burst of subagents. limitcast does that arithmetic for you:
+        </p>
+        <pre>$ limitcast status
+window     used  burn      runs out  resets     today     status
+claude 5h  71%   +18.2%/h  16:40     17:00      -         AT_RISK
+claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   OK</pre>
+        <ul>
+          <li>The 5-hour window is forecast from the last hour's pace; <b>AT_RISK</b> means it runs out before it resets.</li>
+          <li>The weekly window uses your pace over the last full day, nights included, and shows today's even share of the week, so one busy hour doesn't cry wolf.</li>
+          <li>The same line sits in your Claude Code status line, from the readings Claude Code already passes to it. No login, nothing leaves your machine.</li>
+        </ul>
+        <p>
+          The free version gives you the forecast and the status line. <a href="/#pricing">Pro</a> also stops new subagents when a window is on
+          pace to run out within 30 minutes, moves them to Sonnet while it's tight, and sends a desktop notification before you hit the limit.
+        </p>
+
+        <h2>What to do when you're close</h2>
+        <ul>
+          <li><b>Don't start a fan-out near the end of a window.</b> Ten subagents at about 2% each are a fifth of it.</li>
+          <li><b>Compact long sessions</b> before a pause, not after: <code>/compact</code> shrinks what the next call has to re-send.</li>
+          <li><b>Queue the heavy job for after the reset</b> instead of starting it with 10% left.</li>
+          <li><b>Check what loads before you type.</b> Unused MCP servers and skills are re-sent on every call and to every subagent: <code>limitcast trim</code> measures them.</li>
+        </ul>
+
+        <h2>See your own numbers</h2>
+        <pre>npm install -g limitcast
+limitcast install     # adds the forecast to your status line; backs up settings.json
+limitcast status      # every window: used, burn rate, runout time, reset</pre>
+        <p>Node 20+, macOS or Linux. <a href="/#install">Install details</a> · <code>limitcast uninstall</code> restores your settings.</p>
+
+        <div class="cta">
+          <p>limitcast forecasts when each Claude Code and Codex window runs out, and its Pro plan stops runaway subagents before they burn the rest of it.</p>
+          <p>
+            <a href="/">See what limitcast does</a> · <a href="/#pricing">Pricing</a> ·
+            <a href="/blog/tokens-per-percent/">How many tokens is 1%?</a> · <a href="/blog/subagents/">Subagents and your limit</a> ·
+            <a href="/blog/prompt-cache-idle/">Idle pauses and the prompt cache</a>
+          </p>
+        </div>
+      </article>
+
+      <footer>limitcast is an independent tool and is not affiliated with Anthropic. Questions or your own numbers: support@limitcast.dev</footer>
+    </main>
+  </body>
+</html>

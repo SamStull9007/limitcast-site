@@ -23,6 +23,117 @@
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="limitcast: Stop getting locked out of Claude Code. A gauge with the forecast runout dashed to the limit.">
     <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "limitcast",
+  "url": "https://limitcast.dev/",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "macOS, Linux",
+  "description": "Forecasts when each Claude Code and Codex usage limit runs out, measures and trims the context every session loads, and stops runaway subagents. Runs locally.",
+  "image": "https://limitcast.dev/og.png",
+  "downloadUrl": "https://www.npmjs.com/package/limitcast",
+  "offers": [
+    {
+      "@type": "Offer",
+      "name": "Free",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    {
+      "@type": "Offer",
+      "name": "Pro, monthly",
+      "price": "9",
+      "priceCurrency": "USD"
+    },
+    {
+      "@type": "Offer",
+      "name": "Pro, yearly",
+      "price": "79",
+      "priceCurrency": "USD"
+    },
+    {
+      "@type": "Offer",
+      "name": "Team, per seat per year (3 seats minimum)",
+      "price": "69",
+      "priceCurrency": "USD"
+    }
+  ]
+}
+    </script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does it send my code or prompts anywhere?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk, and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the network, and Pro keeps working offline for 30 days after the last check."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it use my Claude login?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. It never touches your subscription credentials, so it can't put your account at risk."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "I use extra usage past my limit. Will the guard block me?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Once a window is used up, limitcast steps aside and leaves it to Claude Code. The guard only acts while you're heading toward a limit."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does it work with Codex and Grok?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: the burn report covers your Grok tokens, but Grok keeps no limit readings on disk, so there's no Grok runout forecast and the guard never blocks Grok."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What if I have two Claude accounts?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sessions of the same account share one history (matched by their limit reset times and usage that only rises), so even a short session gets a forecast, and two accounts used in parallel never mix."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Will one heavy hour make it say I'll run out of my weekly limit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The 5-hour window is forecast from the last hour's pace. The weekly window uses your average pace over the last full day, idle time included, so a burst on Monday doesn't predict a runout by Wednesday. The exception is a burst that would use up the week within the next hour: that still triggers the warning and the subagent guard."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does the free trial work?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Pick yearly or monthly and you get Pro for 14 days at no charge: your license key is ready as soon as you check out, in Polar's customer portal (linked from your confirmation email). Your card is charged when the trial ends. Cancel before then, in the same portal, and you pay nothing and the key stops working."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I get a refund?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes, within 14 days of any charge, no questions asked. Email support@limitcast.dev from the address you bought with and we'll refund it and cancel the subscription."
+      }
+    }
+  ]
+}
+    </script>
     <script
       data-goatcounter="https://limitcast.goatcounter.com/count"
       async
@@ -398,7 +509,12 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
         </div>
       </div>
       <p><small>Day one, from <code>limitcast results</code> and <code>limitcast report</code>. Measure your own: <code>npx limitcast results</code>.</small></p>
-      <p><a href="/blog/tokens-per-percent/">How many tokens is 1% of your Claude Code limit? →</a><br><a href="/blog/subagents/">Do subagents burn your limit faster? →</a></p>
+      <p>
+        <a href="/blog/claude-code-usage-limits/">Claude Code usage limit reached: how the 5-hour and weekly limits work →</a><br>
+        <a href="/blog/tokens-per-percent/">How many tokens is 1% of your Claude Code limit? →</a><br>
+        <a href="/blog/subagents/">Do subagents burn your limit faster? →</a><br>
+        <a href="/blog/prompt-cache-idle/">Why a long idle pause costs you: the prompt cache →</a>
+      </p>
 
       <h2 id="how">Everything you get</h2>
       <p class="muted">
