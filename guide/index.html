@@ -153,6 +153,25 @@ pre code {
 .dim {
 	color: var(--code-dim);
 }
+.sample {
+	margin: 4px 0 6px;
+	font-size: 13px;
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.sample.cols {
+	white-space: pre;
+}
+.sample .warn {
+	color: #fbbf24;
+}
+.sample .ok {
+	color: #4ade80;
+}
+.sample-note {
+	color: var(--muted);
+	font-size: 0.95rem;
+}
 .problem {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -317,6 +336,7 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 	</div>
 
 	<h2>What limitcast does</h2>
+	<p class="sample-note">Each feature shows the exact text limitcast prints. The numbers are an example; yours come from your own readings and transcripts.</p>
 
 	<section class="feature">
 		<div class="feature-head">
@@ -358,6 +378,14 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				the status line, a <code>today</code> column in <code>status</code>.
 			</li>
 		</ul>
+		<pre class="sample cols">$ limitcast status
+window     used  burn      runs out  resets     today     status
+claude 5h  71%   +18.2%/h  16:40     17:00      -         <span class="warn">AT_RISK</span>
+claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   <span class="ok">OK</span>
+codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</span>
+
+<span class="dim"># in the status line:</span>
+5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			you see the lockout coming while there's still time to slow down, switch
@@ -418,6 +446,13 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				>) and <code>--undo</code> restores the file exactly.
 			</li>
 		</ul>
+		<pre class="sample">$ limitcast trim --apply
+✓ Hid 66 skills from the model (`/name` still works): dataviz, block-kit, …
+✓ Turned off 9 MCP servers for ~/work/api: postman, context7, …
+Takes effect in your next Claude Code session. Undo: `limitcast trim --undo`
+
+$ limitcast trim --codex --apply
+✓ Turned off 3 Codex MCP servers (enabled = false in ~/.codex/config.toml): firecrawl, icm, node_repl</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			every token you cut is saved on every turn of every session and every
@@ -468,6 +503,11 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				already approved keep their approval.
 			</li>
 		</ul>
+		<pre class="sample"><span class="dim"># a new subagent, 21 minutes before the window runs out:</span>
+limitcast: Claude 5h limit is 93% used and on pace to run out in ~21 min, before it resets. Finish with the agents already running, or set LIMITCAST_ALLOW=1 to spawn anyway.
+
+<span class="dim"># a new subagent while the window is tight:</span>
+limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			stops the most common way people lose the end of a window: a burst of
@@ -492,6 +532,12 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				records.
 			</li>
 		</ul>
+		<pre class="sample cols">$ limitcast report --days 7
+| tool   | tokens | output | cache reads | share |
+| claude | 863.6M |   2.9M |      840.8M |   99% |
+| codex  |  12.9M |  44.1k |       12.6M |    1% |
+
+Subagents used <b>21%</b> of Claude tokens.</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			shows which projects, models or habits use up your plan, across all three
@@ -519,6 +565,9 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				ahead it warned, subagents stopped, tokens not re-sent.
 			</li>
 		</ul>
+		<pre class="sample">limitcast: your Claude Code starting context grew ~3.4k tokens since your last session (MCP server instructions: linear new~2.1k, Instruction files: ~/CLAUDE.md +~1.3k). Run `limitcast trim` for details.
+
+limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent. Details: limitcast results</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			catches a new plugin, a growing CLAUDE.md or a chatty hook the day it
@@ -557,6 +606,14 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				run you out.
 			</li>
 		</ul>
+		<pre class="sample">$ limitcast results
+<b>Since limitcast started watching</b>
+- <b>2.9M tokens not re-sent.</b> Your sessions now start smaller than the first one limitcast measured…
+  Against your limit: <b>≈ 0.31% of a 5-hour window.</b> From your own readings, 1% of it is about 167.0k new tokens or 11.2M cached ones…
+- <b>Warned you before 1 of the 1 limits it watched you approach</b>, on average 40 min ahead.
+
+<b>Limits reached</b>
+- Claude 7d: hit Sat, Oct 24, 20:51, warned 40 min ahead</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			you can check that limitcast works, and see what it's worth, from your own
@@ -601,6 +658,14 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				puts results, your current windows and the burn report on one page.
 			</li>
 		</ul>
+		<pre class="sample"><span class="dim"># desktop notification:</span>
+limitcast — Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.
+
+<span class="dim"># status line, when you need it:</span>
+limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact
+
+$ limitcast after-reset --detach -- claude -p "run the full test suite"
+Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			you hear about a limit before you hit it, and the heavy work waits for the
@@ -645,6 +710,12 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				inside a session.
 			</li>
 		</ul>
+		<pre class="sample cols">$ limitcast doctor
+✓ Status-line recorder installed
+✓ Hook launcher points at this Node and limitcast
+✓ Claude Code subagent guard installed
+✓ Codex subagent guard installed and trusted
+✓ Last Claude reading 0 min ago</pre>
 	</section>
 
 	<h2>Privacy</h2>
@@ -742,6 +813,14 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 			purchase address.
 		</li>
 	</ul>
+
+	<h2>What happens when you buy</h2>
+	<ol class="facts">
+		<li><strong>Start the trial.</strong> Pick yearly or monthly; Polar handles checkout. Nothing is charged for 14 days.</li>
+		<li><strong>Get your key.</strong> It's in Polar's customer portal, linked from your confirmation email, and starts with <code>LIMITCAST-</code>.</li>
+		<li><strong>Turn on Pro, in one minute.</strong> <code>limitcast activate &lt;key&gt;</code>, then <code>limitcast install --guard --alerts</code> and <code>limitcast notify on</code>. Restart Claude Code.</li>
+		<li><strong>Check it in a week.</strong> <code>limitcast results</code> shows what it warned you about, stopped and saved. Not worth it? Cancel in the portal before day 14 and pay nothing.</li>
+	</ol>
 
 	<h2>What works with which tool</h2>
 	<div class="table-wrap">
