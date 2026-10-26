@@ -262,11 +262,19 @@
           <li><b>Watch your context size.</b> limitcast Pro puts a <code>/compact</code> nudge in the status line once a session re-sends more than ~150k tokens per call.</li>
         </ul>
 
-        <h2>Coming in limitcast 0.11: a warning before the expensive message</h2>
+        <h2>limitcast 0.11: a warning before the expensive message</h2>
         <p>
-          The next limitcast release adds a cold-cache warning to Pro: when a large session has sat idle past the cache lifetime, it holds your
-          first message once and tells you what it will cost against your own measured limit, so you can send it anyway or <code>/compact</code>
-          first. It isn't released yet; this post will link it when it is.
+          limitcast Pro now has a cold-cache warning. When a session that re-sends 100k+ tokens has sat idle past the cache lifetime (60 minutes
+          by default, <code>LIMITCAST_CACHE_MINUTES</code> to change it), it holds your first message once and tells you what it will cost against
+          your own measured limit. Send it again to go ahead, or <code>/compact</code> first:
+        </p>
+        <pre>limitcast: this session sat idle for 75 minutes, so its prompt cache has
+expired. Your message re-sends 300k tokens of context: ≈1.8% of your
+5-hour window (≈0.03% if the cache were still warm). Send it again to go
+ahead, or run /compact first to shrink it.</pre>
+        <p>
+          It comes with <code>limitcast install --guard</code> (<a href="/#install">install</a>); free installs record what it would have held.
+          Already installed with <code>--guard</code>? Run <code>limitcast doctor --fix</code> to add it. <a href="/#f-cold">More on the warning</a>
         </p>
 
         <h2>Measure your own numbers</h2>

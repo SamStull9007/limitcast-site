@@ -72,7 +72,7 @@
       "name": "Does it send my code or prompts anywhere?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk, and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the network, and Pro keeps working offline for 30 days after the last check."
+        "text": "No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk, and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the network, and Pro keeps working offline for 30 days after the last check. If you turn on phone or webhook notifications (Pro, off by default), each notification's text goes to the service you chose (ntfy.sh or your webhook), and nothing else does."
       }
     },
     {
@@ -576,13 +576,50 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on
 Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
       </section>
 
+      <section class="feature" id="f-receipts">
+        <div>
+          <h3>Subagent receipts and budgets <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
+          <p>
+            Each time a subagent finishes, you see what it cost against your 5-hour window, priced from your own readings (the model never sees
+            it). Set a budget and the guard holds new subagents once they've used that share of the current window, until it resets.
+          </p>
+        </div>
+        <pre>limitcast: that Explore subagent used ≈2.1% of your 5-hour window
+(34 calls, 180k new tokens).
+
+$ limitcast budget subagents 15
+Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%.
+Once it's spent, the guard holds new subagents until the window resets.</pre>
+      </section>
+
+      <section class="feature" id="f-cold">
+        <div>
+          <h3>Cold-cache warning <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
+          <p>
+            Come back to a big session after a long break and the prompt cache has expired: your next message re-sends the whole context as new
+            tokens. limitcast holds that first message once and tells you what it will cost, so you can <code>/compact</code> first. Send it again
+            and it goes through. The cache lifetime is 60 minutes by default (<code>LIMITCAST_CACHE_MINUTES</code>).
+          </p>
+          <p class="pro-note">Free installs record what it would have held; <code>results</code> shows it.</p>
+        </div>
+        <pre>limitcast: this session sat idle for 75 minutes, so its prompt cache has
+expired. Your message re-sends 300k tokens of context: ≈1.8% of your
+5-hour window (≈0.03% if the cache were still warm). Send it again to go
+ahead, or run /compact first to shrink it.</pre>
+      </section>
+
       <section class="feature" id="f-notify">
         <div>
-          <h3>Desktop notifications <span class="badge pro">Pro</span></h3>
+          <h3>Notifications: desktop, phone or Slack <span class="badge pro">Pro</span></h3>
           <p>
             One notification when a Claude window turns NEAR, AT_RISK or HIT, and one when it resets after a HIT, so you can step away and come back
             at the right time. On macOS they come from limitcast's own notifier app, listed under its name in System Settings. Linux uses
             notify-send.
+          </p>
+          <p>
+            <b>New in 0.11:</b> the same messages on your phone through <a href="https://ntfy.sh">ntfy</a>
+            (<code>limitcast notify ntfy &lt;topic&gt;</code>) or in a Slack or Discord channel (<code>limitcast notify webhook &lt;url&gt;</code>).
+            Opt-in; only the notification text is sent, to the service you chose.
           </p>
         </div>
         <div class="notif" role="img" aria-label="Example notification: Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.">
@@ -660,6 +697,20 @@ Instruction files: ~/CLAUDE.md +~1.3k). Run `limitcast trim` for details.
 
 limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min),
 guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent.</pre>
+      </section>
+
+      <section class="feature" id="f-limitchange">
+        <div>
+          <h3>Limit-change alert <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
+          <p>
+            Every day limitcast re-measures how many tokens move your 5-hour meter by 1%, from your own readings. When that shifts by 15% or more
+            against the weeks before, you get a notification, so you know when the limit itself changed rather than your habits.
+          </p>
+        </div>
+        <div class="notif" role="img" aria-label="Example notification: Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.">
+          <img src="/icon.png" alt="" width="40" height="40">
+          <div><b>limitcast</b><br>Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.</div>
+        </div>
       </section>
 
       <section class="feature" id="f-after">
@@ -756,7 +807,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
             </tr>
             <tr>
               <td>Stops subagents before you run out</td>
-              <td>Yes, Claude Code and Codex; on a tight window, moves new Claude subagents to Sonnet</td>
+              <td>Yes, Claude Code and Codex; on a tight window, moves new Claude subagents to Sonnet; optional subagent budget per 5-hour window</td>
               <td>No</td>
               <td>No (hooks observe only)</td>
               <td>No</td>
@@ -824,7 +875,10 @@ limitcast doctor</pre>
             <li>Trim advisor: names what to cut and what each costs</li>
             <li>One command makes the cuts; one undoes them (Claude Code and Codex)</li>
             <li>Subagent guard: blocks runaway subagents, switches to Sonnet when a window is tight</li>
-            <li>Desktop notifications, and jobs that run after the reset</li>
+            <li>What each subagent cost, and a subagent budget per window</li>
+            <li>Cold-cache warning before a message re-sends an expired context</li>
+            <li>Notifications on desktop, phone (ntfy) or Slack/Discord, and when your limit itself changes</li>
+            <li>Jobs that run after the reset</li>
             <li>Other-account pointer and a /compact nudge in the status line</li>
             <li>Alerts when your starting context grows, and a weekly summary</li>
             <li>Burn report and dashboard across Claude Code, Codex and Grok</li>
@@ -873,7 +927,11 @@ limitcast doctor</pre>
             <tr><td>Moves new subagents to Sonnet while a window is tight</td><td>Preview only</td><td>✓</td></tr>
             <tr><td><a href="#f-trim">Trim advisor</a>: names each unused server, skill and hook, and its cost</td><td>Totals only</td><td>✓</td></tr>
             <tr><td><code>trim --apply</code> / <code>--undo</code>, for Claude Code and Codex</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-notify">Desktop notifications</a> (macOS, Linux)</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-receipts">Subagent receipts</a>: what each finished subagent cost against your window</td><td></td><td>✓</td></tr>
+            <tr><td>Subagent budget per 5-hour window (<code>limitcast budget subagents 15</code>)</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-cold">Cold-cache warning</a> before a message re-sends an expired context</td><td>Preview only</td><td>✓</td></tr>
+            <tr><td><a href="#f-notify">Notifications</a>: desktop (macOS, Linux), phone (ntfy), Slack or Discord webhook</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-limitchange">Limit-change alert</a> when your tokens per 1% shift 15% or more</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-after">Run a job after the reset</a></td><td></td><td>✓</td></tr>
             <tr><td>Pointer to your other Claude account, <code>/compact</code> nudge</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-alerts">Starting-context alerts</a> and a weekly summary</td><td></td><td>✓</td></tr>
@@ -891,7 +949,7 @@ limitcast doctor</pre>
           No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk,
           and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you
           deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the
-          network, and Pro keeps working offline for 30 days after the last check.
+          network, and Pro keeps working offline for 30 days after the last check. If you turn on phone or webhook notifications (Pro, off by default), each notification's text goes to the service you chose (ntfy.sh or your webhook), and nothing else does.
         </p>
       </details>
       <details>

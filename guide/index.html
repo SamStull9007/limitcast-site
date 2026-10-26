@@ -517,6 +517,75 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITC
 
 	<section class="feature">
 		<div class="feature-head">
+			<h3>Subagent receipts and budgets</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast budget subagents &lt;percent&gt;|off</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.11. When a subagent finishes, a SubagentStop hook prices it from
+				its own transcript against your 5-hour window, using your own
+				calibration, and shows you the receipt. The model never sees it.
+			</li>
+			<li>
+				<code>limitcast budget subagents 15</code>
+				makes the guard hold new subagents once subagents have used 15% of the
+				current 5-hour window, until it resets. <code>off</code> removes it;
+				<code>limitcast budget subagents</code> shows what's used so far.
+			</li>
+			<li>
+				Pricing needs about a day of your own readings first; until then
+				nothing counts against the budget. <code>limitcast results</code>
+				totals your subagents and names the biggest.
+			</li>
+		</ul>
+		<pre class="sample">limitcast: that Explore subagent used ≈2.1% of your 5-hour window (34 calls, 180k new tokens).
+
+$ limitcast budget subagents 15
+Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. Once it's spent, the guard holds new subagents until the window resets.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			you see which subagents are expensive while you're still working, and a
+			cap keeps one busy hour of agents from eating the whole window.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Cold-cache warning</h3>
+			<span class="tier">Free preview</span>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast install --guard</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.11. After a long pause the prompt cache has expired, and your
+				next message re-sends the whole context as new tokens, which count far
+				more against your limit than cached ones.
+			</li>
+			<li>
+				When a session that re-sends 100k+ tokens has been idle longer than the
+				cache lives (60 minutes; set <code>LIMITCAST_CACHE_MINUTES</code>), a
+				UserPromptSubmit hook holds that first message once and says what it
+				will cost. Send it again and it goes through, or run
+				<code>/compact</code> first.
+			</li>
+			<li>
+				Never holds messages from background agents, <code>/compact</code> or
+				<code>/clear</code>. If the hook fails, the message goes through.
+				<strong>Free</strong> installs record what it would have held.
+			</li>
+		</ul>
+		<pre class="sample">limitcast: this session sat idle for 75 minutes, so its prompt cache has expired. Your message re-sends 300k tokens of context: ≈1.8% of your 5-hour window (≈0.03% if the cache were still warm). Send it again to go ahead, or run /compact first to shrink it.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			a "continue" after lunch no longer quietly costs a slice of your window;
+			you decide whether to compact first.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
 			<h3>Burn report</h3>
 			<span class="tier pro">Pro</span>
 			<span class="cmd">limitcast report [--days N] [--out FILE]</span>
@@ -625,7 +694,7 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 		<div class="feature-head">
 			<h3>Acts for you</h3>
 			<span class="tier pro">Pro</span>
-			<span class="cmd">notify · after-reset · results --html</span>
+			<span class="cmd">notify · budget · after-reset · results --html</span>
 		</div>
 		<ul>
 			<li>
@@ -635,6 +704,19 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 				limitcast notifier app (no Dock icon), so "limitcast" has its own entry
 				in System Settings → Notifications; allow it there, and pick Persistent
 				to keep a warning on screen until you dismiss it.
+			</li>
+			<li>
+				New in 0.11: <code>limitcast notify ntfy &lt;topic&gt;</code> also sends
+				every notification to your phone through ntfy (install the ntfy app and
+				subscribe to the topic), and
+				<code>limitcast notify webhook &lt;url&gt;</code> to a Slack or Discord
+				incoming webhook. <code>off</code> removes either. They're sent in the
+				background, so no hook waits on the network.
+			</li>
+			<li>
+				New in 0.11: every day limitcast re-measures how many tokens move your
+				5-hour meter by 1%. When that shifts by 15% or more against the weeks
+				before, you get a notification that your limit itself changed.
 			</li>
 			<li>
 				<code>limitcast after-reset -- &lt;command&gt;</code>
@@ -658,8 +740,9 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 				puts results, your current windows and the burn report on one page.
 			</li>
 		</ul>
-		<pre class="sample"><span class="dim"># desktop notification:</span>
+		<pre class="sample"><span class="dim"># desktop notification (and your phone or Slack, if you set one):</span>
 limitcast — Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.
+limitcast — Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.
 
 <span class="dim"># status line, when you need it:</span>
 limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact
@@ -701,6 +784,11 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				<code>doctor --fix</code> re-installs with the current Node.
 			</li>
 			<li>
+				Already installed with <code>--guard</code> before 0.11? Run
+				<code>limitcast doctor --fix</code> to add the subagent receipts and the
+				cold-cache warning.
+			</li>
+			<li>
 				<code>limitcast trial</code>
 				turns on Pro for 7 days on this computer, with no card, once.
 			</li>
@@ -729,6 +817,11 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 			A Pro license talks to Polar, the payment and licensing service, only to
 			activate, for a weekly background check, and to deactivate. Each call
 			sends the license key and your computer's name.
+		</li>
+		<li>
+			Phone and webhook notifications (Pro) are off until you turn them on. Then
+			each notification's text goes to the service you chose, ntfy.sh or your
+			webhook, and nothing else does.
 		</li>
 		<li>Hooks never wait on the network.</li>
 	</ul>
@@ -789,7 +882,17 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<td class="yes">✓</td>
 				</tr>
 				<tr>
-					<td>Notifications, after-reset jobs, account pointer, dashboard</td>
+					<td>Subagent receipts and a subagent budget per window</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Cold-cache warning</td>
+					<td class="muted">Preview</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Notifications (desktop, phone, Slack or Discord), limit-change alerts, after-reset jobs, account pointer, dashboard</td>
 					<td></td>
 					<td class="yes">✓</td>
 				</tr>
@@ -869,7 +972,7 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 	</div>
 
 	<h2>Get started</h2>
-	<pre><code>npm install -g limitcast     <span class="dim"># or: brew install samstull9007/limitcast/limitcast</span>
+	<pre><code>npm install -g limitcast     <span class="dim"># or: brew trust samstull9007/limitcast &amp;&amp; brew install samstull9007/limitcast/limitcast</span>
 limitcast install            <span class="dim"># free: status-line recorder</span>
 limitcast trial              <span class="dim"># Pro free for 7 days, no card</span>
 limitcast activate &lt;key&gt;     <span class="dim"># Pro</span>
@@ -877,8 +980,9 @@ limitcast install --guard    <span class="dim"># the subagent guard (free: previ
 limitcast doctor
 limitcast results            <span class="dim"># what limitcast did for you</span></code></pre>
 	<p class="muted">
-		Requires Node 20 or later on macOS or Linux. Restart Claude Code after
-		installing. To add the slash commands, run
+		Requires Node 20 or later on macOS or Linux. Homebrew 7 and later asks you to
+		trust a third-party tap before installing from it, hence the
+		<code>brew trust</code>. Restart Claude Code after installing. To add the slash commands, run
 		<code>claude plugin install limitcast --marketplace SamStull9007/limitcast</code>
 		in a terminal, or inside Claude Code
 		<code>/plugin marketplace add SamStull9007/limitcast</code>, then
