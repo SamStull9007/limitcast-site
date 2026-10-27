@@ -1,387 +1,468 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>limitcast feature guide</title>
-<meta name="description" content="Every limitcast feature for Claude Code, Codex and Grok users: runout forecast, trim advisor, subagent guard, burn report, results, privacy, and Free vs Pro.">
-<link rel="canonical" href="https://limitcast.dev/guide/">
-<link rel="icon" type="image/png" href="/icon.png">
-<link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://limitcast.dev/guide/">
-<meta property="og:title" content="limitcast feature guide">
-<meta property="og:description" content="Every limitcast feature for Claude Code, Codex and Grok users, and what Free and Pro include.">
-<meta property="og:image" content="https://limitcast.dev/og.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<script data-goatcounter="https://limitcast.goatcounter.com/count" async src="https://gc.zgo.at/count.v4.js" integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+" crossorigin="anonymous"></script>
-<style>
-body { margin: 0; }
-/* Layout: one reading column; each feature is a ruled row with a tier tag and the command it runs. Palette and type follow limitcast.dev. */
-:root {
-	--bg: #fbfaf7;
-	--fg: #1d1c1a;
-	--muted: #5f5c55;
-	--line: #e4e0d8;
-	--card: #ffffff;
-	--accent: #c2410c;
-	--accent-soft: #fbe9df;
-	--code-bg: #1d1c1a;
-	--code-fg: #f3efe6;
-	--code-dim: #a8a399;
-	--ok: #15803d;
-	--font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-	--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-}
-@media (prefers-color-scheme: dark) {
-	:root:not([data-theme="light"]) {
-		--bg: #141312;
-		--fg: #eeeae2;
-		--muted: #a8a399;
-		--line: #2c2a27;
-		--card: #1b1a18;
-		--accent: #f97316;
-		--accent-soft: #2e1d12;
-		--code-bg: #0c0b0a;
-		--code-fg: #eeeae2;
-		--code-dim: #8a857c;
-		--ok: #4ade80;
-		color-scheme: dark;
-	}
-}
-:root[data-theme="dark"] {
-	--bg: #141312;
-	--fg: #eeeae2;
-	--muted: #a8a399;
-	--line: #2c2a27;
-	--card: #1b1a18;
-	--accent: #f97316;
-	--accent-soft: #2e1d12;
-	--code-bg: #0c0b0a;
-	--code-fg: #eeeae2;
-	--code-dim: #8a857c;
-	--ok: #4ade80;
-	color-scheme: dark;
-}
-* {
-	box-sizing: border-box;
-}
-body {
-	background: var(--bg);
-	color: var(--fg);
-	font: 17px / 1.6 var(--font-body);
-}
-main {
-	max-width: 820px;
-	margin: 0 auto;
-	padding-left: max(16px, env(safe-area-inset-left, 0px));
-	padding-right: max(16px, env(safe-area-inset-right, 0px));
-	padding-block: 32px 72px;
-}
-.brand {
-	font-weight: 700;
-	letter-spacing: -0.02em;
-	display: flex;
-	justify-content: space-between;
-	align-items: baseline;
-	gap: 16px;
-	flex-wrap: wrap;
-}
-.brand a {
-	color: var(--muted);
-	font-weight: 400;
-	font-size: 0.95rem;
-}
-h1 {
-	font-size: clamp(2rem, 5.5vw, 3rem);
-	line-height: 1.1;
-	letter-spacing: -0.03em;
-	margin: 40px 0 16px;
-	text-wrap: balance;
-}
-h2 {
-	font-size: 1.5rem;
-	letter-spacing: -0.02em;
-	margin: 64px 0 8px;
-	text-wrap: balance;
-}
-h3 {
-	font-size: 1.15rem;
-	letter-spacing: -0.01em;
-	margin: 0;
-}
-p {
-	margin: 0 0 12px;
-	max-width: 65ch;
-}
-.lede {
-	font-size: 1.2rem;
-	color: var(--muted);
-}
-.muted {
-	color: var(--muted);
-}
-a {
-	color: var(--accent);
-}
-a:focus-visible {
-	outline: 2px solid var(--accent);
-	outline-offset: 2px;
-}
-code {
-	font: 0.9em var(--font-mono);
-	background: var(--accent-soft);
-	padding: 1px 5px;
-	border-radius: 4px;
-}
-pre {
-	background: var(--code-bg);
-	color: var(--code-fg);
-	padding: 18px 20px;
-	border-radius: 10px;
-	overflow-x: auto;
-	font: 14px / 1.55 var(--font-mono);
-	margin: 24px 0;
-}
-pre code {
-	background: none;
-	padding: 0;
-	font: inherit;
-}
-.dim {
-	color: var(--code-dim);
-}
-.sample {
-	margin: 4px 0 6px;
-	font-size: 13px;
-	white-space: pre-wrap;
-	overflow-wrap: anywhere;
-}
-.sample.cols {
-	white-space: pre;
-}
-.sample .warn {
-	color: #fbbf24;
-}
-.sample .ok {
-	color: #4ade80;
-}
-.sample-note {
-	color: var(--muted);
-	font-size: 0.95rem;
-}
-.problem {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-	gap: 16px;
-	margin-top: 20px;
-}
-.problem div {
-	border: 1px solid var(--line);
-	background: var(--card);
-	border-radius: 10px;
-	padding: 18px 20px;
-	min-width: 0;
-}
-.problem p {
-	margin: 6px 0 0;
-	color: var(--muted);
-}
-.feature {
-	border-top: 1px solid var(--line);
-	padding-block: 28px;
-	display: grid;
-	gap: 10px;
-}
-.feature:last-of-type {
-	border-bottom: 1px solid var(--line);
-}
-.feature-head {
-	display: flex;
-	gap: 10px 14px;
-	align-items: baseline;
-	flex-wrap: wrap;
-}
-.tier {
-	font: 600 0.72rem / 1 var(--font-body);
-	text-transform: uppercase;
-	letter-spacing: 0.08em;
-	padding: 4px 8px;
-	border-radius: 999px;
-	border: 1px solid var(--line);
-	color: var(--muted);
-}
-.tier.pro {
-	border-color: var(--accent);
-	color: var(--accent);
-}
-.cmd {
-	font: 0.88rem var(--font-mono);
-	color: var(--muted);
-	overflow-wrap: anywhere;
-}
-.feature ul {
-	margin: 0;
-	padding-left: 20px;
-	max-width: 65ch;
-}
-.feature li {
-	margin-bottom: 4px;
-}
-.gain {
-	margin: 4px 0 0;
-	padding-left: 14px;
-	border-left: 3px solid var(--accent);
-}
-.gain strong {
-	color: var(--accent);
-}
-.table-wrap {
-	overflow-x: auto;
-	margin-top: 16px;
-}
-table {
-	border-collapse: collapse;
-	width: 100%;
-	min-width: 520px;
-	font-size: 0.95rem;
-}
-th,
-td {
-	text-align: left;
-	padding: 10px 12px;
-	border-bottom: 1px solid var(--line);
-	vertical-align: top;
-}
-th {
-	font-size: 0.8rem;
-	text-transform: uppercase;
-	letter-spacing: 0.06em;
-	color: var(--muted);
-	font-weight: 600;
-}
-td.yes {
-	color: var(--ok);
-	font-weight: 600;
-}
-.price {
-	font-variant-numeric: tabular-nums;
-	font-weight: 700;
-}
-.facts {
-	display: grid;
-	gap: 8px;
-	margin-top: 16px;
-	padding-left: 20px;
-	max-width: 65ch;
-}
-footer {
-	margin-top: 56px;
-	color: var(--muted);
-	font-size: 0.92rem;
-}
-</style>
-</head>
-<body>
+	<head>
+		<meta charset="utf-8">
+		<meta
+			name="viewport"
+			content="width=device-width, initial-scale=1, viewport-fit=cover"
+		>
+		<title>limitcast feature guide</title>
+		<meta
+			name="description"
+			content="Every limitcast feature for Claude Code, Codex and Grok users: runout forecast, trim advisor, subagent guard, burn report, results, privacy, and Free vs Pro."
+		>
+		<link rel="canonical" href="https://limitcast.dev/guide/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://limitcast.dev/guide/">
+		<meta property="og:title" content="limitcast feature guide">
+		<meta
+			property="og:description"
+			content="Every limitcast feature for Claude Code, Codex and Grok users, and what Free and Pro include."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		body {
+			margin: 0;
+		}
+		/* Layout: one reading column; each feature is a ruled row with a tier tag and the command it runs. Palette and type follow limitcast.dev. */
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--accent-soft: #fbe9df;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+			--code-dim: #a8a399;
+			--ok: #15803d;
+			--font-body:
+				ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+			--font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root:not([data-theme="light"]) {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--accent-soft: #2e1d12;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+				--code-dim: #8a857c;
+				--ok: #4ade80;
+				color-scheme: dark;
+			}
+		}
+		:root[data-theme="dark"] {
+			--bg: #141312;
+			--fg: #eeeae2;
+			--muted: #a8a399;
+			--line: #2c2a27;
+			--card: #1b1a18;
+			--accent: #f97316;
+			--accent-soft: #2e1d12;
+			--code-bg: #0c0b0a;
+			--code-fg: #eeeae2;
+			--code-dim: #8a857c;
+			--ok: #4ade80;
+			color-scheme: dark;
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			background: var(--bg);
+			color: var(--fg);
+			font: 17px / 1.6 var(--font-body);
+		}
+		main {
+			max-width: 820px;
+			margin: 0 auto;
+			padding-left: max(16px, env(safe-area-inset-left, 0px));
+			padding-right: max(16px, env(safe-area-inset-right, 0px));
+			padding-block: 32px 72px;
+		}
+		.brand {
+			font-weight: 700;
+			letter-spacing: -0.02em;
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			gap: 16px;
+			flex-wrap: wrap;
+		}
+		.brand a {
+			color: var(--muted);
+			font-weight: 400;
+			font-size: 0.95rem;
+		}
+		h1 {
+			font-size: clamp(2rem, 5.5vw, 3rem);
+			line-height: 1.1;
+			letter-spacing: -0.03em;
+			margin: 40px 0 16px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.5rem;
+			letter-spacing: -0.02em;
+			margin: 64px 0 8px;
+			text-wrap: balance;
+		}
+		h3 {
+			font-size: 1.15rem;
+			letter-spacing: -0.01em;
+			margin: 0;
+		}
+		p {
+			margin: 0 0 12px;
+			max-width: 65ch;
+		}
+		.lede {
+			font-size: 1.2rem;
+			color: var(--muted);
+		}
+		.muted {
+			color: var(--muted);
+		}
+		a {
+			color: var(--accent);
+		}
+		a:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: 2px;
+		}
+		code {
+			font: 0.9em var(--font-mono);
+			background: var(--accent-soft);
+			padding: 1px 5px;
+			border-radius: 4px;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 18px 20px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font: 14px / 1.55 var(--font-mono);
+			margin: 24px 0;
+		}
+		pre code {
+			background: none;
+			padding: 0;
+			font: inherit;
+		}
+		.dim {
+			color: var(--code-dim);
+		}
+		.sample {
+			margin: 4px 0 6px;
+			font-size: 13px;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+		.sample.cols {
+			white-space: pre;
+		}
+		.sample .warn {
+			color: #fbbf24;
+		}
+		.sample .ok {
+			color: #4ade80;
+		}
+		.sample-note {
+			color: var(--muted);
+			font-size: 0.95rem;
+		}
+		.problem {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 16px;
+			margin-top: 20px;
+		}
+		.problem div {
+			border: 1px solid var(--line);
+			background: var(--card);
+			border-radius: 10px;
+			padding: 18px 20px;
+			min-width: 0;
+		}
+		.problem p {
+			margin: 6px 0 0;
+			color: var(--muted);
+		}
+		.feature {
+			border-top: 1px solid var(--line);
+			padding-block: 28px;
+			display: grid;
+			gap: 10px;
+		}
+		.feature:last-of-type {
+			border-bottom: 1px solid var(--line);
+		}
+		.feature-head {
+			display: flex;
+			gap: 10px 14px;
+			align-items: baseline;
+			flex-wrap: wrap;
+		}
+		.tier {
+			font: 600 0.72rem / 1 var(--font-body);
+			text-transform: uppercase;
+			letter-spacing: 0.08em;
+			padding: 4px 8px;
+			border-radius: 999px;
+			border: 1px solid var(--line);
+			color: var(--muted);
+		}
+		.tier.pro {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+		.cmd {
+			font: 0.88rem var(--font-mono);
+			color: var(--muted);
+			overflow-wrap: anywhere;
+		}
+		.feature ul {
+			margin: 0;
+			padding-left: 20px;
+			max-width: 65ch;
+		}
+		.feature li {
+			margin-bottom: 4px;
+		}
+		.gain {
+			margin: 4px 0 0;
+			padding-left: 14px;
+			border-left: 3px solid var(--accent);
+		}
+		.gain strong {
+			color: var(--accent);
+		}
+		.table-wrap {
+			overflow-x: auto;
+			margin-top: 16px;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			min-width: 520px;
+			font-size: 0.95rem;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 10px 12px;
+			border-bottom: 1px solid var(--line);
+			vertical-align: top;
+		}
+		th {
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			letter-spacing: 0.06em;
+			color: var(--muted);
+			font-weight: 600;
+		}
+		td.yes {
+			color: var(--ok);
+			font-weight: 600;
+		}
+		.price {
+			font-variant-numeric: tabular-nums;
+			font-weight: 700;
+		}
+		.facts {
+			display: grid;
+			gap: 8px;
+			margin-top: 16px;
+			padding-left: 20px;
+			max-width: 65ch;
+		}
+		footer {
+			margin-top: 56px;
+			color: var(--muted);
+			font-size: 0.92rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<div class="brand">
+				<span>limitcast</span>
+				<span><a href="/">limitcast.dev</a> · <a href="/blog/">Blog</a></span>
+			</div>
 
-<main>
-	<div class="brand">
-		<span>limitcast</span>
-		<span><a href="/">limitcast.dev</a> · <a href="/blog/">Blog</a></span>
-	</div>
+			<h1>Get more work from your AI coding plan</h1>
+			<p class="lede">
+				limitcast is a command-line tool that shows what fills your context,
+				warns you before a usage window runs out, and stops new subagents that
+				would use up the rest of it. Then it separates recorded actions from
+				estimated context reduction. It reads data already on your machine. No
+				logins.
+			</p>
 
-	<h1>Stretch your Claude Code plan</h1>
-	<p class="lede">
-		limitcast is a command-line tool that shows what fills your context, warns
-		you before a usage window runs out, and stops new subagents that would use
-		up the rest of it. Then it shows you what that saved. It reads data already
-		on your machine. No logins.
-	</p>
+			<pre><code><span class="dim">$</span> limitcast trim
+This example Claude Code session started at 102.7k tokens before the first message.
 
-	<pre><code><span class="dim">$</span> limitcast trim
-Every Claude Code session starts at 102.7k tokens before your first message.
-
-## Measured savings: ~6.2k tokens per session (6% of your starting context)
+## Estimated removable context: ~6.2k tokens (6% of this starting context)
 - Disable 9 MCP servers you haven't used in 14 days (~0.9k): postman, context7, ...
 - Hide 66 skills from the model (~5.3k): dataviz, block-kit, ...</code></pre>
 
-	<h2>Where your plan goes</h2>
-	<p class="muted">
-		Claude Code and Codex plans meter usage in rolling windows, such as a 5-hour
-		window and a weekly one. Two things use them up faster than most people
-		notice.
-	</p>
-	<div class="problem">
-		<div>
-			<h3>Starting context</h3>
+			<h2>Start with your own setup</h2>
+			<pre><code>npm install -g limitcast
+limitcast onboard</code></pre>
 			<p>
-				Every session loads about 100k tokens before you type: hook output, MCP
-				server instructions and tool lists, skill listings, agent lists and
-				CLAUDE.md files. That block is sent again on every turn and to every
-				subagent.
+				<code>onboard</code>
+				is read-only: it checks setup and gives the next command.
+				<code>doctor</code>
+				checks installation and data;
+				<code>trim</code>
+				analyzes context. After installing the recorder, restart your coding
+				tool and complete a normal turn before expecting live readings.
 			</p>
-		</div>
-		<div>
-			<h3>Subagents</h3>
 			<p>
-				Each subagent starts with its own copy of that context. A few parallel
-				subagents late in a window can use up the rest of it, and you find out
-				when you're locked out.
+				Choose trials explicitly: <code>limitcast trial</code> gives 7 days of
+				Pro without a card. The separate Polar checkout trial gives 14 days,
+				then bills your selected subscription. Protection needs
+				<code>limitcast install --guard --alerts</code>, a restart, and Codex
+				hook approval when requested. A configured hook is not proof it has
+				acted.
 			</p>
-		</div>
-	</div>
+			<p>
+				Free guard installs record what Pro would have done and never block.
+				With Pro, keep essentials using
+				<code>trim keep &lt;name&gt;</code>
+				before <code>trim --apply</code>. Use the matching
+				<code>--undo</code>
+				command to reverse cuts. The guard leaves existing agents running;
+				<code>LIMITCAST_ALLOW=1</code>
+				overrides it for a command/session until unset.
+			</p>
+			<h2>Check what earned its place this week</h2>
+			<p>
+				<code>limitcast results</code>
+				now puts a capacity report first: per-tool input, cached reads, output
+				and UTC active days; applied controls and free previews; and useful next
+				steps. Pro adds a Claude context-reduction estimate using activity
+				timestamps, so a session crossing the week boundary is attributed to the
+				right period.
+			</p>
+			<p>
+				Context estimates compare with a recorded starting baseline and use
+				characters / 4. Different projects or manual configuration changes can
+				change that baseline. Older records without timestamps are excluded from
+				weekly estimates; Codex/Grok context savings remain unavailable. Blocks,
+				cache holds and model changes are reported as events, with no invented
+				saved-token total. Previous-period comparisons require two complete
+				periods.
+			</p>
+			<p>
+				<code>limitcast results --share</code>
+				creates a voluntary totals-only check-in without prompts, project names,
+				paths or account identifiers. Nothing is uploaded automatically. The
+				local dashboard uses the same capacity calculations.
+			</p>
 
-	<h2>What limitcast does</h2>
-	<p class="sample-note">Each feature shows the exact text limitcast prints. The numbers are an example; yours come from your own readings and transcripts.</p>
+			<h2>Where your plan goes</h2>
+			<p class="muted">
+				Claude Code and Codex plans meter usage in rolling windows, such as a
+				5-hour window and a weekly one. Two things use them up faster than most
+				people notice.
+			</p>
+			<div class="problem">
+				<div>
+					<h3>Starting context</h3>
+					<p>
+						A heavily configured session can load substantial context before you
+						type: hook output, MCP server instructions and tool lists, skill
+						listings, agent lists and CLAUDE.md files. That block is sent again
+						on every turn and to every subagent.
+					</p>
+				</div>
+				<div>
+					<h3>Subagents</h3>
+					<p>
+						Each subagent starts with its own copy of that context. A few
+						parallel subagents late in a window can use up the rest of it, and
+						you find out when you're locked out.
+					</p>
+				</div>
+			</div>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Runout forecast</h3>
-			<span class="tier">Free</span>
-			<span class="cmd">limitcast status</span>
-		</div>
-		<ul>
-			<li>
-				For each limit window: percent used, burn rate, the clock time it runs
-				out, and when it resets.
-			</li>
-			<li>
-				Claude Code passes its own limit readings to your status line; limitcast
-				records them as they change. Codex is read from its session logs with no
-				setup.
-			</li>
-			<li>
-				The burn rate is a straight-line fit over the last hour of the window.
-				<strong>AT_RISK</strong>
-				means you'll hit 100% before the reset;
-				<strong>NEAR</strong>
-				means 95% or more is used, even before there's a burn rate.
-			</li>
-			<li>
-				The weekly window is paced over the last full day, nights and idle time
-				included, so one busy hour on Monday doesn't predict a runout by
-				Wednesday. A burst that would use up the week within the next hour still
-				triggers the warning and the guard.
-			</li>
-			<li>
-				Sessions of the same account share one history, so a short session still
-				gets a forecast. Two accounts used in parallel never mix.
-			</li>
-			<li>
-				<strong>Daily allowance:</strong>
-				for the weekly window, today's even share of what was left this morning,
-				and how much of it today used: <code>7d 41% · today 6% left</code> in
-				the status line, a <code>today</code> column in <code>status</code>.
-			</li>
-			<li>
-				<strong>Which window first:</strong>
-				when a window is on pace to run out, <code>status</code> ends with one
-				line naming the one that runs out first and where else there is room.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast status
+			<h2>What limitcast does</h2>
+			<p class="sample-note">
+				Each feature shows the exact text limitcast prints. The numbers are an
+				example; yours come from your own readings and transcripts.
+			</p>
+
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Runout forecast</h3>
+					<span class="tier">Free</span>
+					<span class="cmd">limitcast status</span>
+				</div>
+				<ul>
+					<li>
+						For each limit window: percent used, burn rate, the clock time it
+						runs out, and when it resets.
+					</li>
+					<li>
+						Claude Code passes its own limit readings to your status line;
+						limitcast records them as they change. Codex is read from its
+						session logs with no setup.
+					</li>
+					<li>
+						The burn rate is a straight-line fit over the last hour of the
+						window.
+						<strong>AT_RISK</strong>
+						means you'll hit 100% before the reset;
+						<strong>NEAR</strong>
+						means 95% or more is used, even before there's a burn rate.
+					</li>
+					<li>
+						The weekly window is paced over the last full day, nights and idle
+						time included, so one busy hour on Monday doesn't predict a runout
+						by Wednesday. A burst that would use up the week within the next
+						hour still triggers the warning and the guard.
+					</li>
+					<li>
+						Sessions of the same account share one history, so a short session
+						still gets a forecast. Two accounts used in parallel never mix.
+					</li>
+					<li>
+						<strong>Daily allowance:</strong>
+						for the weekly window, today's even share of what was left this
+						morning, and how much of it today used:
+						<code>7d 41% · today 6% left</code>
+						in the status line, a
+						<code>today</code>
+						column in <code>status</code>.
+					</li>
+					<li>
+						<strong>Which window first:</strong>
+						when a window is on pace to run out, <code>status</code> ends with
+						one line naming the one that runs out first and where else there is
+						room.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast status
 window     used  burn      runs out  resets     today     status
 claude 5h  71%   +18.2%/h  16:40     17:00      -         <span class="warn">AT_RISK</span>
 claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   <span class="ok">OK</span>
@@ -391,75 +472,82 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.
 
 <span class="dim"># in the status line:</span>
 5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			you see the lockout coming while there's still time to slow down, switch
-			tools, or move heavy work past the reset.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you see the lockout coming while there's still time to slow down,
+					switch tools, or move heavy work past the reset.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Trim advisor</h3>
-			<span class="tier">Free totals</span>
-			<span class="tier pro">Pro names and cuts</span>
-			<span class="cmd">limitcast trim [--days N] [--share] [--apply]</span>
-		</div>
-		<ul>
-			<li>
-				Reads your latest session's transcript and counts the tokens each
-				startup item actually loaded: SessionStart hook output, each MCP
-				server's instructions and tool names, each skill, the agent list, and
-				instruction files.
-			</li>
-			<li>
-				Compares that with what you used over the last N days (default 7): skill
-				calls, slash commands and MCP tool calls.
-			</li>
-			<li>
-				<strong>Free</strong>
-				shows your starting-context total and how much of it you haven't used.
-			</li>
-			<li>
-				<strong>Pro</strong>
-				names each server, skill and hook to cut and what it costs.
-			</li>
-			<li>
-				<code>--apply</code>
-				(Pro) makes the cuts through Claude Code's own settings: unused skills
-				are hidden from the model (<code>/name</code>
-				still works) and unused MCP servers are turned off for that project.
-				Both files are backed up, and
-				<code>--undo</code>
-				reverses exactly what changed. Plugin skills, and servers whose exact
-				name it can't confirm, are listed for <code>/plugin</code> and
-				<code>/mcp</code>. If Claude Code later writes over those settings, the
-				cuts are put back at the next session start; anything you turn back on
-				yourself stays on.
-			</li>
-			<li>
-				<code>--share</code>
-				prints totals with no project, file, skill, server or hook names, so
-				it's safe to post.
-			</li>
-			<li>
-				<code>--codex</code>
-				does the same for Codex: the AGENTS.md text it loads every session, and
-				the MCP servers in <code>~/.codex/config.toml</code> you haven't used.
-				With Pro, <code>--apply</code> turns them off (<code
-					>enabled = false</code
-				>) and <code>--undo</code> restores the file exactly.
-			</li>
-			<li>
-				<code>trim keep &lt;name&gt;[,&lt;name&gt;]</code>
-				(free) puts servers or skills on a keep-list that <code>--apply</code>
-				never turns off or hides, in Claude Code, Codex and Grok, whatever the
-				spelling (<code>ego-browser</code> and <code>ego_browser</code> match).
-				<code>trim</code> shows what it would keep, <code>trim keep --remove
-				&lt;name&gt;</code> drops one, and <code>trim keep</code> alone lists them.
-			</li>
-		</ul>
-		<pre class="sample">$ limitcast trim --apply
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Trim advisor</h3>
+					<span class="tier">Free totals</span>
+					<span class="tier pro">Pro names and cuts</span>
+					<span class="cmd">limitcast trim [--days N] [--share] [--apply]</span>
+				</div>
+				<ul>
+					<li>
+						Reads your latest session's transcript and counts the tokens each
+						startup item actually loaded: SessionStart hook output, each MCP
+						server's instructions and tool names, each skill, the agent list,
+						and instruction files.
+					</li>
+					<li>
+						Compares that with what you used over the last N days (default 7):
+						skill calls, slash commands and MCP tool calls.
+					</li>
+					<li>
+						<strong>Free</strong>
+						shows your starting-context total and how much of it you haven't
+						used.
+					</li>
+					<li>
+						<strong>Pro</strong>
+						names each server, skill and hook to cut and what it costs.
+					</li>
+					<li>
+						<code>--apply</code>
+						(Pro) makes the cuts through Claude Code's own settings: unused
+						skills are hidden from the model (<code>/name</code>
+						still works) and unused MCP servers are turned off for that project.
+						Both files are backed up, and
+						<code>--undo</code>
+						reverses exactly what changed. Plugin skills, and servers whose
+						exact name it can't confirm, are listed for <code>/plugin</code> and
+						<code>/mcp</code>. If Claude Code later writes over those settings,
+						the cuts are put back at the next session start; anything you turn
+						back on yourself stays on.
+					</li>
+					<li>
+						<code>--share</code>
+						prints totals with no project, file, skill, server or hook names, so
+						it's safe to post.
+					</li>
+					<li>
+						<code>--codex</code>
+						does the same for Codex: the AGENTS.md text it loads every session,
+						and the MCP servers in <code>~/.codex/config.toml</code> you haven't
+						used. With Pro, <code>--apply</code> turns them off (<code
+							>enabled = false</code
+						>) and <code>--undo</code> restores the file exactly.
+					</li>
+					<li>
+						<code>trim keep &lt;name&gt;[,&lt;name&gt;]</code>
+						(free) puts servers or skills on a keep-list that
+						<code>--apply</code>
+						never turns off or hides, in Claude Code, Codex and Grok, whatever
+						the spelling (<code>ego-browser</code>
+						and <code>ego_browser</code> match).
+						<code>trim</code>
+						shows what it would keep,
+						<code>trim keep --remove &lt;name&gt;</code>
+						drops one, and
+						<code>trim keep</code>
+						alone lists them.
+					</li>
+				</ul>
+				<pre class="sample">$ limitcast trim --apply
 ✓ Hid 66 skills from the model (`/name` still works): dataviz, block-kit, …
 ✓ Turned off 9 MCP servers for ~/work/api: postman, context7, …
 Takes effect in your next Claude Code session. Undo: `limitcast trim --undo`
@@ -469,66 +557,71 @@ $ limitcast trim --codex --apply
 
 $ limitcast trim keep ego-browser
 Kept by `trim --apply`: ego-browser</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			every token you cut is saved on every turn of every session and every
-			subagent. The numbers come from your own transcripts, not estimates.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					every token you cut is saved on every turn of every session and every
+					subagent. The numbers come from your own transcripts, not estimates.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Subagent guard</h3>
-			<span class="tier">Free preview</span>
-			<span class="tier pro">Pro blocks</span>
-			<span class="cmd">limitcast install --guard</span>
-		</div>
-		<ul>
-			<li>
-				A hook that runs before Claude Code starts a <code>Task</code> or
-				<code>Agent</code>
-				subagent, or Codex starts a
-				<code>spawn_agent</code>.
-			</li>
-			<li>
-				Blocks the spawn only when that tool's own window is on pace to run out
-				within 30 minutes and before it resets. The margin is set by
-				<code>LIMITCAST_GUARD_MINUTES</code>.
-			</li>
-			<li>
-				While a Claude window is tight (NEAR or AT_RISK) but not about to run
-				out, a new subagent that would run on your main model (or Opus) runs on
-				Sonnet instead. An explicit Sonnet or Haiku is left alone.
-			</li>
-			<li>
-				<strong>Free</strong>
-				installs run it as a preview: it never acts, and
-				<code>limitcast results</code>
-				shows what it would have stopped or switched, and whether those windows
-				then ran out. When there's something to show, the status line says so
-				once a week.
-			</li>
-			<li>
-				Built to stay out of your way: if it errors, it allows the call; a
-				window already at 100% is left alone so paid extra usage keeps working;
-				<code>LIMITCAST_ALLOW=1</code>
-				overrides it.
-			</li>
-			<li>
-				<strong>Daily hold</strong>
-				(Pro, off by default): <code>limitcast budget today on</code> also holds
-				new subagents once today's share of a weekly window is used up, until
-				local midnight. With notifications on you get one message a day at 80%
-				of today's share. A window already at 100% is left alone,
-				<code>LIMITCAST_ALLOW=1</code> overrides it, and free installs see what it
-				would have held in <code>limitcast results</code>.
-			</li>
-			<li>
-				In Codex it is added after your existing hooks, so the ones you've
-				already approved keep their approval.
-			</li>
-		</ul>
-		<pre class="sample"><span class="dim"># a new subagent, 21 minutes before the window runs out:</span>
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Subagent guard</h3>
+					<span class="tier">Free preview</span>
+					<span class="tier pro">Pro blocks</span>
+					<span class="cmd">limitcast install --guard</span>
+				</div>
+				<ul>
+					<li>
+						A hook that runs before Claude Code starts a <code>Task</code> or
+						<code>Agent</code>
+						subagent, or Codex starts a
+						<code>spawn_agent</code>.
+					</li>
+					<li>
+						Blocks the spawn only when that tool's own window is on pace to run
+						out within 30 minutes and before it resets. The margin is set by
+						<code>LIMITCAST_GUARD_MINUTES</code>.
+					</li>
+					<li>
+						While a Claude window is tight (NEAR or AT_RISK) but not about to
+						run out, a new subagent that would run on your main model (or Opus)
+						runs on Sonnet instead. An explicit Sonnet or Haiku is left alone.
+					</li>
+					<li>
+						<strong>Free</strong>
+						installs run it as a preview: it never acts, and
+						<code>limitcast results</code>
+						shows what it would have stopped or switched, and whether those
+						windows then ran out. When there's something to show, the status
+						line says so once a week.
+					</li>
+					<li>
+						Built to stay out of your way: if it errors, it allows the call; a
+						window already at 100% is left alone so paid extra usage keeps
+						working;
+						<code>LIMITCAST_ALLOW=1</code>
+						overrides it.
+					</li>
+					<li>
+						<strong>Daily hold</strong>
+						(Pro, off by default): <code>limitcast budget today on</code> also
+						holds new subagents once today's share of a weekly window is used
+						up, until local midnight. With notifications on you get one message
+						a day at 80% of today's share. A window already at 100% is left
+						alone,
+						<code>LIMITCAST_ALLOW=1</code>
+						overrides it, and free installs see what it would have held in
+						<code>limitcast results</code>.
+					</li>
+					<li>
+						In Codex it is added after your existing hooks, so the ones you've
+						already approved keep their approval.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				><span class="dim"># a new subagent, 21 minutes before the window runs out:</span>
 limitcast: Claude 5h limit is 93% used and on pace to run out in ~21 min, before it resets. Finish with the agents already running, or set LIMITCAST_ALLOW=1 to spawn anyway.
 
 <span class="dim"># a new subagent while the window is tight:</span>
@@ -536,157 +629,179 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITC
 
 <span class="dim"># a new subagent once today's share is used up (budget today on):</span>
 limitcast: today's share of your Claude 7d limit is used up (6% of 5%). New subagents are held until midnight. Turn this off: `limitcast budget today off`, or set LIMITCAST_ALLOW=1 to spawn anyway.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			stops the most common way people lose the end of a window: a burst of
-			subagents started when the window is nearly gone.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					stops the most common way people lose the end of a window: a burst of
+					subagents started when the window is nearly gone.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Subagent models by type</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast subagent-model &lt;type&gt; &lt;model&gt;|off</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.13. Pin a kind of subagent to a model and every new subagent of
-				that kind runs on it: <code>limitcast subagent-model Explore haiku</code>.
-				The model can be <code>sonnet</code>, <code>opus</code>,
-				<code>haiku</code> or a full model id.
-			</li>
-			<li>
-				A spawn that names its own model keeps it. While a window is tight, a kind
-				pinned to Opus is still moved to Sonnet. With no arguments the command
-				lists what is pinned and the kinds you ran in the last 30 days.
-			</li>
-			<li>
-				Needs the guard (<code>limitcast install --guard</code>), which runs as a
-				PreToolUse hook on the Task and Agent tools. <code>results</code> counts
-				the subagents it moved; free installs record what it would have done.
-			</li>
-			<li>
-				limitcast cannot tell whether a cheaper model costs less of your limit per
-				token, so check <code>limitcast report --why</code> after a week.
-			</li>
-		</ul>
-		<pre class="sample">$ limitcast subagent-model Explore haiku
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Subagent models by type</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd"
+						>limitcast subagent-model &lt;type&gt; &lt;model&gt;|off</span
+					>
+				</div>
+				<ul>
+					<li>
+						New in 0.13. Pin a kind of subagent to a model and every new
+						subagent of that kind runs on it:
+						<code>limitcast subagent-model Explore haiku</code>. The model can
+						be <code>sonnet</code>, <code>opus</code>,
+						<code>haiku</code>
+						or a full model id.
+					</li>
+					<li>
+						A spawn that names its own model keeps it. While a window is tight,
+						a kind pinned to Opus is still moved to Sonnet. With no arguments
+						the command lists what is pinned and the kinds you ran in the last
+						30 days.
+					</li>
+					<li>
+						Needs the guard (<code>limitcast install --guard</code>), which runs
+						as a PreToolUse hook on the Task and Agent tools.
+						<code>results</code>
+						counts the subagents it moved; free installs record what it would
+						have done.
+					</li>
+					<li>
+						limitcast cannot tell whether a cheaper model costs less of your
+						limit per token, so check <code>limitcast report --why</code> after
+						a week.
+					</li>
+				</ul>
+				<pre class="sample">$ limitcast subagent-model Explore haiku
 Explore: haiku
 
 Types you ran in the last 30 days: general-purpose (86), Explore (39), fork (39)
 
 limitcast: Explore subagents run on haiku, the model you set for them.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			the subagents that only read and search stop running on your most
-			expensive model.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					the subagents that only read and search stop running on your most
+					expensive model.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Subagent receipts and budgets</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast budget subagents &lt;percent&gt;|off</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.11. When a subagent finishes, a SubagentStop hook prices it from
-				its own transcript against your 5-hour window, using your own
-				calibration, and shows you the receipt. The model never sees it.
-			</li>
-			<li>
-				<code>limitcast budget subagents 15</code>
-				makes the guard hold new subagents once subagents have used 15% of the
-				current 5-hour window, until it resets. <code>off</code> removes it;
-				<code>limitcast budget subagents</code> shows what's used so far.
-			</li>
-			<li>
-				New in 0.12. Before a new subagent starts, you see what that kind has
-				cost you so far (the median and the largest, as a share of a 5-hour
-				window). It appears once you have 3 priced runs, and only when a typical
-				run is over 1% of a window or the window is near its limit. It is shown
-				to you only and never blocks.
-			</li>
-			<li>
-				Pricing needs about a day of your own readings first; until then
-				nothing counts against the budget. <code>limitcast results</code>
-				totals your subagents and names the biggest.
-			</li>
-		</ul>
-		<pre class="sample">limitcast: that Explore subagent used ≈2.1% of your 5-hour window (34 calls, 180k new tokens).
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Subagent receipts and budgets</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd"
+						>limitcast budget subagents &lt;percent&gt;|off</span
+					>
+				</div>
+				<ul>
+					<li>
+						New in 0.11. When a subagent finishes, a SubagentStop hook prices it
+						from its own transcript against your 5-hour window, using your own
+						calibration, and shows you the receipt. The model never sees it.
+					</li>
+					<li>
+						<code>limitcast budget subagents 15</code>
+						makes the guard hold new subagents once subagents have used 15% of
+						the current 5-hour window, until it resets. <code>off</code> removes
+						it;
+						<code>limitcast budget subagents</code>
+						shows what's used so far.
+					</li>
+					<li>
+						New in 0.12. Before a new subagent starts, you see what that kind
+						has cost you so far (the median and the largest, as a share of a
+						5-hour window). It appears once you have 3 priced runs, and only
+						when a typical run is over 1% of a window or the window is near its
+						limit. It is shown to you only and never blocks.
+					</li>
+					<li>
+						Pricing needs about a day of your own readings first; until then
+						nothing counts against the budget. <code>limitcast results</code>
+						totals your subagents and names the biggest.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				>limitcast: that Explore subagent used ≈2.1% of your 5-hour window (34 calls, 180k new tokens).
 
 $ limitcast budget subagents 15
 Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. Once it's spent, the guard holds new subagents until the window resets.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			you see which subagents are expensive while you're still working, and a
-			cap keeps one busy hour of agents from eating the whole window.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you see which subagents are expensive while you're still working, and
+					a cap keeps one busy hour of agents from eating the whole window.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Cold-cache warning</h3>
-			<span class="tier">Free preview</span>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast install --guard</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.11. After a long pause the prompt cache has expired, and your
-				next message re-sends the whole context as new tokens, which count far
-				more against your limit than cached ones.
-			</li>
-			<li>
-				When a session that re-sends 100k+ tokens has been idle longer than the
-				cache lives (60 minutes; set <code>LIMITCAST_CACHE_MINUTES</code>), a
-				UserPromptSubmit hook holds that first message once and says what it
-				will cost. Send it again and it goes through, or run
-				<code>/compact</code> first.
-			</li>
-			<li>
-				Never holds messages from background agents, <code>/compact</code> or
-				<code>/clear</code>. If the hook fails, the message goes through.
-				<strong>Free</strong> installs record what it would have held.
-			</li>
-		</ul>
-		<pre class="sample">limitcast: this session sat idle for 75 minutes, so its prompt cache has expired. Your message re-sends 300k tokens of context: ≈1.8% of your 5-hour window (≈0.03% if the cache were still warm). Send it again to go ahead, or run /compact first to shrink it.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			a "continue" after lunch no longer quietly costs a slice of your window;
-			you decide whether to compact first.
-		</p>
-	</section>
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Cold-cache warning</h3>
+					<span class="tier">Free preview</span>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast install --guard</span>
+				</div>
+				<ul>
+					<li>
+						New in 0.11. After a long pause the prompt cache has expired, and
+						your next message re-sends the whole context as new tokens, which
+						count far more against your limit than cached ones.
+					</li>
+					<li>
+						When a session that re-sends 100k+ tokens has been idle longer than
+						the cache lives (60 minutes; set
+						<code>LIMITCAST_CACHE_MINUTES</code>), a UserPromptSubmit hook holds
+						that first message once and says what it will cost. Send it again
+						and it goes through, or run
+						<code>/compact</code>
+						first.
+					</li>
+					<li>
+						Never holds messages from background agents,
+						<code>/compact</code>
+						or
+						<code>/clear</code>. If the hook fails, the message goes through.
+						<strong>Free</strong>
+						installs record what it would have held.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				>limitcast: this session sat idle for 75 minutes, so its prompt cache has expired. Your message re-sends 300k tokens of context: ≈1.8% of your 5-hour window (≈0.03% if the cache were still warm). Send it again to go ahead, or run /compact first to shrink it.</pre>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					a "continue" after lunch no longer quietly costs a slice of your
+					window; you decide whether to compact first.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Burn report</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast report [--days N] [--out FILE]</span>
-		</div>
-		<ul>
-			<li>
-				Tokens by tool (Claude Code, Codex, Grok), day, project, model and
-				session.
-			</li>
-			<li>The share of tokens that went to subagents.</li>
-			<li>
-				New in 0.13. The API-equivalent cost: what the same tokens would cost at
-				the API's list prices (input, 5-minute and 1-hour cache writes, cache
-				reads and output), as a total and per tool, day, project, model and
-				session. It is a yardstick for how much your plan covers, not a bill.
-				Claude models are priced; tokens on any other model are left out and
-				counted separately, never as $0. Change a price or add a model in
-				<code>~/.local/state/limitcast/prices.json</code>.
-			</li>
-			<li>
-				Read from each tool's own local logs, including Grok's per-turn usage
-				records.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast report --days 7
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Burn report</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast report [--days N] [--out FILE]</span>
+				</div>
+				<ul>
+					<li>
+						Tokens by tool (Claude Code, Codex, Grok), day, project, model and
+						session.
+					</li>
+					<li>The share of tokens that went to subagents.</li>
+					<li>
+						New in 0.13. The API-equivalent cost: what the same tokens would
+						cost at the API's list prices (input, 5-minute and 1-hour cache
+						writes, cache reads and output), as a total and per tool, day,
+						project, model and session. It is a yardstick for how much your plan
+						covers, not a bill. Claude models are priced; tokens on any other
+						model are left out and counted separately, never as $0. Change a
+						price or add a model in
+						<code>~/.local/state/limitcast/prices.json</code>.
+					</li>
+					<li>
+						Read from each tool's own local logs, including Grok's per-turn
+						usage records.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast report --days 7
 | tool   | tokens | output | cache reads | share | API-equivalent |
 | claude | 863.6M |   2.9M |      840.8M |   99% |           $219 |
 | codex  |  12.9M |  44.1k |       12.6M |    1% |              - |
@@ -694,47 +809,52 @@ Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. On
 <b>API-equivalent cost: $219</b> at list prices for Claude models, not what a
 subscription charges. 12.9M tokens on other models are not counted.
 Subagents used <b>21%</b> of Claude tokens.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			shows which projects, models or habits use up your plan, across all three
-			tools in one report.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					shows which projects, models or habits use up your plan, across all
+					three tools in one report.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Plan advisor</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast plan [--days N] · plan set &lt;pro|max5|max20&gt;</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.13. Does your Claude plan fit how much you use? limitcast keeps
-				the peak of every 5-hour and weekly window (for 120 days, starting when
-				you install this version) and compares them with your plan.
-			</li>
-			<li>
-				It points to the next plan, with the monthly price difference, if you
-				reached a limit three or more times (or the weekly limit once). It points
-				to a smaller plan if that plan's limits would have held your busiest
-				window and week with room to spare. It also shows what your Claude Code
-				tokens would cost at API list prices, against your plan's price.
-			</li>
-			<li>
-				Tell it your plan first: <code>limitcast plan set max20</code>. It needs a
-				week or two of history before it recommends anything. Prices (Pro $20, Max
-				5x $100, Max 20x $200) and the 5x and 20x multipliers are from
-				claude.com/pricing on 26 October 2026; the Max 20x price was not on that
-				page, and you can change any price in
-				<code>~/.local/state/limitcast/prices.json</code>.
-			</li>
-			<li>
-				Anthropic states the multiplier for the 5-hour session; the advisor
-				assumes weekly limits scale the same way. It cannot see paid extra usage,
-				which may cost less than a bigger plan if you rarely reach a limit.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast plan
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Plan advisor</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd"
+						>limitcast plan [--days N] · plan set &lt;pro|max5|max20&gt;</span
+					>
+				</div>
+				<ul>
+					<li>
+						New in 0.13. Does your Claude plan fit how much you use? limitcast
+						keeps the peak of every 5-hour and weekly window (for 120 days,
+						starting when you install this version) and compares them with your
+						plan.
+					</li>
+					<li>
+						It points to the next plan, with the monthly price difference, if
+						you reached a limit three or more times (or the weekly limit once).
+						It points to a smaller plan if that plan's limits would have held
+						your busiest window and week with room to spare. It also shows what
+						your Claude Code tokens would cost at API list prices, against your
+						plan's price.
+					</li>
+					<li>
+						Tell it your plan first: <code>limitcast plan set max20</code>. It
+						needs a week or two of history before it recommends anything. Prices
+						(Pro $20, Max 5x $100, Max 20x $200) and the 5x and 20x multipliers
+						are from claude.com/pricing on 26 October 2026; the Max 20x price
+						was not on that page, and you can change any price in
+						<code>~/.local/state/limitcast/prices.json</code>.
+					</li>
+					<li>
+						Anthropic states the multiplier for the 5-hour session; the advisor
+						assumes weekly limits scale the same way. It cannot see paid extra
+						usage, which may cost less than a bigger plan if you rarely reach a
+						limit.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast plan
 Claude plan: Max 20x, $200 a month
 
 Over 16 days: 63 five-hour windows with use (0 reached the limit, busiest
@@ -745,37 +865,38 @@ Max 5x would have fit: it has 1/4 of the usage per session, so your busiest
 
 At API list prices your Claude Code tokens of the last 16 days would have
 cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			a recommendation in dollars, from your own usage, instead of guessing which
-			plan to pay for. (Example output; your numbers will differ.)
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					a recommendation in dollars, from your own usage, instead of guessing
+					which plan to pay for. (Example output; your numbers will differ.)
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Where your tokens went</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast report --why [--days N]</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.12. Sorts the new tokens (input, cache writes and output; cached
-				reads barely count against your limit) into subagents, session starts,
-				cache rebuilds after an idle pause, tool results by tool and model output.
-			</li>
-			<li>
-				Splits subagents by type and model, shows all new tokens by model, lists the
-				single steps that cost the most, and ends with what to ask for instead.
-				Models may count differently against your limit, so the model tables show
-				token counts, not window shares.
-			</li>
-			<li>
-				Claude Code only. Your transcripts are read once and cached, so later runs
-				only read what changed.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast report --why
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Where your tokens went</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast report --why [--days N]</span>
+				</div>
+				<ul>
+					<li>
+						New in 0.12. Sorts the new tokens (input, cache writes and output;
+						cached reads barely count against your limit) into subagents,
+						session starts, cache rebuilds after an idle pause, tool results by
+						tool and model output.
+					</li>
+					<li>
+						Splits subagents by type and model, shows all new tokens by model,
+						lists the single steps that cost the most, and ends with what to ask
+						for instead. Models may count differently against your limit, so the
+						model tables show token counts, not window shares.
+					</li>
+					<li>
+						Claude Code only. Your transcripts are read once and cached, so
+						later runs only read what changed.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast report --why
 115.2M new tokens (input, cache writes and output; cached reads are left out).
 
 | where                                                  | new tokens | share | 5-hour windows |
@@ -788,141 +909,150 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 
 ## What to try
 - mcp:linear (6.8M, 7.7k per call): ask for fewer fields and a smaller limit.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			you see what your window is really spent on (subagents, idle-cache rebuilds,
-			one chatty tool, a scheduled job) before you decide what to change.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you see what your window is really spent on (subagents, idle-cache
+					rebuilds, one chatty tool, a scheduled job) before you decide what to
+					change.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Heaviest scheduled-job starts</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast report --jobs [--days N]</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.12. A script or scheduled job that calls <code>claude -p</code>
-				starts a fresh session every run and pays your whole starting context
-				again. limitcast groups those headless runs by the first 45 characters of
-				their prompt and shows runs, new tokens at start, starting prompt size,
-				cold starts and calls per run.
-			</li>
-			<li>
-				A start is cold when more than half of its prompt was new tokens, not
-				served from the prompt cache. The report shows how the gap since the
-				job's last run decides that, and what the cold runs cost beyond the same
-				job's warm ones.
-			</li>
-			<li>
-				It ends with how to launch a job leaner. Prompt text is shown on your
-				machine only: don't paste the report publicly unredacted.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast report --jobs
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Heaviest scheduled-job starts</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast report --jobs [--days N]</span>
+				</div>
+				<ul>
+					<li>
+						New in 0.12. A script or scheduled job that calls
+						<code>claude -p</code>
+						starts a fresh session every run and pays your whole starting
+						context again. limitcast groups those headless runs by the first 45
+						characters of their prompt and shows runs, new tokens at start,
+						starting prompt size, cold starts and calls per run.
+					</li>
+					<li>
+						A start is cold when more than half of its prompt was new tokens,
+						not served from the prompt cache. The report shows how the gap since
+						the job's last run decides that, and what the cold runs cost beyond
+						the same job's warm ones.
+					</li>
+					<li>
+						It ends with how to launch a job leaner. Prompt text is shown on
+						your machine only: don't paste the report publicly unredacted.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast report --jobs
 566 headless runs spent 14.8M new tokens just starting: 13% of all new tokens.
 
 | job (first words of its prompt)        | runs | new at start | prompt | cold |
 | Prepare the nightly brief for the team |  283 |        25.6k |  34.4k |  99% |
 | Update the weekly status canvas        |  154 |        32.4k |  32.4k | 100% |
 | Review this change for security issues |  106 |        15.3k |  17.5k |  79% |</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			finds the scheduled job that quietly spends a slice of your plan on every
-			start. (Example job names changed.)
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					finds the scheduled job that quietly spends a slice of your plan on
+					every start. (Example job names changed.)
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Starting-context alerts</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast install --alerts</span>
-		</div>
-		<ul>
-			<li>
-				At the start of each session, tells you when your starting context grew
-				by about 1k tokens or more, and names what grew.
-			</li>
-			<li>
-				The message is shown to you only, never to the model. It runs in about
-				0.3 seconds.
-			</li>
-			<li>
-				Once a week, one line on what limitcast did: limits reached, how far
-				ahead it warned, subagents stopped, tokens not re-sent.
-			</li>
-		</ul>
-		<pre class="sample">limitcast: your Claude Code starting context grew ~3.4k tokens since your last session (MCP server instructions: linear new~2.1k, Instruction files: ~/CLAUDE.md +~1.3k). Run `limitcast trim` for details.
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Starting-context alerts</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast install --alerts</span>
+				</div>
+				<ul>
+					<li>
+						At the start of each session, tells you when your starting context
+						grew by about 1k tokens or more, and names what grew.
+					</li>
+					<li>
+						The message is shown to you only, never to the model. It runs in
+						about 0.3 seconds.
+					</li>
+					<li>
+						Once a week, one line on what limitcast did: limits reached, how far
+						ahead it warned, subagents stopped, tokens not re-sent.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				>limitcast: your Claude Code starting context grew ~3.4k tokens since your last session (MCP server instructions: linear new~2.1k, Instruction files: ~/CLAUDE.md +~1.3k). Run `limitcast trim` for details.
 
 limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent. Details: limitcast results</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			catches a new plugin, a growing CLAUDE.md or a chatty hook the day it
-			appears, not weeks later.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					catches a new plugin, a growing CLAUDE.md or a chatty hook the day it
+					appears, not weeks later.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Large tool-output notice</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">limitcast install --alerts</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.12. A PostToolUse hook estimates each Bash, Read, Grep, WebFetch
-				and MCP tool result from its size. At about 20k tokens or more it tells
-				you, once per tool per session, with what to ask for next time.
-				<code>LIMITCAST_TOOL_TOKENS</code> changes the threshold.
-			</li>
-			<li>
-				Shown to you only, never to the model, and it adds about 30 ms per call.
-				If the hook fails, the call goes through. To add it to an existing
-				install, run <code>limitcast install --alerts</code> again.
-			</li>
-		</ul>
-		<pre class="sample">limitcast: that linear list_issues result was ≈25k tokens (≈0.17% of a 5-hour window to write, then re-read on every later call). Next time: ask for fewer fields and a smaller limit.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			one oversized result is easy to miss; this names it the moment it happens,
-			and what to ask for instead.
-		</p>
-	</section>
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Large tool-output notice</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd">limitcast install --alerts</span>
+				</div>
+				<ul>
+					<li>
+						New in 0.12. A PostToolUse hook estimates each Bash, Read, Grep,
+						WebFetch and MCP tool result from its size. At about 20k tokens or
+						more it tells you, once per tool per session, with what to ask for
+						next time.
+						<code>LIMITCAST_TOOL_TOKENS</code>
+						changes the threshold.
+					</li>
+					<li>
+						Shown to you only, never to the model, and it adds about 30 ms per
+						call. If the hook fails, the call goes through. To add it to an
+						existing install, run <code>limitcast install --alerts</code> again.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				>limitcast: that linear list_issues result was ≈25k tokens (≈0.17% of a 5-hour window to write, then re-read on every later call). Next time: ask for fewer fields and a smaller limit.</pre>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					one oversized result is easy to miss; this names it the moment it
+					happens, and what to ask for instead.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Results</h3>
-			<span class="tier">Free</span>
-			<span class="cmd">limitcast results [--days N] [--share]</span>
-		</div>
-		<ul>
-			<li>
-				Opens with what happened since limitcast started watching: tokens not
-				re-sent (your smaller starting context times every model call, read from
-				your transcripts), how many of the limits it watched you approach it
-				warned you about and how far ahead, and the subagents the guard stopped.
-			</li>
-			<li>
-				Then the last week in detail: every limit you hit, with the forecast
-				replayed from only the readings it had at the time, and what happened to
-				each window after the guard acted.
-			</li>
-			<li>
-				The totals outlast the 8 days of raw readings: a daily background update
-				keeps them current. <code>--share</code> prints totals only, safe to
-				post.
-			</li>
-			<li>
-				Shows what a smaller starting context was worth against your 5-hour
-				limit, calibrated from your own readings: how many new tokens, and how
-				many cached ones, move your meter by 1%. Cached tokens count far less,
-				which is why long sessions and subagents, not your CLAUDE.md, are what
-				run you out.
-			</li>
-		</ul>
-		<pre class="sample">$ limitcast results
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Results</h3>
+					<span class="tier">Free</span>
+					<span class="cmd">limitcast results [--days N] [--share]</span>
+				</div>
+				<ul>
+					<li>
+						Opens with what happened since limitcast started watching: tokens
+						not re-sent (your smaller starting context times every model call,
+						read from your transcripts), how many of the limits it watched you
+						approach it warned you about and how far ahead, and the subagents
+						the guard stopped.
+					</li>
+					<li>
+						Then the last week in detail: every limit you hit, with the forecast
+						replayed from only the readings it had at the time, and what
+						happened to each window after the guard acted.
+					</li>
+					<li>
+						The totals outlast the 8 days of raw readings: a daily background
+						update keeps them current. <code>--share</code> prints totals only,
+						safe to post.
+					</li>
+					<li>
+						Shows what a smaller starting context was worth against your 5-hour
+						limit, calibrated from your own readings: how many new tokens, and
+						how many cached ones, move your meter by 1%. Cached tokens count far
+						less, which is why long sessions and subagents, not your CLAUDE.md,
+						are what run you out.
+					</li>
+				</ul>
+				<pre class="sample">$ limitcast results
 <b>Since limitcast started watching</b>
 - <b>2.9M tokens not re-sent.</b> Your sessions now start smaller than the first one limitcast measured…
   Against your limit: <b>≈ 0.31% of a 5-hour window.</b> From your own readings, 1% of it is about 167.0k new tokens or 11.2M cached ones…
@@ -930,64 +1060,71 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 
 <b>Limits reached</b>
 - Claude 7d: hit Sat, Oct 24, 20:51, warned 40 min ahead</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			you can check that limitcast works, and see what it's worth, from your own
-			data.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you can check that limitcast works, and see what it's worth, from your
+					own data.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Acts for you</h3>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">notify · budget · after-reset · results --html</span>
-		</div>
-		<ul>
-			<li>
-				<code>limitcast notify on</code>
-				sends one desktop notification when a Claude window turns NEAR, AT_RISK
-				or HIT, and when it resets after a HIT. On macOS they come from a tiny
-				limitcast notifier app (no Dock icon), so "limitcast" has its own entry
-				in System Settings → Notifications; allow it there, and pick Persistent
-				to keep a warning on screen until you dismiss it.
-			</li>
-			<li>
-				New in 0.11: <code>limitcast notify ntfy &lt;topic&gt;</code> also sends
-				every notification to your phone through ntfy (install the ntfy app and
-				subscribe to the topic), and
-				<code>limitcast notify webhook &lt;url&gt;</code> to a Slack or Discord
-				incoming webhook. <code>off</code> removes either. They're sent in the
-				background, so no hook waits on the network.
-			</li>
-			<li>
-				New in 0.11: every day limitcast re-measures how many tokens move your
-				5-hour meter by 1%. When that shifts by 15% or more against the weeks
-				before, you get a notification that your limit itself changed.
-			</li>
-			<li>
-				<code>limitcast after-reset -- &lt;command&gt;</code>
-				waits for the window to reset, then runs the command (add
-				<code>--detach</code>
-				to run it in the background).
-			</li>
-			<li>
-				When the current Claude account is near its limit, the status line
-				points to your other account with the most room, and
-				<code>status</code>
-				lists every account limitcast has current readings for.
-			</li>
-			<li>
-				Past ~150k tokens re-sent per model call, the status line suggests
-				<code>/compact</code>. If you use your own status line, it stays as it was and the
-				limitcast line (with this suggestion) goes on the line under it.
-			</li>
-			<li>
-				<code>limitcast results --html</code>
-				puts results, your current windows and the burn report on one page.
-			</li>
-		</ul>
-		<pre class="sample"><span class="dim"># desktop notification (and your phone or Slack, if you set one):</span>
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Acts for you</h3>
+					<span class="tier pro">Pro</span>
+					<span class="cmd"
+						>notify · budget · after-reset · results --html</span
+					>
+				</div>
+				<ul>
+					<li>
+						<code>limitcast notify on</code>
+						sends one desktop notification when a Claude window turns NEAR,
+						AT_RISK or HIT, and when it resets after a HIT. On macOS they come
+						from a tiny limitcast notifier app (no Dock icon), so "limitcast"
+						has its own entry in System Settings → Notifications; allow it
+						there, and pick Persistent to keep a warning on screen until you
+						dismiss it.
+					</li>
+					<li>
+						New in 0.11: <code>limitcast notify ntfy &lt;topic&gt;</code> also
+						sends every notification to your phone through ntfy (install the
+						ntfy app and subscribe to the topic), and
+						<code>limitcast notify webhook &lt;url&gt;</code>
+						to a Slack or Discord incoming webhook. <code>off</code> removes
+						either. They're sent in the background, so no hook waits on the
+						network.
+					</li>
+					<li>
+						New in 0.11: every day limitcast re-measures how many tokens move
+						your 5-hour meter by 1%. When that shifts by 15% or more against the
+						weeks before, you get a notification that your limit itself changed.
+					</li>
+					<li>
+						<code>limitcast after-reset -- &lt;command&gt;</code>
+						waits for the window to reset, then runs the command (add
+						<code>--detach</code>
+						to run it in the background).
+					</li>
+					<li>
+						When the current Claude account is near its limit, the status line
+						points to your other account with the most room, and
+						<code>status</code>
+						lists every account limitcast has current readings for.
+					</li>
+					<li>
+						Past ~150k tokens re-sent per model call, the status line suggests
+						<code>/compact</code>. If you use your own status line, it stays as
+						it was and the limitcast line (with this suggestion) goes on the
+						line under it.
+					</li>
+					<li>
+						<code>limitcast results --html</code>
+						puts results, your current windows and the burn report on one page.
+					</li>
+				</ul>
+				<pre
+					class="sample"
+				><span class="dim"># desktop notification (and your phone or Slack, if you set one):</span>
 limitcast — Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.
 limitcast — Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.
 
@@ -996,342 +1133,405 @@ limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact
 
 $ limitcast after-reset --detach -- claude -p "run the full test suite"
 Will run at 17:00 (after the claude 5h reset), in the background.</pre>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			you hear about a limit before you hit it, and the heavy work waits for the
-			reset instead of you.
-		</p>
-	</section>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you hear about a limit before you hit it, and the heavy work waits for
+					the reset instead of you.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Grok</h3>
-			<span class="tier">Free</span>
-			<span class="tier pro">Pro</span>
-			<span class="cmd">install · budget grok &lt;usd&gt; · trim --grok</span>
-		</div>
-		<ul>
-			<li>
-				New in 0.12. <code>limitcast install</code> wraps Grok's status line (the
-				session model, context % and cost on one line, with the limitcast
-				forecast under it). <code>--guard</code> adds a guard for
-				<code>spawn_subagent</code>.
-			</li>
-			<li>
-				<code>limitcast trim --grok</code> measures Grok's system prompt and tool
-				definitions and the MCP servers in <code>~/.grok/config.toml</code> you
-				haven't used. <strong>Free</strong> shows totals; <strong>Pro</strong>
-				names them and turns them off (<code>--undo</code> restores the file).
-			</li>
-			<li>
-				Grok stores what you spent, not a percentage, so the status line shows
-				<code>grok 5h $X · 7d $Y</code> until you set a dollar cap with
-				<code>limitcast budget grok 20</code> (<strong>Pro</strong>). Then
-				<code>status</code> forecasts that window and the guard blocks new Grok
-				subagents when it is on pace to run out.
-			</li>
-		</ul>
-		<p class="gain">
-			<strong>Benefit:</strong>
-			the same forecast, guard and trim for Grok, once you tell limitcast what a
-			5-hour window is worth to you.
-		</p>
-	</section>
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Grok</h3>
+					<span class="tier">Free</span>
+					<span class="tier pro">Pro</span>
+					<span class="cmd"
+						>install · budget grok &lt;usd&gt; · trim --grok</span
+					>
+				</div>
+				<ul>
+					<li>
+						New in 0.12. <code>limitcast install</code> wraps Grok's status line
+						(the session model, context % and cost on one line, with the
+						limitcast forecast under it). <code>--guard</code> adds a guard for
+						<code>spawn_subagent</code>.
+					</li>
+					<li>
+						<code>limitcast trim --grok</code>
+						measures Grok's system prompt and tool definitions and the MCP
+						servers in <code>~/.grok/config.toml</code> you haven't used.
+						<strong>Free</strong>
+						shows totals; <strong>Pro</strong>
+						names them and turns them off (<code>--undo</code>
+						restores the file).
+					</li>
+					<li>
+						Grok stores what you spent, not a percentage, so the status line
+						shows
+						<code>grok 5h $X · 7d $Y</code>
+						until you set a dollar cap with
+						<code>limitcast budget grok 20</code>
+						(<strong>Pro</strong>). Then
+						<code>status</code>
+						forecasts that window and the guard blocks new Grok subagents when
+						it is on pace to run out.
+					</li>
+				</ul>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					the same forecast, guard and trim for Grok, once you tell limitcast
+					what a 5-hour window is worth to you.
+				</p>
+			</section>
 
-	<section class="feature">
-		<div class="feature-head">
-			<h3>Setup and upkeep</h3>
-			<span class="tier">Free</span>
-			<span class="cmd">install · uninstall · doctor [--fix] · trial</span>
-		</div>
-		<ul>
-			<li>
-				<code>install</code>
-				backs up <code>~/.claude/settings.json</code> and keeps your status line
-				looking exactly the same while it records readings. Running it twice is
-				safe. It then shows your starting context right away.
-			</li>
-			<li><code>uninstall</code> restores your original settings exactly.</li>
-			<li>
-				<code>doctor</code>
-				checks setup, data freshness and the license, and tells you plainly if
-				Claude Code, Codex or Grok changed the log format limitcast reads. It
-				also runs once a day in the background: a problem shows
-				<code>⚠ run limitcast doctor</code> in the status line.
-			</li>
-			<li>
-				Hooks go through a small launcher that survives Node upgrades: if the
-				Node it used is gone, it finds <code>limitcast</code> on your PATH, and
-				if that's gone too, your status line still shows and every hook allows.
-				<code>doctor --fix</code> re-installs with the current Node.
-			</li>
-			<li>
-				Already installed with <code>--guard</code> before 0.11? Run
-				<code>limitcast doctor --fix</code> to add the subagent receipts and the
-				cold-cache warning.
-			</li>
-			<li>
-				<code>limitcast trial</code>
-				turns on Pro for 7 days on this computer, with no card, once.
-			</li>
-			<li>
-				The Claude Code plugin adds <code>/limitcast:status</code>,
-				<code>/limitcast:results</code> and <code>/limitcast:trim</code>
-				inside a session.
-			</li>
-		</ul>
-		<pre class="sample cols">$ limitcast doctor
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Setup and upkeep</h3>
+					<span class="tier">Free</span>
+					<span class="cmd">install · uninstall · doctor [--fix] · trial</span>
+				</div>
+				<ul>
+					<li>
+						<code>install</code>
+						backs up <code>~/.claude/settings.json</code> and keeps your status
+						line looking exactly the same while it records readings. Running it
+						twice is safe. It then shows your starting context right away.
+					</li>
+					<li>
+						<code>uninstall</code>
+						restores your original settings exactly.
+					</li>
+					<li>
+						<code>doctor</code>
+						checks setup, data freshness and the license, and tells you plainly
+						if Claude Code, Codex or Grok changed the log format limitcast
+						reads. It also runs once a day in the background: a problem shows
+						<code>⚠ run limitcast doctor</code>
+						in the status line.
+					</li>
+					<li>
+						Hooks go through a small launcher that survives Node upgrades: if
+						the Node it used is gone, it finds <code>limitcast</code> on your
+						PATH, and if that's gone too, your status line still shows and every
+						hook allows.
+						<code>doctor --fix</code>
+						re-installs with the current Node.
+					</li>
+					<li>
+						Already installed with <code>--guard</code> before 0.11? Run
+						<code>limitcast doctor --fix</code>
+						to add the subagent receipts and the cold-cache warning.
+					</li>
+					<li>
+						<code>limitcast trial</code>
+						turns on Pro for 7 days on this computer, with no card, once.
+					</li>
+					<li>
+						The Claude Code plugin adds <code>/limitcast:status</code>,
+						<code>/limitcast:results</code>
+						and <code>/limitcast:trim</code>
+						inside a session.
+					</li>
+				</ul>
+				<pre class="sample cols">$ limitcast doctor
 ✓ Status-line recorder installed
 ✓ Hook launcher points at this Node and limitcast
 ✓ Claude Code subagent guard installed
 ✓ Codex subagent guard installed and trusted
 ✓ Last Claude reading 0 min ago</pre>
-	</section>
+			</section>
 
-	<h2>Privacy</h2>
-	<ul class="facts">
-		<li>
-			Your usage data stays on your machine. Everything is read from files that
-			already exist there.
-		</li>
-		<li>The free version makes no network calls.</li>
-		<li>
-			A Pro license talks to Polar, the payment and licensing service, only to
-			activate, for a weekly background check, and to deactivate. Each call
-			sends the license key and your computer's name.
-		</li>
-		<li>
-			Phone and webhook notifications (Pro) are off until you turn them on. Then
-			each notification's text goes to the service you chose, ntfy.sh or your
-			webhook, and nothing else does.
-		</li>
-		<li>Hooks never wait on the network.</li>
-	</ul>
+			<h2>Privacy</h2>
+			<ul class="facts">
+				<li>
+					Your usage data stays on your machine. Everything is read from files
+					that already exist there.
+				</li>
+				<li>The free version makes no network calls.</li>
+				<li>
+					A Pro license talks to Polar, the payment and licensing service, only
+					to activate, for a weekly background check, and to deactivate. Each
+					call sends the license key and your computer's name.
+				</li>
+				<li>
+					Phone and webhook notifications (Pro) are off until you turn them on.
+					Then each notification's text goes to the service you chose, ntfy.sh
+					or your webhook, and nothing else does.
+				</li>
+				<li>Hooks never wait on the network.</li>
+			</ul>
 
-	<h2>Free and Pro</h2>
-	<div class="table-wrap">
-		<table>
-			<thead>
-				<tr>
-					<th scope="col"></th>
-					<th scope="col">Free</th>
-					<th scope="col">Pro</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Price</td>
-					<td class="price">$0</td>
-					<td>
-						<span class="price">$79</span>/year or
-						<span class="price">$9</span>/month, 14 days free. Team:
-						<span class="price">$69</span>/seat/year, 3 seats minimum
-					</td>
-				</tr>
-				<tr>
-					<td>Runout forecast with NEAR warnings and the daily allowance</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>
-						Starting-context total and how much you never use (Claude Code, Codex
-						and Grok)
-					</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Results: value since install, limits warned about</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Subagent guard</td>
-					<td class="muted">Preview</td>
-					<td class="yes">Blocks, switches to Sonnet</td>
-				</tr>
-				<tr>
-					<td>
-						Names each item to cut, and cuts it (<code>trim --apply</code>)
-					</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Keep-list: servers and skills <code>trim --apply</code> never touches</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Daily share: a notification at 80% and an optional hold on new subagents</td>
-					<td class="muted">Preview</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Burn report, alerts, weekly summary</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Where your tokens went, scheduled-job starts, large tool-output notice</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Plan advisor, API-equivalent cost in the burn report</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>A model for each kind of subagent</td>
-					<td class="muted">Preview</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Grok: status line, trim totals, guard preview</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Grok dollar cap (forecast and guard), <code>trim --grok --apply</code></td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Subagent receipts, a cost preview before each subagent, and a budget per window</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Cold-cache warning</td>
-					<td class="muted">Preview</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Notifications (desktop, phone, Slack or Discord), limit-change alerts, after-reset jobs, account pointer, dashboard</td>
-					<td></td>
-					<td class="yes">✓</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<ul class="facts">
-		<li>
-			One key works on 3 computers. <code>limitcast deactivate</code> frees a
-			slot so you can move it.
-		</li>
-		<li>The key keeps working for up to 30 days offline.</li>
-		<li>
-			14-day free trial on every plan: you're charged only if you keep Pro past
-			day 14. Cancel anytime in Polar's customer portal. Or try it first with
-			<code>limitcast trial</code>: 7 days, no card.
-		</li>
-		<li>Team: each person gets their own key.</li>
-		<li>
-			14-day refund on any charge: email support@limitcast.dev from your
-			purchase address.
-		</li>
-	</ul>
+			<h2>Free and Pro</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th scope="col"></th>
+							<th scope="col">Free</th>
+							<th scope="col">Pro</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Price</td>
+							<td class="price">$0</td>
+							<td>
+								<span class="price">$79</span>/year or
+								<span class="price">$9</span>/month, 14 days free. Team:
+								<span class="price">$69</span>/seat/year, 3 seats minimum
+							</td>
+						</tr>
+						<tr>
+							<td>
+								Runout forecast with NEAR warnings and the daily allowance
+							</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Starting-context total and how much you never use (Claude Code,
+								Codex and Grok)
+							</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Results: value since install, limits warned about</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Subagent guard</td>
+							<td class="muted">Preview</td>
+							<td class="yes">Blocks, switches to Sonnet</td>
+						</tr>
+						<tr>
+							<td>
+								Names each item to cut, and cuts it (<code>trim --apply</code>)
+							</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Keep-list: servers and skills <code>trim --apply</code> never
+								touches
+							</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Daily share: a notification at 80% and an optional hold on new
+								subagents
+							</td>
+							<td class="muted">Preview</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Burn report, alerts, weekly summary</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Where your tokens went, scheduled-job starts, large tool-output
+								notice
+							</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Plan advisor, API-equivalent cost in the burn report</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>A model for each kind of subagent</td>
+							<td class="muted">Preview</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Grok: status line, trim totals, guard preview</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Grok dollar cap (forecast and guard),
+								<code>trim --grok --apply</code>
+							</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Subagent receipts, a cost preview before each subagent, and a
+								budget per window
+							</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Cold-cache warning</td>
+							<td class="muted">Preview</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Notifications (desktop, phone, Slack or Discord), limit-change
+								alerts, after-reset jobs, account pointer, dashboard
+							</td>
+							<td></td>
+							<td class="yes">✓</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<ul class="facts">
+				<li>
+					One key works on 3 computers. <code>limitcast deactivate</code> frees
+					a slot so you can move it.
+				</li>
+				<li>The key keeps working for up to 30 days offline.</li>
+				<li>
+					14-day free trial on every plan: you're charged only if you keep Pro
+					past day 14. Cancel anytime in Polar's customer portal. Or try it
+					first with
+					<code>limitcast trial</code>: 7 days, no card.
+				</li>
+				<li>Team: each person gets their own key.</li>
+				<li>
+					14-day refund on any charge: email support@limitcast.dev from your
+					purchase address.
+				</li>
+			</ul>
 
-	<h2>What happens when you buy</h2>
-	<ol class="facts">
-		<li><strong>Start the trial.</strong> Pick yearly or monthly; Polar handles checkout. Nothing is charged for 14 days.</li>
-		<li><strong>Get your key.</strong> It's in Polar's customer portal, linked from your confirmation email, and starts with <code>LIMITCAST-</code>.</li>
-		<li><strong>Turn on Pro, in one minute.</strong> <code>limitcast activate &lt;key&gt;</code>, then <code>limitcast install --guard --alerts</code> and <code>limitcast notify on</code>. Restart Claude Code.</li>
-		<li><strong>Check it in a week.</strong> <code>limitcast results</code> shows what it warned you about, stopped and saved. Not worth it? Cancel in the portal before day 14 and pay nothing.</li>
-	</ol>
+			<h2>What happens when you buy</h2>
+			<ol class="facts">
+				<li>
+					<strong>Start the trial.</strong>
+					Pick yearly or monthly; Polar handles checkout. Nothing is charged for
+					14 days.
+				</li>
+				<li>
+					<strong>Get your key.</strong>
+					It's in Polar's customer portal, linked from your confirmation email,
+					and starts with <code>LIMITCAST-</code>.
+				</li>
+				<li>
+					<strong>Turn on Pro, in one minute.</strong>
+					<code>limitcast activate &lt;key&gt;</code>, then
+					<code>limitcast install --guard --alerts</code>
+					and
+					<code>limitcast notify on</code>. Restart Claude Code.
+				</li>
+				<li>
+					<strong>Check it in a week.</strong>
+					<code>limitcast results</code>
+					shows what it warned you about, stopped and saved. Not worth it?
+					Cancel in the portal before day 14 and pay nothing.
+				</li>
+			</ol>
 
-	<h2>What works with which tool</h2>
-	<div class="table-wrap">
-		<table>
-			<thead>
-				<tr>
-					<th scope="col"></th>
-					<th scope="col">Claude Code</th>
-					<th scope="col">Codex</th>
-					<th scope="col">Grok</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td>Runout forecast</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-					<td class="muted">Spend only; forecast after a dollar cap</td>
-				</tr>
-				<tr>
-					<td>Subagent guard</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-					<td class="muted">Blocks once a dollar cap is set</td>
-				</tr>
-				<tr>
-					<td>Burn report</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Results</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-					<td class="muted">-</td>
-				</tr>
-				<tr>
-					<td>Trim advisor (<code>--codex</code> and <code>--grok</code> for the others)</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-					<td class="yes">✓</td>
-				</tr>
-				<tr>
-					<td>Where your tokens went, scheduled-job starts, tool-output notice</td>
-					<td class="yes">✓</td>
-					<td class="muted">-</td>
-					<td class="muted">-</td>
-				</tr>
-				<tr>
-					<td>Plan advisor, a model for each kind of subagent</td>
-					<td class="yes">✓</td>
-					<td class="muted">-</td>
-					<td class="muted">-</td>
-				</tr>
-				<tr>
-					<td>API-equivalent cost in the burn report</td>
-					<td class="yes">✓</td>
-					<td class="muted">-</td>
-					<td class="muted">-</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
+			<h2>What works with which tool</h2>
+			<div class="table-wrap">
+				<table>
+					<thead>
+						<tr>
+							<th scope="col"></th>
+							<th scope="col">Claude Code</th>
+							<th scope="col">Codex</th>
+							<th scope="col">Grok</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Runout forecast</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+							<td class="muted">Spend only; forecast after a dollar cap</td>
+						</tr>
+						<tr>
+							<td>Subagent guard</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+							<td class="muted">Blocks once a dollar cap is set</td>
+						</tr>
+						<tr>
+							<td>Burn report</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>Results</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+							<td class="muted">-</td>
+						</tr>
+						<tr>
+							<td>
+								Trim advisor (<code>--codex</code>
+								and <code>--grok</code> for the others)
+							</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+							<td class="yes">✓</td>
+						</tr>
+						<tr>
+							<td>
+								Where your tokens went, scheduled-job starts, tool-output notice
+							</td>
+							<td class="yes">✓</td>
+							<td class="muted">-</td>
+							<td class="muted">-</td>
+						</tr>
+						<tr>
+							<td>Plan advisor, a model for each kind of subagent</td>
+							<td class="yes">✓</td>
+							<td class="muted">-</td>
+							<td class="muted">-</td>
+						</tr>
+						<tr>
+							<td>API-equivalent cost in the burn report</td>
+							<td class="yes">✓</td>
+							<td class="muted">-</td>
+							<td class="muted">-</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-	<h2>Get started</h2>
-	<pre><code>npm install -g limitcast     <span class="dim"># or: brew trust samstull9007/limitcast &amp;&amp; brew install samstull9007/limitcast/limitcast</span>
+			<h2>Get started</h2>
+			<pre
+			><code>npm install -g limitcast     <span class="dim"># or: brew trust samstull9007/limitcast &amp;&amp; brew install samstull9007/limitcast/limitcast</span>
 limitcast install            <span class="dim"># free: status-line recorder</span>
 limitcast trial              <span class="dim"># Pro free for 7 days, no card</span>
 limitcast activate &lt;key&gt;     <span class="dim"># Pro</span>
 limitcast install --guard    <span class="dim"># the subagent guard (free: preview only)</span>
 limitcast doctor
 limitcast results            <span class="dim"># what limitcast did for you</span></code></pre>
-	<p class="muted">
-		Requires Node 20 or later on macOS or Linux. Homebrew 7 and later asks you to
-		trust a third-party tap before installing from it, hence the
-		<code>brew trust</code>. Restart Claude Code after installing. To add the slash commands, run
-		<code>claude plugin install limitcast --marketplace SamStull9007/limitcast</code>
-		in a terminal, or inside Claude Code
-		<code>/plugin marketplace add SamStull9007/limitcast</code>, then
-		<code>/plugin install limitcast@limitcast</code>.
-	</p>
+			<p class="muted">
+				Requires Node 20 or later on macOS or Linux. Homebrew 7 and later asks
+				you to trust a third-party tap before installing from it, hence the
+				<code>brew trust</code>. Restart Claude Code after installing. To add
+				the slash commands, run
+				<code
+					>claude plugin install limitcast --marketplace
+					SamStull9007/limitcast</code
+				>
+				in a terminal, or inside Claude Code
+				<code>/plugin marketplace add SamStull9007/limitcast</code>, then
+				<code>/plugin install limitcast@limitcast</code>.
+			</p>
 
-	<footer>
-		Pricing and checkout:
-		<a href="/#pricing"
-			>limitcast.dev</a
-		>
-		· Support: support@limitcast.dev
-	</footer>
-</main>
-
-</body>
+			<footer>
+				Pricing and checkout:
+				<a href="/#pricing">limitcast.dev</a>
+				· Support: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
 </html>

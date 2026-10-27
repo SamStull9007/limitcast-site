@@ -1,29 +1,35 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>limitcast: stretch your Claude Code plan</title>
-    <meta
-      name="description"
-      content="limitcast measures the ~100k tokens every Claude Code session loads before you type, shows what you never use, and stops runaway subagents before they burn your window. Runs locally."
-    >
-    <link rel="canonical" href="https://limitcast.dev/">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://limitcast.dev/">
-    <meta property="og:title" content="limitcast: stop getting locked out of Claude Code">
-    <meta
-      property="og:description"
-      content="Forecasts when each usage limit runs out, stops runaway subagents, and shows what drains your plan. Local only, free tier."
-    >
-    <meta property="og:image" content="https://limitcast.dev/og.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="limitcast: Stop getting locked out of Claude Code. A gauge with the forecast runout dashed to the limit.">
-    <meta name="twitter:card" content="summary_large_image">
-    <script type="application/ld+json">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>limitcast: get more work from your AI coding plan</title>
+		<meta
+			name="description"
+			content="Forecast usage limits, control subagent burn, and trim unused starting context across Claude Code, Codex and Grok. Runs locally. Start free, no card."
+		>
+		<link rel="canonical" href="https://limitcast.dev/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://limitcast.dev/">
+		<meta
+			property="og:title"
+			content="limitcast: stop getting locked out of Claude Code"
+		>
+		<meta
+			property="og:description"
+			content="Forecasts when each usage limit runs out, stops runaway subagents, and shows what drains your plan. Local only, free tier."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta
+			property="og:image:alt"
+			content="limitcast: Stop getting locked out of Claude Code. A gauge with the forecast runout dashed to the limit."
+		>
+		<meta name="twitter:card" content="summary_large_image">
+		<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
@@ -62,7 +68,7 @@
   ]
 }
     </script>
-    <script type="application/ld+json">
+		<script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -142,453 +148,588 @@
   ]
 }
     </script>
-    <script
-      data-goatcounter="https://limitcast.goatcounter.com/count"
-      async
-      src="https://gc.zgo.at/count.v4.js"
-      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
-      crossorigin="anonymous"
-    ></script>
-    <style>
-    .demo {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-      background: var(--code-bg);
-      margin: 1.5rem 0 0.4rem;
-    }
-    .muted {
-      color: var(--muted);
-    }
-    .dim {
-      color: #8a857c;
-    }
-    .feature {
-      padding: 28px 0;
-      border-top: 1px solid var(--line);
-    }
-    .feature > div:first-child {
-      max-width: 720px;
-      margin-bottom: 14px;
-    }
-    .feature h3 {
-      margin: 0 0 8px;
-      font-size: 1.15rem;
-    }
-    .feature p {
-      margin: 0 0 10px;
-    }
-    .feature pre {
-      margin: 0;
-      font-size: 13px;
-      white-space: pre-wrap;
-      overflow-wrap: anywhere;
-    }
-    .feature pre.cols {
-      white-space: pre;
-    }
-    .pro-note {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .badge {
-      display: inline-block;
-      vertical-align: 2px;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      padding: 2px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--line);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .badge.pro {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-    .shot {
-      display: block;
-      width: 100%;
-      max-width: 600px;
-      height: auto;
-      border-radius: 10px;
-      border: 1px solid var(--line);
-    }
-    .notif {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-      max-width: 400px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      box-shadow: 0 8px 28px rgb(0 0 0 / 0.18);
-      font-size: 0.9rem;
-      line-height: 1.4;
-    }
-    .notif img {
-      border-radius: 9px;
-      flex: none;
-    }
-    .steps {
-      padding-left: 22px;
-    }
-    .steps li {
-      margin-bottom: 10px;
-    }
-    .table-wrap {
-      overflow-x: auto;
-    }
-    table.compare {
-      min-width: 980px;
-    }
-    .plans th:nth-child(2),
-    .plans td:nth-child(2) {
-      background: none;
-      font-weight: 400;
-      color: var(--muted);
-    }
-    .plans th:nth-child(3),
-    .plans td:nth-child(3) {
-      background: var(--card);
-      font-weight: 600;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      min-width: 560px;
-      font-size: 0.95rem;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 10px 12px;
-      border-bottom: 1px solid var(--line);
-      vertical-align: top;
-    }
-    th:nth-child(2),
-    td:nth-child(2) {
-      background: var(--card);
-      font-weight: 600;
-    }
-    :root {
-      --bg: #fbfaf7;
-      --fg: #1d1c1a;
-      --muted: #5f5c55;
-      --line: #e4e0d8;
-      --card: #ffffff;
-      --accent: #c2410c;
-      --accent-fg: #ffffff;
-      --code-bg: #1d1c1a;
-      --code-fg: #f3efe6;
-      --ok: #15803d;
-      --warn: #b45309;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141312;
-        --fg: #eeeae2;
-        --muted: #a8a399;
-        --line: #2c2a27;
-        --card: #1b1a18;
-        --accent: #f97316;
-        --accent-fg: #141312;
-        --code-bg: #0c0b0a;
-        --code-fg: #eeeae2;
-        --ok: #4ade80;
-        --warn: #fbbf24;
-      }
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font:
-        17px / 1.6 ui-sans-serif,
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        sans-serif;
-    }
-    a {
-      color: var(--accent);
-      text-underline-offset: 2px;
-    }
-    a:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
-    main {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 0 16px 64px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px 16px;
-      flex-wrap: wrap;
-      padding: 20px 0;
-    }
-    nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 20px;
-    }
-    .logo {
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    nav a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-    h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin: 48px 0 16px;
-    }
-    h2 {
-      font-size: 1.6rem;
-      letter-spacing: -0.02em;
-      margin: 64px 0 16px;
-    }
-    .lede {
-      font-size: 1.2rem;
-      color: var(--muted);
-      max-width: 640px;
-    }
-    pre {
-      background: var(--code-bg);
-      color: var(--code-fg);
-      padding: 18px 20px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font:
-        14px / 1.55 ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        monospace;
-    }
-    .ok {
-      color: var(--ok);
-    }
-    .warn {
-      color: var(--warn);
-    }
-    .cta {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin: 28px 0;
-    }
-    .btn {
-      display: inline-block;
-      padding: 12px 20px;
-      border-radius: 8px;
-      font-weight: 600;
-      text-decoration: none;
-      border: 1px solid var(--line);
-      color: var(--fg);
-    }
-    .btn.primary {
-      background: var(--accent);
-      color: var(--accent-fg);
-      border-color: var(--accent);
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 22px;
-    }
-    .card h3 {
-      margin: 0 0 8px;
-      font-size: 1.1rem;
-    }
-    .card p {
-      margin: 0;
-      color: var(--muted);
-    }
-    .price {
-      font-size: 2.2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .price small {
-      font-size: 1rem;
-      color: var(--muted);
-      font-weight: 400;
-    }
-    .card ul {
-      padding-left: 20px;
-      color: var(--muted);
-    }
-    .featured {
-      border: 2px solid var(--accent);
-    }
-    details {
-      border-bottom: 1px solid var(--line);
-      padding: 14px 0;
-    }
-    summary {
-      cursor: pointer;
-      font-weight: 600;
-    }
-    footer {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 64px;
-    }
-    code {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 0.92em;
-    }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <span class="logo">limitcast</span>
-        <nav><a href="#how">Features</a><a href="#compare">Compare</a><a href="#pricing">Pricing</a><a href="#faq">FAQ</a><a href="/guide/">Guide</a><a href="/blog/">Blog</a><a href="https://github.com/SamStull9007/limitcast">GitHub</a></nav>
-      </header>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		.demo {
+			display: block;
+			width: 100%;
+			height: auto;
+			border-radius: 10px;
+			border: 1px solid var(--line);
+			background: var(--code-bg);
+			margin: 1.5rem 0 0.4rem;
+		}
+		.muted {
+			color: var(--muted);
+		}
+		.dim {
+			color: #8a857c;
+		}
+		.feature {
+			padding: 28px 0;
+			border-top: 1px solid var(--line);
+		}
+		.feature > div:first-child {
+			max-width: 720px;
+			margin-bottom: 14px;
+		}
+		.feature h3 {
+			margin: 0 0 8px;
+			font-size: 1.15rem;
+		}
+		.feature p {
+			margin: 0 0 10px;
+		}
+		.feature pre {
+			margin: 0;
+			font-size: 13px;
+			white-space: pre-wrap;
+			overflow-wrap: anywhere;
+		}
+		.feature pre.cols {
+			white-space: pre;
+		}
+		.pro-note {
+			color: var(--muted);
+			font-size: 0.95rem;
+		}
+		.badge {
+			display: inline-block;
+			vertical-align: 2px;
+			font-size: 0.72rem;
+			font-weight: 600;
+			letter-spacing: 0.02em;
+			padding: 2px 8px;
+			border-radius: 999px;
+			border: 1px solid var(--line);
+			color: var(--muted);
+			white-space: nowrap;
+		}
+		.badge.pro {
+			border-color: var(--accent);
+			color: var(--accent);
+		}
+		.shot {
+			display: block;
+			width: 100%;
+			max-width: 600px;
+			height: auto;
+			border-radius: 10px;
+			border: 1px solid var(--line);
+		}
+		.notif {
+			display: flex;
+			gap: 12px;
+			align-items: flex-start;
+			max-width: 400px;
+			padding: 14px 16px;
+			border-radius: 16px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			box-shadow: 0 8px 28px rgb(0 0 0 / 0.18);
+			font-size: 0.9rem;
+			line-height: 1.4;
+		}
+		.notif img {
+			border-radius: 9px;
+			flex: none;
+		}
+		.steps {
+			padding-left: 22px;
+		}
+		.steps li {
+			margin-bottom: 10px;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table.compare {
+			min-width: 980px;
+		}
+		.plans th:nth-child(2),
+		.plans td:nth-child(2) {
+			background: none;
+			font-weight: 400;
+			color: var(--muted);
+		}
+		.plans th:nth-child(3),
+		.plans td:nth-child(3) {
+			background: var(--card);
+			font-weight: 600;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			min-width: 560px;
+			font-size: 0.95rem;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 10px 12px;
+			border-bottom: 1px solid var(--line);
+			vertical-align: top;
+		}
+		th:nth-child(2),
+		td:nth-child(2) {
+			background: var(--card);
+			font-weight: 600;
+		}
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--accent-fg: #ffffff;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+			--ok: #15803d;
+			--warn: #b45309;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--accent-fg: #141312;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+				--ok: #4ade80;
+				--warn: #fbbf24;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				17px / 1.6 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		a {
+			color: var(--accent);
+			text-underline-offset: 2px;
+		}
+		a:focus-visible {
+			outline: 2px solid var(--accent);
+			outline-offset: 2px;
+		}
+		main {
+			max-width: 960px;
+			margin: 0 auto;
+			padding: 0 16px 64px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+		}
+		nav {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 4px 20px;
+		}
+		.logo {
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		nav a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		h1 {
+			font-size: clamp(2rem, 5vw, 3.2rem);
+			line-height: 1.1;
+			letter-spacing: -0.03em;
+			margin: 48px 0 16px;
+		}
+		h2 {
+			font-size: 1.6rem;
+			letter-spacing: -0.02em;
+			margin: 64px 0 16px;
+		}
+		.lede {
+			font-size: 1.2rem;
+			color: var(--muted);
+			max-width: 640px;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 18px 20px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.ok {
+			color: var(--ok);
+		}
+		.warn {
+			color: var(--warn);
+		}
+		.cta {
+			display: flex;
+			gap: 12px;
+			flex-wrap: wrap;
+			margin: 28px 0;
+		}
+		.btn {
+			display: inline-block;
+			padding: 12px 20px;
+			border-radius: 8px;
+			font-weight: 600;
+			text-decoration: none;
+			border: 1px solid var(--line);
+			color: var(--fg);
+		}
+		.btn:focus-visible,
+		a:focus-visible {
+			outline: 3px solid var(--accent);
+			outline-offset: 4px;
+		}
+		button.btn {
+			background: var(--card);
+			color: var(--fg);
+			min-height: 44px;
+			font: inherit;
+			cursor: pointer;
+		}
+		#copy-status {
+			display: inline-block;
+			margin-left: 12px;
+			max-width: 48ch;
+		}
+		.btn.primary {
+			background: var(--accent);
+			color: var(--accent-fg);
+			border-color: var(--accent);
+		}
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+			gap: 16px;
+		}
+		.card {
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			padding: 22px;
+		}
+		.card h3 {
+			margin: 0 0 8px;
+			font-size: 1.1rem;
+		}
+		.card p {
+			margin: 0;
+			color: var(--muted);
+		}
+		.price {
+			font-size: 2.2rem;
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		.price small {
+			font-size: 1rem;
+			color: var(--muted);
+			font-weight: 400;
+		}
+		.card ul {
+			padding-left: 20px;
+			color: var(--muted);
+		}
+		.featured {
+			border: 2px solid var(--accent);
+		}
+		details {
+			border-bottom: 1px solid var(--line);
+			padding: 14px 0;
+		}
+		summary {
+			cursor: pointer;
+			font-weight: 600;
+		}
+		footer {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 64px;
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.92em;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<span class="logo">limitcast</span>
+				<nav>
+					<a href="#how">Features</a><a href="#compare">Compare</a
+					><a href="#pricing">Pricing</a><a href="#faq">FAQ</a
+					><a href="/guide/">Guide</a><a href="/blog/">Blog</a
+					><a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
 
-      <section id="thanks" class="card featured" hidden>
-        <h3>Thanks for buying limitcast Pro.</h3>
-        <p>Get your license key: open the confirmation email from Polar, click <b>Access purchase</b>, and copy the key under <b>limitcast Pro license</b> (it starts with <code>LIMITCAST-</code>). Activate it:</p>
-        <pre>npm install -g limitcast
+			<section id="thanks" class="card featured" hidden>
+				<h3>Thanks for buying limitcast Pro.</h3>
+				<p>
+					Get your license key: open the confirmation email from Polar, click
+					<b>Access purchase</b>, and copy the key under
+					<b>limitcast Pro license</b>
+					(it starts with <code>LIMITCAST-</code>). Activate it:
+				</p>
+				<pre>npm install -g limitcast
 limitcast activate LIMITCAST-your-key
 limitcast install --guard --alerts
 limitcast notify on
 limitcast trim --apply</pre>
-        <p>One key works on up to 3 computers. <code>limitcast deactivate</code> frees one. Questions: support@limitcast.dev</p>
-      </section>
+				<p>
+					One key works on up to 3 computers.
+					<code>limitcast deactivate</code>
+					frees one. Questions: support@limitcast.dev
+				</p>
+			</section>
 
-      <h1>Stretch your Claude Code plan.</h1>
-      <p class="lede">
-        Every Claude Code session starts with ~100k tokens of context before you type, re-sent on every turn and to every subagent. limitcast measures
-        exactly what's in it, cuts what you never use, and stops runaway subagents (or moves them to Sonnet) before they burn the rest of your
-        window. More work out of the plan you already pay for.
-      </p>
-      <div class="cta">
-        <a class="btn primary" href="#pricing">Get Pro</a>
-        <a class="btn" href="#install">Install free</a>
-      </div>
+			<h1>Get more work from your AI coding plan.</h1>
+			<p class="lede">
+				Forecast your usage limits, control subagent burn, and trim unused
+				starting context across Claude Code, Codex and Grok. One local tool,
+				with backups, keep-lists and undo.
+			</p>
+			<div class="cta">
+				<a
+					class="btn primary"
+					href="#install"
+					data-goatcounter-click="install-intent"
+					>Install free — no card</a
+				>
+				<a class="btn" href="#pricing">Try Pro</a>
+			</div>
+			<p class="pro-note">
+				Your code and prompts stay on your machine. No AI account credentials
+				required. Pro controls remain optional.
+			</p>
+			<pre id="quick-install"><code>npm install -g limitcast
+limitcast onboard</code></pre>
+			<button
+				class="btn"
+				type="button"
+				id="copy-install"
+				data-goatcounter-click="install-copy-intent"
+			>
+				Copy install commands
+			</button>
+			<span id="copy-status" role="status" aria-live="polite"></span>
+			<p class="pro-note">
+				Start with the free checks. CLI Pro trial: 7 days, no card. Polar
+				checkout trial: 14 days, then your chosen subscription is billed.
+			</p>
+			<p>
+				<strong>Predict:</strong>
+				see which window is likely to run out first.
+				<strong>Protect:</strong>
+				control new subagents when capacity is tight.
+				<strong>Trim:</strong>
+				inspect unused context and apply reversible cuts with Pro.
+			</p>
 
-      <video class="demo" autoplay muted loop playsinline preload="metadata" poster="/demo-poster.png" width="1200" height="800">
-        <source src="/demo.mp4" type="video/mp4">
-        <img src="/demo.gif" alt="limitcast status, trim and results running in a terminal" width="1200" height="800">
-      </video>
-      <p><small>Recorded on the author's machine: <code>status</code>, <code>trim --share</code> and <code>results</code>, unedited.</small></p>
+			<video
+				class="demo"
+				autoplay
+				muted
+				loop
+				playsinline
+				preload="metadata"
+				poster="/demo-poster.png"
+				width="1200"
+				height="800"
+			>
+				<source src="/demo.mp4" type="video/mp4">
+				<img
+					src="/demo.gif"
+					alt="limitcast status, trim and results running in a terminal"
+					width="1200"
+					height="800"
+				>
+			</video>
+			<p>
+				<small
+					>Recorded on the author's machine: <code>status</code>,
+					<code>trim --share</code>
+					and <code>results</code>, unedited.</small
+				>
+			</p>
 
-      <pre>$ limitcast trim
+			<pre>$ limitcast trim
 Every Claude Code session starts at <b>102.7k tokens</b> before your first message.
 
-## Measured savings: ~6.2k tokens per session (6% of your starting context)
+## Estimated removable context: ~6.2k tokens (6% of this starting context)
 - Disable 9 MCP servers you haven't used in 14 days (~0.9k): postman, context7, ...
 - Hide 66 skills from the model (~5.3k): dataviz, block-kit, ...
 
 | Instruction files      8.2k | Tool names          7.1k |
 | Skill listing          6.7k | SessionStart hooks  6.5k |
 | Agent list             4.9k | MCP instructions    3.1k |</pre>
-      <p><small>A real run on a heavy user's setup, names shortened. Your numbers come from your own transcripts.</small></p>
+			<p>
+				<small
+					>A real run on a heavy user's setup, names shortened. Your numbers
+					come from your own transcripts.</small
+				>
+			</p>
 
-      <h2 id="proof">What it found on its author's machine</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>40 min</h3>
-          <p>warning before a weekly Claude limit ran out, from a forecast that only had the readings it had at the time.</p>
-        </div>
-        <div class="card">
-          <h3>200k vs 10.7M</h3>
-          <p>
-            tokens per 1% of the 5-hour window: new tokens vs cached ones. Cached context is cheap; long sessions and subagents are what run you out.
-          </p>
-        </div>
-        <div class="card">
-          <h3>30%</h3>
-          <p>of Claude tokens went to subagents in a day. That's what the guard watches.</p>
-        </div>
-      </div>
-      <p><small>Day one, from <code>limitcast results</code> and <code>limitcast report</code>. Measure your own: <code>npx limitcast results</code>.</small></p>
-      <p>
-        <a href="/blog/claude-code-usage-limits/">Claude Code usage limit reached: how the 5-hour and weekly limits work →</a><br>
-        <a href="/blog/tokens-per-percent/">How many tokens is 1% of your Claude Code limit? →</a><br>
-        <a href="/blog/subagents/">Do subagents burn your limit faster? →</a><br>
-        <a href="/blog/prompt-cache-idle/">Why a long idle pause costs you: the prompt cache →</a>
-      </p>
+			<h2 id="proof">What it found on its author's machine</h2>
+			<div class="grid">
+				<div class="card">
+					<h3>40 min</h3>
+					<p>
+						warning before a weekly Claude limit ran out, from a forecast that
+						only had the readings it had at the time.
+					</p>
+				</div>
+				<div class="card">
+					<h3>200k vs 10.7M</h3>
+					<p>
+						tokens per 1% of the 5-hour window: new tokens vs cached ones.
+						Cached context is cheap; long sessions and subagents are what run
+						you out.
+					</p>
+				</div>
+				<div class="card">
+					<h3>30%</h3>
+					<p>
+						of Claude tokens went to subagents in a day. That's what the guard
+						watches.
+					</p>
+				</div>
+			</div>
+			<p>
+				<small
+					>Day one, from <code>limitcast results</code> and
+					<code>limitcast report</code>. Measure your own:
+					<code>npx limitcast results</code>.</small
+				>
+			</p>
+			<p>
+				<a href="/blog/claude-code-usage-limits/"
+					>Claude Code usage limit reached: how the 5-hour and weekly limits
+					work →</a
+				><br>
+				<a href="/blog/tokens-per-percent/"
+					>How many tokens is 1% of your Claude Code limit? →</a
+				><br>
+				<a href="/blog/subagents/">Do subagents burn your limit faster? →</a>
+				<br>
+				<a href="/blog/prompt-cache-idle/"
+					>Why a long idle pause costs you: the prompt cache →</a
+				>
+			</p>
 
-      <h2 id="how">Everything you get</h2>
-      <p class="muted">
-        Each feature below shows the exact text limitcast prints. The numbers in the samples are an example; yours come from your own readings and
-        transcripts.
-      </p>
+			<h2 id="how">Everything you get</h2>
+			<p class="muted">
+				Each feature below shows the exact text limitcast prints. The numbers in
+				the samples are an example; yours come from your own readings and
+				transcripts.
+			</p>
 
-      <section class="feature" id="f-statusline">
-        <div>
-          <h3>Your limits in the status line <span class="badge">Free</span></h3>
-          <p>
-            Every Claude Code prompt shows how much of each window you've used, when it runs out if you keep this pace, and today's even share of the
-            week. Your own status line stays exactly as it was; limitcast adds to it.
-          </p>
-          <p class="pro-note">
-            <span class="badge pro">Pro</span> adds a pointer to your other Claude account when this one is nearly out, and a <code>/compact</code>
-            nudge once a session re-sends more than ~150k tokens per call.
-          </p>
-        </div>
-        <pre>5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left
+			<section class="feature" id="f-statusline">
+				<div>
+					<h3>
+						Your limits in the status line <span class="badge">Free</span>
+					</h3>
+					<p>
+						Every Claude Code prompt shows how much of each window you've used,
+						when it runs out if you keep this pace, and today's even share of
+						the week. Your own status line stays exactly as it was; limitcast
+						adds to it.
+					</p>
+					<p class="pro-note">
+						<span class="badge pro">Pro</span>
+						adds a pointer to your other Claude account when this one is nearly
+						out, and a <code>/compact</code>
+						nudge once a session re-sends more than ~150k tokens per call.
+					</p>
+				</div>
+				<pre
+				>5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left
 
 <span class="dim"># Pro, when you need it:</span>
 5h 96% <span class="warn">⚠ near limit</span> · 7d 58% · today 2% over
 limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-forecast">
-        <div>
-          <h3>Runout forecast <span class="badge">Free</span></h3>
-          <p>
-            Burn rate and the clock time each 5-hour and weekly window runs out, for Claude Code and Codex, and for Grok once you set a dollar cap. The
-            weekly window is paced over the last full day, nights included, so one busy hour doesn't cry wolf. <b>NEAR</b> at 95%, even before there's a rate.
-          </p>
-          <p>
-            <b>New in 0.14:</b> when a window is on pace to run out, <code>status</code> ends with one line that names the one that runs out first and
-            where else there is room.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast status
+			<section class="feature" id="f-forecast">
+				<div>
+					<h3>Runout forecast <span class="badge">Free</span></h3>
+					<p>
+						Burn rate and the clock time each 5-hour and weekly window runs out,
+						for Claude Code and Codex, and for Grok once you set a dollar cap.
+						The weekly window is paced over the last full day, nights included,
+						so one busy hour doesn't cry wolf. <b>NEAR</b> at 95%, even before
+						there's a rate.
+					</p>
+					<p>
+						<b>New in 0.14:</b>
+						when a window is on pace to run out, <code>status</code> ends with
+						one line that names the one that runs out first and where else there
+						is room.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast status
 window     used  burn      runs out  resets     today     status
 claude 5h  71%   +18.2%/h  16:40     17:00      -         <span class="warn">AT_RISK</span>
 claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   <span class="ok">OK</span>
 codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</span>
 
 You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-guard">
-        <div>
-          <h3>Subagent guard <span class="badge pro">Pro</span> <span class="badge">Free preview</span></h3>
-          <p>
-            A burst of subagents is the most common way to lose the end of a window. When a window is on pace to run out within 30 minutes, the
-            guard stops new subagents in Claude Code and Codex (and in Grok once you set a dollar cap). While a Claude window is merely tight, new subagents run on Sonnet instead of your
-            main model. Once you're past 100% it steps aside, so paid extra usage keeps working.
-          </p>
-          <p class="pro-note">Free installs run it as a preview: it never acts, and <code>results</code> shows what it would have stopped.</p>
-        </div>
-        <pre><span class="dim"># a new subagent, 21 minutes before the window runs out:</span>
+			<section class="feature" id="f-guard">
+				<div>
+					<h3>
+						Subagent guard <span class="badge pro">Pro</span>
+						<span class="badge">Free preview</span>
+					</h3>
+					<p>
+						A burst of subagents is the most common way to lose the end of a
+						window. When a window is on pace to run out within 30 minutes, the
+						guard stops new subagents in Claude Code and Codex (and in Grok once
+						you set a dollar cap). While a Claude window is merely tight, new
+						subagents run on Sonnet instead of your main model. Once you're past
+						100% it steps aside, so paid extra usage keeps working.
+					</p>
+					<p class="pro-note">
+						Free installs run it as a preview: it never acts, and
+						<code>results</code>
+						shows what it would have stopped.
+					</p>
+				</div>
+				<pre
+				><span class="dim"># a new subagent, 21 minutes before the window runs out:</span>
 limitcast: Claude 5h limit is 93% used and on pace to run out in
 ~21 min, before it resets. Finish with the agents already running,
 or set LIMITCAST_ALLOW=1 to spawn anyway.
@@ -596,22 +737,31 @@ or set LIMITCAST_ALLOW=1 to spawn anyway.
 <span class="dim"># a new subagent while the window is tight:</span>
 limitcast: Claude 5h limit is 88% used; this subagent runs on
 Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-daily">
-        <div>
-          <h3>Your week, paced by the day <span class="badge pro">Pro</span> <span class="badge">Free preview</span> <span class="badge">New in 0.14</span></h3>
-          <p>
-            The <code>today</code> figure in your status line is your share of what is left of the week, split evenly over the days until it resets.
-            Now it acts: with notifications on, you get one message a day when you have used 80% of today's share. Turn on
-            <code>limitcast budget today on</code> and the guard also holds new subagents once today's share is used up, until local midnight.
-          </p>
-          <p class="pro-note">
-            The hold is off by default. A window already at 100% is left to the tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free installs
-            record what Pro would have held, and <code>results</code> shows it.
-          </p>
-        </div>
-        <pre><span class="dim"># once a day, at 80% of today's share:</span>
+			<section class="feature" id="f-daily">
+				<div>
+					<h3>
+						Your week, paced by the day <span class="badge pro">Pro</span>
+						<span class="badge">Free preview</span>
+						<span class="badge">New in 0.14</span>
+					</h3>
+					<p>
+						The <code>today</code> figure in your status line is your share of
+						what is left of the week, split evenly over the days until it
+						resets. Now it acts: with notifications on, you get one message a
+						day when you have used 80% of today's share. Turn on
+						<code>limitcast budget today on</code>
+						and the guard also holds new subagents once today's share is used
+						up, until local midnight.
+					</p>
+					<p class="pro-note">
+						The hold is off by default. A window already at 100% is left to the
+						tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free installs
+						record what Pro would have held, and <code>results</code> shows it.
+					</p>
+				</div>
+				<pre><span class="dim"># once a day, at 80% of today's share:</span>
 limitcast: Claude 7d: 80% of today's share used, 1% left today.
 
 <span class="dim"># a new subagent, with the hold on:</span>
@@ -619,22 +769,32 @@ limitcast: today's share of your Claude 7d limit is used up (6% of
 5%). New subagents are held until midnight. Turn this off:
 `limitcast budget today off`, or set LIMITCAST_ALLOW=1 to
 spawn anyway.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-models">
-        <div>
-          <h3>A model for each kind of subagent <span class="badge pro">Pro</span> <span class="badge">New in 0.13</span></h3>
-          <p>
-            Most subagents just read and search, and they inherit your main model. Pin a kind to a cheaper one and every new subagent of that kind
-            runs on it, for example <code>Explore</code> on Haiku. A spawn that names its own model is left alone, and while a window is tight a kind
-            pinned to Opus still moves to Sonnet. <code>results</code> counts the subagents it moved.
-          </p>
-          <p class="pro-note">
-            Needs <code>limitcast install --guard</code>. Free installs record what it would have done. Whether a cheaper model costs less of your
-            limit per token isn't something limitcast can tell, so check <code>report --why</code> after a week.
-          </p>
-        </div>
-        <pre>$ limitcast subagent-model Explore haiku
+			<section class="feature" id="f-models">
+				<div>
+					<h3>
+						A model for each kind of subagent <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.13</span>
+					</h3>
+					<p>
+						Most subagents just read and search, and they inherit your main
+						model. Pin a kind to a cheaper one and every new subagent of that
+						kind runs on it, for example <code>Explore</code> on Haiku. A spawn
+						that names its own model is left alone, and while a window is tight
+						a kind pinned to Opus still moves to Sonnet.
+						<code>results</code>
+						counts the subagents it moved.
+					</p>
+					<p class="pro-note">
+						Needs <code>limitcast install --guard</code>. Free installs record
+						what it would have done. Whether a cheaper model costs less of your
+						limit per token isn't something limitcast can tell, so check
+						<code>report --why</code>
+						after a week.
+					</p>
+				</div>
+				<pre>$ limitcast subagent-model Explore haiku
 Explore: haiku
 
 Types you ran in the last 30 days: general-purpose (86), Explore (39), fork (39)
@@ -642,21 +802,29 @@ New subagents of these types run on that model unless the spawn names one itself
 
 <span class="dim"># the next Explore subagent:</span>
 limitcast: Explore subagents run on haiku, the model you set for them.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-receipts">
-        <div>
-          <h3>Subagent receipts and budgets <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
-          <p>
-            Each time a subagent finishes, you see what it cost against your 5-hour window, priced from your own readings (the model never sees
-            it). Set a budget and the guard holds new subagents once they've used that share of the current window, until it resets.
-          </p>
-          <p>
-            <b>New in 0.12:</b> before a new subagent starts, you see what that kind has cost you so far. It appears once you have 3 priced runs, and
-            only when a typical run is over 1% of a window or the window is near its limit. It never blocks.
-          </p>
-        </div>
-        <pre>limitcast: that Explore subagent used ≈2.1% of your 5-hour window
+			<section class="feature" id="f-receipts">
+				<div>
+					<h3>
+						Subagent receipts and budgets <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.11</span>
+					</h3>
+					<p>
+						Each time a subagent finishes, you see what it cost against your
+						5-hour window, priced from your own readings (the model never sees
+						it). Set a budget and the guard holds new subagents once they've
+						used that share of the current window, until it resets.
+					</p>
+					<p>
+						<b>New in 0.12:</b>
+						before a new subagent starts, you see what that kind has cost you so
+						far. It appears once you have 3 priced runs, and only when a typical
+						run is over 1% of a window or the window is near its limit. It never
+						blocks.
+					</p>
+				</div>
+				<pre>limitcast: that Explore subagent used ≈2.1% of your 5-hour window
 (34 calls, 180k new tokens).
 
 limitcast: Explore subagents have cost you a median ≈1.2% (max ≈3.6%) of
@@ -665,61 +833,106 @@ a 5-hour window over 7 runs; this window is 38% used.
 $ limitcast budget subagents 15
 Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%.
 Once it's spent, the guard holds new subagents until the window resets.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-cold">
-        <div>
-          <h3>Cold-cache warning <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
-          <p>
-            Come back to a big session after a long break and the prompt cache has expired: your next message re-sends the whole context as new
-            tokens. limitcast holds that first message once and tells you what it will cost, so you can <code>/compact</code> first. Send it again
-            and it goes through. The cache lifetime is 60 minutes by default (<code>LIMITCAST_CACHE_MINUTES</code>).
-          </p>
-          <p class="pro-note">Free installs record what it would have held; <code>results</code> shows it.</p>
-        </div>
-        <pre>limitcast: this session sat idle for 75 minutes, so its prompt cache has
+			<section class="feature" id="f-cold">
+				<div>
+					<h3>
+						Cold-cache warning <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.11</span>
+					</h3>
+					<p>
+						Come back to a big session after a long break and the prompt cache
+						has expired: your next message re-sends the whole context as new
+						tokens. limitcast holds that first message once and tells you what
+						it will cost, so you can <code>/compact</code> first. Send it again
+						and it goes through. The cache lifetime is 60 minutes by default (<code
+							>LIMITCAST_CACHE_MINUTES</code
+						>).
+					</p>
+					<p class="pro-note">
+						Free installs record what it would have held;
+						<code>results</code>
+						shows it.
+					</p>
+				</div>
+				<pre
+				>limitcast: this session sat idle for 75 minutes, so its prompt cache has
 expired. Your message re-sends 300k tokens of context: ≈1.8% of your
 5-hour window (≈0.03% if the cache were still warm). Send it again to go
 ahead, or run /compact first to shrink it.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-notify">
-        <div>
-          <h3>Notifications: desktop, phone or Slack <span class="badge pro">Pro</span></h3>
-          <p>
-            One notification when a Claude window turns NEAR, AT_RISK or HIT, and one when it resets after a HIT, so you can step away and come back
-            at the right time. On macOS they come from limitcast's own notifier app, listed under its name in System Settings. Linux uses
-            notify-send.
-          </p>
-          <p>
-            <b>New in 0.11:</b> the same messages on your phone through <a href="https://ntfy.sh">ntfy</a>
-            (<code>limitcast notify ntfy &lt;topic&gt;</code>) or in a Slack or Discord channel (<code>limitcast notify webhook &lt;url&gt;</code>).
-            Opt-in; only the notification text is sent, to the service you chose.
-          </p>
-        </div>
-        <div class="notif" role="img" aria-label="Example notification: Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.">
-          <img src="/icon.png" alt="" width="40" height="40">
-          <div><b>limitcast</b><br>Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00.</div>
-        </div>
-      </section>
+			<section class="feature" id="f-notify">
+				<div>
+					<h3>
+						Notifications: desktop, phone or Slack
+						<span class="badge pro">Pro</span>
+					</h3>
+					<p>
+						One notification when a Claude window turns NEAR, AT_RISK or HIT,
+						and one when it resets after a HIT, so you can step away and come
+						back at the right time. On macOS they come from limitcast's own
+						notifier app, listed under its name in System Settings. Linux uses
+						notify-send.
+					</p>
+					<p>
+						<b>New in 0.11:</b>
+						the same messages on your phone through
+						<a href="https://ntfy.sh">ntfy</a>
+						(<code>limitcast notify ntfy &lt;topic&gt;</code>) or in a Slack or
+						Discord channel (<code>limitcast notify webhook &lt;url&gt;</code>).
+						Opt-in; only the notification text is sent, to the service you
+						chose.
+					</p>
+				</div>
+				<div
+					class="notif"
+					role="img"
+					aria-label="Example notification: Claude 5h limit is on pace to run out at 16:40, before it resets at 17:00."
+				>
+					<img src="/icon.png" alt="" width="40" height="40">
+					<div>
+						<b>limitcast</b><br>Claude 5h limit is on pace to run out at 16:40,
+						before it resets at 17:00.
+					</div>
+				</div>
+			</section>
 
-      <section class="feature" id="f-trim">
-        <div>
-          <h3>Trim advisor, with apply and undo <span class="badge pro">Pro</span></h3>
-          <p>
-            Measures what your latest session loaded before you typed (hook output, MCP servers, tool names, skills, agents, instruction files),
-            names the ones you haven't used, and what each costs. One command hides the skills from the model and turns the servers off for that
-            project; another puts everything back. If Claude Code overwrites the settings, the cuts come back at the next session. Codex has
-            <code>trim --codex</code>, and <b>new in 0.12</b> Grok has <code>trim --grok</code>: its system prompt and the MCP servers in
-            <code>~/.grok/config.toml</code> you haven't used.
-          </p>
-          <p>
-            <b>New in 0.14:</b> <code>limitcast trim keep ego-browser</code> puts a server or skill on a keep-list that no <code>--apply</code> ever
-            turns off or hides, for Claude Code, Codex and Grok. It is free to set, and <code>trim</code> shows what it would keep.
-          </p>
-          <p class="pro-note"><span class="badge">Free</span> shows the totals: your starting context and how much of it you never use.</p>
-        </div>
-        <pre>$ limitcast trim --apply
+			<section class="feature" id="f-trim">
+				<div>
+					<h3>
+						Trim advisor, with apply and undo <span class="badge pro">Pro</span>
+					</h3>
+					<p>
+						Measures what your latest session loaded before you typed (hook
+						output, MCP servers, tool names, skills, agents, instruction files),
+						names the ones you haven't used, and what each costs. One command
+						hides the skills from the model and turns the servers off for that
+						project; another puts everything back. If Claude Code overwrites the
+						settings, the cuts come back at the next session. Codex has
+						<code>trim --codex</code>, and <b>new in 0.12</b> Grok has
+						<code>trim --grok</code>: its system prompt and the MCP servers in
+						<code>~/.grok/config.toml</code>
+						you haven't used.
+					</p>
+					<p>
+						<b>New in 0.14:</b>
+						<code>limitcast trim keep ego-browser</code>
+						puts a server or skill on a keep-list that no
+						<code>--apply</code>
+						ever turns off or hides, for Claude Code, Codex and Grok. It is free
+						to set, and
+						<code>trim</code>
+						shows what it would keep.
+					</p>
+					<p class="pro-note">
+						<span class="badge">Free</span>
+						shows the totals: your starting context and how much of it you never
+						use.
+					</p>
+				</div>
+				<pre>$ limitcast trim --apply
 ✓ Hid 66 skills from the model (`/name` still works): dataviz, block-kit, …
 ✓ Turned off 9 MCP servers for ~/work/api: postman, context7, …
 Takes effect in your next Claude Code session. Undo: `limitcast trim --undo`
@@ -730,54 +943,86 @@ $ limitcast trim --codex --apply
 
 $ limitcast trim keep ego-browser
 Kept by `trim --apply`: ego-browser</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-grok">
-        <div>
-          <h3>Grok <span class="badge">Free</span> <span class="badge pro">Pro budget</span> <span class="badge">New in 0.12</span></h3>
-          <p>
-            <code>limitcast install</code> wraps Grok's status line: session model, context % and cost on one line, with the limitcast forecast under
-            it. <code>--guard</code> adds a guard for <code>spawn_subagent</code>, and <code>trim --grok</code> measures what Grok loads before you type.
-          </p>
-          <p>
-            Grok stores what you spent, not a percentage, so the status line shows your 5-hour and 7-day spend until you set a dollar cap. With a cap
-            (<span class="badge pro">Pro</span>), limitcast forecasts that window and the guard blocks new Grok subagents when it is on pace to run out.
-          </p>
-        </div>
-        <pre>$ limitcast install --guard
+			<section class="feature" id="f-grok">
+				<div>
+					<h3>
+						Grok <span class="badge">Free</span>
+						<span class="badge pro">Pro budget</span>
+						<span class="badge">New in 0.12</span>
+					</h3>
+					<p>
+						<code>limitcast install</code>
+						wraps Grok's status line: session model, context % and cost on one
+						line, with the limitcast forecast under it.
+						<code>--guard</code>
+						adds a guard for <code>spawn_subagent</code>, and
+						<code>trim --grok</code>
+						measures what Grok loads before you type.
+					</p>
+					<p>
+						Grok stores what you spent, not a percentage, so the status line
+						shows your 5-hour and 7-day spend until you set a dollar cap. With a
+						cap (<span class="badge pro">Pro</span>), limitcast forecasts that
+						window and the guard blocks new Grok subagents when it is on pace to
+						run out.
+					</p>
+				</div>
+				<pre>$ limitcast install --guard
 $ limitcast budget grok 20
 $ limitcast trim --grok</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-results">
-        <div>
-          <h3>Results and the dashboard <span class="badge">Free</span> <span class="badge pro">Pro dashboard</span></h3>
-          <p>
-            Proof it works, from your own data: every limit you hit and how far ahead limitcast warned, the tokens your smaller starting context
-            saved, priced against your own 5-hour limit, and what the guard stopped (free: would have stopped) and whether that window then ran out.
-          </p>
-          <p class="pro-note">
-            <span class="badge pro">Pro</span> puts results, the current windows and the burn report on one page:
-            <code>limitcast results --html</code>.
-          </p>
-        </div>
-        <img class="shot" src="/dashboard.png" alt="limitcast results dashboard: tokens not re-sent, value against the 5-hour window, limits reached with warning lead times, and current windows" width="900" height="1270" loading="lazy">
-      </section>
+			<section class="feature" id="f-results">
+				<div>
+					<h3>
+						Results and the dashboard <span class="badge">Free</span>
+						<span class="badge pro">Pro dashboard</span>
+					</h3>
+					<p>
+						Evidence from your own data: every limit you hit and how far ahead
+						limitcast warned, the tokens your smaller starting context saved,
+						priced against your own 5-hour limit, and what the guard stopped
+						(free: would have stopped) and whether that window then ran out.
+					</p>
+					<p class="pro-note">
+						<span class="badge pro">Pro</span>
+						puts results, the current windows and the burn report on one page:
+						<code>limitcast results --html</code>.
+					</p>
+				</div>
+				<img
+					class="shot"
+					src="/dashboard.png"
+					alt="limitcast results dashboard: tokens not re-sent, value against the 5-hour window, limits reached with warning lead times, and current windows"
+					width="900"
+					height="1270"
+					loading="lazy"
+				>
+			</section>
 
-      <section class="feature" id="f-report">
-        <div>
-          <h3>Burn report <span class="badge pro">Pro</span></h3>
-          <p>
-            Claude Code, Codex and Grok tokens by tool, day, project, model and session, read from each tool's own logs, plus the share that went to
-            subagents. See which project or habit is eating your plan.
-          </p>
-          <p>
-            <b>New in 0.13:</b> the API-equivalent cost: what the same tokens would cost at the API's list prices, per tool, day, project, model and
-            session. It's a yardstick for how much your plan covers, not a bill. Claude models are priced; any other model is left out and counted
-            separately, never as $0. The dollar figure in the example is illustrative.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast report --days 7
+			<section class="feature" id="f-report">
+				<div>
+					<h3>Burn report <span class="badge pro">Pro</span></h3>
+					<p>
+						Claude Code, Codex and Grok tokens by tool, day, project, model and
+						session, read from each tool's own logs, plus the share that went to
+						subagents. See which project or habit is eating your plan.
+					</p>
+					<p>
+						<b>New in 0.13:</b>
+						the API-equivalent cost: what the same tokens would cost at the
+						API's list prices, per tool, day, project, model and session. It's a
+						yardstick for how much your plan covers, not a bill. Claude models
+						are priced; any other model is left out and counted separately,
+						never as $0. The dollar figure in the example is illustrative.
+						Context reduction is estimated from characters and a recorded
+						baseline; it is not measured cash saved. Blocks and cache notices
+						are events, not proven prevented interruptions.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast report --days 7
 | tool   | tokens | output | cache reads | share | API-equivalent |
 | claude | 863.6M |   2.9M |      840.8M |   99% |           $219 |
 | codex  |  12.9M |  44.1k |       12.6M |    1% |              - |
@@ -789,22 +1034,31 @@ Subagents used <b>21%</b> of Claude tokens.
 ## Top projects
 | ~/work/api     | 305.4M | 35% |
 | ~/work/web     |  80.8M |  9% |</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-plan">
-        <div>
-          <h3>Does your plan fit? <span class="badge pro">Pro</span> <span class="badge">New in 0.13</span></h3>
-          <p>
-            limitcast keeps the peak of every 5-hour and weekly window you have. Tell it your plan and it says whether you reached your limits often
-            enough to look at the next one, or used so little that a smaller one would have fit, with the monthly price difference. It also shows what
-            your tokens would cost at API list prices, so you can see what your plan covers.
-          </p>
-          <p class="pro-note">
-            It needs a week or two of history before it recommends anything, and it cannot see extra-usage spend. Anthropic states the 5-hour
-            multiplier for Max (5x or 20x Pro); the advisor assumes weekly limits scale the same way. Example output below; your numbers will differ.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast plan set max20
+			<section class="feature" id="f-plan">
+				<div>
+					<h3>
+						Does your plan fit? <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.13</span>
+					</h3>
+					<p>
+						limitcast keeps the peak of every 5-hour and weekly window you have.
+						Tell it your plan and it says whether you reached your limits often
+						enough to look at the next one, or used so little that a smaller one
+						would have fit, with the monthly price difference. It also shows
+						what your tokens would cost at API list prices, so you can see what
+						your plan covers.
+					</p>
+					<p class="pro-note">
+						It needs a week or two of history before it recommends anything, and
+						it cannot see extra-usage spend. Anthropic states the 5-hour
+						multiplier for Max (5x or 20x Pro); the advisor assumes weekly
+						limits scale the same way. Example output below; your numbers will
+						differ.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast plan set max20
 $ limitcast plan
 Claude plan: Max 20x, $200 a month
 
@@ -816,22 +1070,29 @@ Max 5x would have fit: it has 1/4 of the usage per session, so your busiest
 
 At API list prices your Claude Code tokens of the last 16 days would have
 cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-why">
-        <div>
-          <h3>Where your tokens went <span class="badge pro">Pro</span> <span class="badge">New in 0.12</span></h3>
-          <p>
-            The burn report says how much you used; this says what it was spent on. limitcast sorts the new tokens, the ones that move your limit
-            (cached reads barely count), into subagents, session starts, cache rebuilds after an idle pause, tool results by tool and model output. It
-            splits subagents by type and model, lists the single steps that cost the most, and says what to ask for instead.
-          </p>
-          <p class="pro-note">
-            Claude Code only. The first run reads your transcripts once and caches them. Models may count differently against your limit, so the
-            model tables show token counts, not window shares.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast report --why
+			<section class="feature" id="f-why">
+				<div>
+					<h3>
+						Where your tokens went <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.12</span>
+					</h3>
+					<p>
+						The burn report says how much you used; this says what it was spent
+						on. limitcast sorts the new tokens, the ones that move your limit
+						(cached reads barely count), into subagents, session starts, cache
+						rebuilds after an idle pause, tool results by tool and model output.
+						It splits subagents by type and model, lists the single steps that
+						cost the most, and says what to ask for instead.
+					</p>
+					<p class="pro-note">
+						Claude Code only. The first run reads your transcripts once and
+						caches them. Models may count differently against your limit, so the
+						model tables show token counts, not window shares.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast report --why
 115.2M new tokens (input, cache writes and output; cached reads are left out).
 
 | where                                                  | new tokens | share | 5-hour windows |
@@ -846,23 +1107,31 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 - 127 single steps added over 20.0k new tokens each: 23% of all
   tool-result tokens, mostly mcp:linear.
 - mcp:linear (6.8M, 7.7k per call): ask for fewer fields and a smaller limit.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-jobs">
-        <div>
-          <h3>Heaviest scheduled-job starts <span class="badge pro">Pro</span> <span class="badge">New in 0.12</span></h3>
-          <p>
-            Every run of a script or scheduled job that calls <code>claude -p</code> pays your whole starting context again. limitcast groups those
-            runs by the first words of their prompt and shows, per job, how many runs, how many new tokens each start cost, how big the starting prompt
-            was, how many starts were cold (the prompt cache didn't have them) and whether starting a job's runs closer together would help. It ends
-            with how to launch a job leaner.
-          </p>
-          <p class="pro-note">
-            The example's job names are changed. The report shows the first 45 characters of each prompt, on your machine only: don't paste it
-            publicly unredacted.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast report --jobs
+			<section class="feature" id="f-jobs">
+				<div>
+					<h3>
+						Heaviest scheduled-job starts <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.12</span>
+					</h3>
+					<p>
+						Every run of a script or scheduled job that calls
+						<code>claude -p</code>
+						pays your whole starting context again. limitcast groups those runs
+						by the first words of their prompt and shows, per job, how many
+						runs, how many new tokens each start cost, how big the starting
+						prompt was, how many starts were cold (the prompt cache didn't have
+						them) and whether starting a job's runs closer together would help.
+						It ends with how to launch a job leaner.
+					</p>
+					<p class="pro-note">
+						The example's job names are changed. The report shows the first 45
+						characters of each prompt, on your machine only: don't paste it
+						publicly unredacted.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast report --jobs
 566 headless runs spent 14.8M new tokens just starting: 13% of all new tokens.
 
 | job (first words of its prompt)        | runs | new at start | prompt | cold |
@@ -873,390 +1142,819 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 ## Cold starts
 537 of 566 runs (95%) started cold: more than half of their starting
 prompt was new tokens, not served from the prompt cache.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-alerts">
-        <div>
-          <h3>Alerts and a weekly summary <span class="badge pro">Pro</span></h3>
-          <p>
-            At the start of a session, a message to you (never the model) when your starting context grew by ~1k tokens or more, naming what grew:
-            a new plugin, a longer CLAUDE.md, a chatty hook. Once a week, one line on what limitcast did.
-          </p>
-        </div>
-        <pre>limitcast: your Claude Code starting context grew ~3.4k tokens
+			<section class="feature" id="f-alerts">
+				<div>
+					<h3>
+						Alerts and a weekly summary <span class="badge pro">Pro</span>
+					</h3>
+					<p>
+						At the start of a session, a message to you (never the model) when
+						your starting context grew by ~1k tokens or more, naming what grew:
+						a new plugin, a longer CLAUDE.md, a chatty hook. Once a week, one
+						line on recorded controls and estimated context reduction. `results`
+						adds per-tool consumption and next steps; estimates are separate
+						from actual usage and previews.
+					</p>
+				</div>
+				<pre>limitcast: your Claude Code starting context grew ~3.4k tokens
 since your last session (MCP server instructions: linear new~2.1k,
 Instruction files: ~/CLAUDE.md +~1.3k). Run `limitcast trim` for details.
 
 limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min),
 guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-toolcheck">
-        <div>
-          <h3>Large tool-output notice <span class="badge pro">Pro</span> <span class="badge">New in 0.12</span></h3>
-          <p>
-            A tool result enters your context once as new tokens and is then re-read on every later call, so one very large result is worth knowing
-            about. When a single result is about 20k tokens or more, limitcast tells you (never the model), once per tool per session, with what to ask
-            for next time. Turn it on with <code>limitcast install --alerts</code>; <code>LIMITCAST_TOOL_TOKENS</code> changes the threshold.
-          </p>
-          <p class="pro-note">It runs on Bash, Read, Grep, WebFetch and MCP tools, and adds about 30 ms per call.</p>
-        </div>
-        <pre>limitcast: that linear list_issues result was ≈25k tokens (≈0.17% of a
+			<section class="feature" id="f-toolcheck">
+				<div>
+					<h3>
+						Large tool-output notice <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.12</span>
+					</h3>
+					<p>
+						A tool result enters your context once as new tokens and is then
+						re-read on every later call, so one very large result is worth
+						knowing about. When a single result is about 20k tokens or more,
+						limitcast tells you (never the model), once per tool per session,
+						with what to ask for next time. Turn it on with
+						<code>limitcast install --alerts</code>;
+						<code>LIMITCAST_TOOL_TOKENS</code>
+						changes the threshold.
+					</p>
+					<p class="pro-note">
+						It runs on Bash, Read, Grep, WebFetch and MCP tools, and adds about
+						30 ms per call.
+					</p>
+				</div>
+				<pre
+				>limitcast: that linear list_issues result was ≈25k tokens (≈0.17% of a
 5-hour window to write, then re-read on every later call). Next time:
 ask for fewer fields and a smaller limit.</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-limitchange">
-        <div>
-          <h3>Limit-change alert <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
-          <p>
-            Every day limitcast re-measures how many tokens move your 5-hour meter by 1%, from your own readings. When that shifts by 15% or more
-            against the weeks before, you get a notification, so you know when the limit itself changed rather than your habits.
-          </p>
-        </div>
-        <div class="notif" role="img" aria-label="Example notification: Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.">
-          <img src="/icon.png" alt="" width="40" height="40">
-          <div><b>limitcast</b><br>Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k.</div>
-        </div>
-      </section>
+			<section class="feature" id="f-limitchange">
+				<div>
+					<h3>
+						Limit-change alert <span class="badge pro">Pro</span>
+						<span class="badge">New in 0.11</span>
+					</h3>
+					<p>
+						Every day limitcast re-measures how many tokens move your 5-hour
+						meter by 1%, from your own readings. When that shifts by 15% or more
+						against the weeks before, you get a notification, so you know when
+						the limit itself changed rather than your habits.
+					</p>
+				</div>
+				<div
+					class="notif"
+					role="img"
+					aria-label="Example notification: Your Claude limit looks smaller: 1% of the 5-hour window now takes ~139k new tokens, down from ~167k."
+				>
+					<img src="/icon.png" alt="" width="40" height="40">
+					<div>
+						<b>limitcast</b><br>Your Claude limit looks smaller: 1% of the
+						5-hour window now takes ~139k new tokens, down from ~167k.
+					</div>
+				</div>
+			</section>
 
-      <section class="feature" id="f-after">
-        <div>
-          <h3>Run it after the reset <span class="badge pro">Pro</span></h3>
-          <p>
-            Out of room with a long job still to run? Queue it: limitcast waits for the window to reset and starts it in the background.
-          </p>
-        </div>
-        <pre>$ limitcast after-reset --detach -- claude -p "run the full test suite and fix failures"
+			<section class="feature" id="f-after">
+				<div>
+					<h3>Run it after the reset <span class="badge pro">Pro</span></h3>
+					<p>
+						Out of room with a long job still to run? Queue it: limitcast waits
+						for the window to reset and starts it in the background.
+					</p>
+				</div>
+				<pre
+				>$ limitcast after-reset --detach -- claude -p "run the full test suite and fix failures"
 Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.local/state/limitcast/after-reset-1793044800000.log</pre>
-      </section>
+			</section>
 
-      <section class="feature" id="f-upkeep">
-        <div>
-          <h3>Set up once, checked every day <span class="badge">Free</span></h3>
-          <p>
-            <code>install</code> backs up your settings and <code>uninstall</code> restores them exactly. A daily background check tells you in the
-            status line if anything breaks, including a Claude Code, Codex or Grok log-format change. Hooks survive Node upgrades. In Claude Code,
-            the plugin adds <code>/limitcast:status</code>, <code>/limitcast:results</code> and <code>/limitcast:trim</code>.
-          </p>
-        </div>
-        <pre class="cols">$ limitcast doctor
+			<section class="feature" id="f-upkeep">
+				<div>
+					<h3>
+						Set up once, checked every day <span class="badge">Free</span>
+					</h3>
+					<p>
+						<code>install</code>
+						backs up your settings and <code>uninstall</code> restores them
+						exactly. A daily background check tells you in the status line if
+						anything breaks, including a Claude Code, Codex or Grok log-format
+						change. Hooks survive Node upgrades. In Claude Code, the plugin adds
+						<code>/limitcast:status</code>, <code>/limitcast:results</code> and
+						<code>/limitcast:trim</code>.
+					</p>
+				</div>
+				<pre class="cols">$ limitcast doctor
 ✓ Status-line recorder installed
 ✓ Hook launcher points at this Node and limitcast
 ✓ Claude Code subagent guard installed
 ✓ Codex subagent guard installed and trusted
 ✓ Last Claude reading 0 min ago
 ✓ Claude Code status-line feed: limit readings present</pre>
-      </section>
+			</section>
 
-      <h2 id="buy">What happens when you buy</h2>
-      <ol class="steps">
-        <li><b>Start the trial.</b> Pick yearly or monthly; Polar handles checkout. Nothing is charged for 14 days.</li>
-        <li><b>Get your key.</b> It's in Polar's customer portal, linked from your confirmation email, and starts with <code>LIMITCAST-</code>.</li>
-        <li>
-          <b>Turn on Pro, in one minute.</b>
-          <code>limitcast activate &lt;key&gt;</code>, then <code>limitcast install --guard --alerts</code> and
-          <code>limitcast notify on</code>. Restart Claude Code.
-        </li>
-        <li><b>Check it in a week.</b> <code>limitcast results</code> shows what it warned you about, stopped and saved. Not worth it? Cancel in the portal before day 14 and pay nothing.</li>
-      </ol>
+			<h2 id="buy">What happens when you buy</h2>
+			<ol class="steps">
+				<li>
+					<b>Start the trial.</b>
+					Pick yearly or monthly; Polar handles checkout. Nothing is charged for
+					14 days.
+				</li>
+				<li>
+					<b>Get your key.</b>
+					It's in Polar's customer portal, linked from your confirmation email,
+					and starts with <code>LIMITCAST-</code>.
+				</li>
+				<li>
+					<b>Turn on Pro, in one minute.</b>
+					<code>limitcast activate &lt;key&gt;</code>, then
+					<code>limitcast install --guard --alerts</code>
+					and
+					<code>limitcast notify on</code>. Restart Claude Code.
+				</li>
+				<li>
+					<b>Check it in a week.</b> <code>limitcast results</code> shows what
+					it warned you about, stopped and saved. Not worth it? Cancel in the
+					portal before day 14 and pay nothing.
+				</li>
+			</ol>
 
-      <h2 id="compare">How it compares</h2>
-      <div class="table-wrap">
-        <table class="compare">
-          <thead>
-            <tr>
-              <th></th>
-              <th>limitcast</th>
-              <th>ccusage</th>
-              <th>ClaudeBar</th>
-              <th>CodexBar</th>
-              <th>CodeBurn</th>
-              <th>agent-usage-guard</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Price</td>
-              <td>Free core; Pro $9/mo or $79/yr, 14 days free</td>
-              <td>Free</td>
-              <td>Free</td>
-              <td>Free</td>
-              <td>Free</td>
-              <td>Free</td>
-            </tr>
-            <tr>
-              <td>What it is</td>
-              <td>CLI, status line and hooks</td>
-              <td>CLI reports</td>
-              <td>macOS menu bar app</td>
-              <td>Menu bar app (macOS, Linux)</td>
-              <td>Desktop app and CLI (macOS, Windows, Linux)</td>
-              <td>Claude Code mod</td>
-            </tr>
-            <tr>
-              <td>Tools covered</td>
-              <td>Claude Code, Codex, Grok</td>
-              <td>18 tools</td>
-              <td>10+ tools</td>
-              <td>Many providers</td>
-              <td>37 tools</td>
-              <td>Claude Code</td>
-            </tr>
-            <tr>
-              <td>When you'll run out</td>
-              <td>Clock time from your burn rate, plus today's share of the week</td>
-              <td>5-hour block tracking</td>
-              <td>Pace label (running hot / on track)</td>
-              <td>Countdown to each reset</td>
-              <td>Whether the month is on pace to run past your plan</td>
-              <td>No forecast; asks once a window is 80% used</td>
-            </tr>
-            <tr>
-              <td>Stops subagents before you run out</td>
-              <td>Yes, Claude Code, Codex and Grok (with a dollar cap); on a tight window, moves new Claude subagents to Sonnet; optional subagent budget per 5-hour window</td>
-              <td>No</td>
-              <td>No (hooks observe only)</td>
-              <td>No</td>
-              <td>Spending caps per session ($5 warn, $15 stop by default), not per window</td>
-              <td>Yes, Claude Code: asks before new agents and caps fan-out</td>
-            </tr>
-            <tr>
-              <td>Measures what loads into every session, and cuts what you don't use</td>
-              <td>Yes, Claude Code, Codex and Grok, with apply and undo</td>
-              <td>No</td>
-              <td>No</td>
-              <td>No</td>
-              <td>Lists what costs tokens (Optimize)</td>
-              <td>Asks before re-reading a very large context</td>
-            </tr>
-            <tr>
-              <td>Uses your logins</td>
-              <td>No</td>
-              <td>No</td>
-              <td>Yes, for its usage API probe</td>
-              <td>Yes, reuses provider sessions (OAuth, cookies)</td>
-              <td>For live limits (<code>codeburn quota</code>)</td>
-              <td>No</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        <small>
-          From each project's public README, October 2026. If you only want to see your numbers, the free tools are great. If you only want
-          subagent caps in Claude Code, agent-usage-guard is a good free option; limitcast adds the runout forecast, Codex, and the starting-context
-          trim.
-        </small>
-      </p>
+			<h2 id="compare">How it compares</h2>
+			<div class="table-wrap">
+				<table class="compare">
+					<thead>
+						<tr>
+							<th></th>
+							<th>limitcast</th>
+							<th>ccusage</th>
+							<th>ClaudeBar</th>
+							<th>CodexBar</th>
+							<th>CodeBurn</th>
+							<th>agent-usage-guard</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>Price</td>
+							<td>Free core; Pro $9/mo or $79/yr, 14 days free</td>
+							<td>Free</td>
+							<td>Free</td>
+							<td>Free</td>
+							<td>Free</td>
+							<td>Free</td>
+						</tr>
+						<tr>
+							<td>What it is</td>
+							<td>CLI, status line and hooks</td>
+							<td>CLI reports</td>
+							<td>macOS menu bar app</td>
+							<td>Menu bar app (macOS, Linux)</td>
+							<td>Desktop app and CLI (macOS, Windows, Linux)</td>
+							<td>Claude Code mod</td>
+						</tr>
+						<tr>
+							<td>Tools covered</td>
+							<td>Claude Code, Codex, Grok</td>
+							<td>18 tools</td>
+							<td>10+ tools</td>
+							<td>Many providers</td>
+							<td>37 tools</td>
+							<td>Claude Code</td>
+						</tr>
+						<tr>
+							<td>When you'll run out</td>
+							<td>
+								Clock time from your burn rate, plus today's share of the week
+							</td>
+							<td>5-hour block tracking</td>
+							<td>Pace label (running hot / on track)</td>
+							<td>Countdown to each reset</td>
+							<td>Whether the month is on pace to run past your plan</td>
+							<td>No forecast; asks once a window is 80% used</td>
+						</tr>
+						<tr>
+							<td>Stops subagents before you run out</td>
+							<td>
+								Yes, Claude Code, Codex and Grok (with a dollar cap); on a tight
+								window, moves new Claude subagents to Sonnet; optional subagent
+								budget per 5-hour window
+							</td>
+							<td>No</td>
+							<td>No (hooks observe only)</td>
+							<td>No</td>
+							<td>
+								Spending caps per session ($5 warn, $15 stop by default), not
+								per window
+							</td>
+							<td>Yes, Claude Code: asks before new agents and caps fan-out</td>
+						</tr>
+						<tr>
+							<td>
+								Measures what loads into every session, and cuts what you don't
+								use
+							</td>
+							<td>Yes, Claude Code, Codex and Grok, with apply and undo</td>
+							<td>No</td>
+							<td>No</td>
+							<td>No</td>
+							<td>
+								Finds waste and applies reversible config changes (Optimize)
+							</td>
+							<td>Asks before re-reading a very large context</td>
+						</tr>
+						<tr>
+							<td>Uses your logins</td>
+							<td>No</td>
+							<td>No</td>
+							<td>Yes, for its usage API probe</td>
+							<td>Yes, reuses provider sessions (OAuth, cookies)</td>
+							<td>For live limits (<code>codeburn quota</code>)</td>
+							<td>No</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<p>
+				<small>
+					From each project's public README, October 2026. If you only want to
+					see your numbers, the free tools are great. If you only want subagent
+					caps in Claude Code, agent-usage-guard is a good free option;
+					limitcast adds the runout forecast, Codex, and the starting-context
+					trim.
+				</small>
+			</p>
 
-      <h2 id="install">Install in 30 seconds</h2>
-      <pre>npm install -g limitcast
-limitcast install           # wraps your status line, backs up settings.json
-limitcast install --guard   # also the subagent guard for Claude Code, Codex and Grok (free: preview, never blocks)
-limitcast trial             # Pro free for 7 days, no card
-limitcast doctor</pre>
-      <p>Requires Node 20+, macOS or Linux. <code>limitcast uninstall</code> restores your original settings.</p>
+			<h2 id="install">Get your first useful result</h2>
+			<pre>npm install -g limitcast
+limitcast onboard          # read-only checks and your next useful step
+limitcast install          # backs up settings and adds the recorder</pre>
+			<ol>
+				<li>
+					<strong>Confirm setup.</strong>
+					Restart your coding tool, complete one normal turn, then run
+					<code>limitcast doctor</code>
+					and <code>limitcast status</code>. Doctor checks setup; Trim analyzes
+					context.
+				</li>
+				<li>
+					<strong>Find an opportunity.</strong>
+					Run <code>limitcast trim</code>, <code>limitcast trim --codex</code>,
+					or <code>limitcast trim --grok</code>. Free shows totals. Nothing is
+					trimmed until you explicitly use Pro <code>--apply</code>.
+				</li>
+				<li>
+					<strong>Try protection.</strong>
+					Choose <code>limitcast trial</code> for 7 days of Pro without a card.
+					Then run <code>limitcast install --guard --alerts</code>, restart, and
+					approve the Codex hook if asked. Free guard installs record previews
+					and never block.
+				</li>
+				<li>
+					<strong>Review recurring value.</strong>
+					Run <code>limitcast results</code> after a week: recorded usage,
+					estimated context reduction, applied controls and potential Pro
+					actions. Share totals voluntarily with
+					<code>limitcast results --share</code>.
+				</li>
+			</ol>
+			<p>
+				Requires Node 20+, macOS or Linux. Keep essentials with
+				<code>limitcast trim keep &lt;name&gt;</code>. Reverse cuts with
+				<code>limitcast trim --undo</code>
+				(add the matching provider flag).
+				<code>limitcast uninstall</code>
+				restores the recorder setup. The guard holds new spawns; it does not
+				stop existing agents or guarantee no lockouts.
+			</p>
 
-      <h2 id="pricing">Pricing</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>Free</h3>
-          <div class="price">$0</div>
-          <ul>
-            <li>Runout forecast for Claude Code and Codex</li>
-            <li>Daily allowance: today's share of the week</li>
-            <li>Status-line readout</li>
-            <li>Your starting context, and how much of it you never use (Claude Code, Codex and Grok)</li>
-            <li>Results: every limit you hit, and how far ahead limitcast warned</li>
-            <li>Guard preview: what Pro would have blocked or switched</li>
-          </ul>
-          <a class="btn" href="#install">Install</a>
-        </div>
-        <div class="card featured">
-          <h3>Pro</h3>
-          <div class="price">$79 <small>/ year</small></div>
-          <p><small>or $9 / month. 14 days free, then billed; cancel anytime before and you pay nothing.</small></p>
-          <ul>
-            <li>Everything in Free</li>
-            <li>Trim advisor: names what to cut and what each costs</li>
-            <li>One command makes the cuts; one undoes them (Claude Code, Codex and Grok)</li>
-            <li>Subagent guard: blocks runaway subagents, switches to Sonnet when a window is tight</li>
-            <li>Pick the model each kind of subagent runs on, for example Explore on Haiku</li>
-            <li>What each subagent cost, what that kind has cost before it starts, and a subagent budget per window</li>
-            <li>Cold-cache warning before a message re-sends an expired context</li>
-            <li>Notifications on desktop, phone (ntfy) or Slack/Discord, and when your limit itself changes</li>
-            <li>Jobs that run after the reset</li>
-            <li>Other-account pointer and a /compact nudge in the status line</li>
-            <li>Alerts when your starting context grows, a weekly summary, and a notice when one tool result is very large</li>
-            <li>Burn report, with API-equivalent dollar cost, and dashboard across Claude Code, Codex and Grok</li>
-            <li>Plan advisor: does a bigger or smaller Claude plan fit how you use it, with the monthly price difference</li>
-            <li>Where your tokens went, by subagent type and model, and which scheduled jobs start heaviest</li>
-            <li>Grok dollar cap: forecast and guard for Grok</li>
-            <li>Email support</li>
-          </ul>
-          <div class="cta">
-            <a class="btn primary" data-checkout="annual" data-goatcounter-click="checkout-annual" href="#pricing">Start free trial: $79/yr</a>
-            <a class="btn" data-checkout="monthly" data-goatcounter-click="checkout-monthly" href="#pricing">Monthly: $9/mo</a>
-          </div>
-          <p><small>Not ready to enter a card? <code>limitcast trial</code> gives you Pro for 7 days, no card.</small></p>
-        </div>
-        <div class="card">
-          <h3>Team</h3>
-          <div class="price">$69 <small>/ seat / year</small></div>
-          <p><small>3 seats minimum. 14 days free.</small></p>
-          <ul>
-            <li>Everything in Pro, for each person</li>
-            <li>Each teammate claims a seat and gets their own key</li>
-            <li>Add or remove seats any time</li>
-          </ul>
-          <a class="btn" data-checkout="team" data-goatcounter-click="checkout-team" href="#pricing">Start team trial</a>
-        </div>
-      </div>
-      <p>
-        Yearly saves 27% over monthly. One key works on 3 computers. Cancel anytime in Polar's customer portal. Charged by mistake? Email
-        support@limitcast.dev within 14 days of a charge for a refund.
-      </p>
+			<h2 id="pilot">Help shape Limitcast</h2>
+			<p>
+				Use Claude Code heavily, or work across Codex and Grok? Start free and
+				try it in a normal work session. We are looking for founding users
+				willing to discuss setup, protection and recurring value.
+			</p>
+			<p>
+				<a
+					href="mailto:support@limitcast.dev?subject=Limitcast%20founding-user%20pilot"
+					>Ask about the founding-user pilot</a
+				>. Feedback and follow-up are voluntary. Share totals only; keep your
+				prompts and source code private. The current trial terms above apply.
+			</p>
 
-      <h3 id="compare-plans">Free and Pro, line by line</h3>
-      <div class="table-wrap">
-        <table class="plans">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Free</th>
-              <th>Pro and Team</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><a href="#f-statusline">Limits in the status line</a>, with today's share of the week</td><td>✓</td><td>✓</td></tr>
-            <tr><td><a href="#f-forecast">Runout forecast</a> for Claude Code and Codex, NEAR at 95%</td><td>✓</td><td>✓</td></tr>
-            <tr><td><a href="#f-results">Results</a>: limits hit, how far ahead it warned, tokens not re-sent, priced against your 5-hour limit</td><td>✓</td><td>✓</td></tr>
-            <tr><td>Starting-context total and how much you never use</td><td>✓</td><td>✓</td></tr>
-            <tr><td>Daily health check, <code>doctor</code>, Claude Code plugin commands</td><td>✓</td><td>✓</td></tr>
-            <tr><td><a href="#f-guard">Subagent guard</a>: stops subagents before a window runs out</td><td>Preview only</td><td>✓</td></tr>
-            <tr><td>Moves new subagents to Sonnet while a window is tight</td><td>Preview only</td><td>✓</td></tr>
-            <tr><td><a href="#f-daily">Daily share</a>: a notification at 80% of today's share, and an optional hold on new subagents</td><td>Preview only</td><td>✓</td></tr>
-            <tr><td><a href="#f-trim">Trim advisor</a>: names each unused server, skill and hook, and its cost</td><td>Totals only</td><td>✓</td></tr>
-            <tr><td><code>trim --apply</code> / <code>--undo</code>, for Claude Code, Codex and Grok</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-trim">Keep-list</a>: servers and skills <code>trim --apply</code> never touches</td><td>✓</td><td>✓</td></tr>
-            <tr><td><a href="#f-receipts">Subagent receipts</a>: what each finished subagent cost against your window, and what that kind has cost before a new one starts</td><td></td><td>✓</td></tr>
-            <tr><td>Subagent budget per 5-hour window (<code>limitcast budget subagents 15</code>)</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-cold">Cold-cache warning</a> before a message re-sends an expired context</td><td>Preview only</td><td>✓</td></tr>
-            <tr><td><a href="#f-notify">Notifications</a>: desktop (macOS, Linux), phone (ntfy), Slack or Discord webhook</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-limitchange">Limit-change alert</a> when your tokens per 1% shift 15% or more</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-after">Run a job after the reset</a></td><td></td><td>✓</td></tr>
-            <tr><td>Pointer to your other Claude account, <code>/compact</code> nudge</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-alerts">Starting-context alerts</a> and a weekly summary</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-report">Burn report</a>: Claude Code, Codex and Grok by day, project, model, session, with API-equivalent cost for Claude</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-why">Where your tokens went</a>: subagents, session starts, cache rebuilds, tool results, by subagent type and model</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-jobs">Heaviest scheduled-job starts</a>, with cold starts per job</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-models">A model for each kind of subagent</a></td><td>Preview only</td><td>✓</td></tr>
-            <tr><td><a href="#f-plan">Plan advisor</a>: does a bigger or smaller Claude plan fit</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-toolcheck">Large tool-output notice</a>, with what to ask for instead</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-grok">Grok</a>: status line, trim totals and a guard preview</td><td>✓</td><td>✓</td></tr>
-            <tr><td>Grok dollar cap: forecast and guard, <code>trim --grok --apply</code></td><td></td><td>✓</td></tr>
-            <tr><td>HTML dashboard: results, current windows and burn report on one page</td><td></td><td>✓</td></tr>
-            <tr><td>Email support</td><td></td><td>✓</td></tr>
-          </tbody>
-        </table>
-      </div>
+			<h2 id="pricing">Pricing</h2>
+			<div class="grid">
+				<div class="card">
+					<h3>Free</h3>
+					<div class="price">$0</div>
+					<ul>
+						<li>Runout forecast for Claude Code and Codex</li>
+						<li>Daily allowance: today's share of the week</li>
+						<li>Status-line readout</li>
+						<li>
+							Your starting context, and how much of it you never use (Claude
+							Code, Codex and Grok)
+						</li>
+						<li>
+							Results: every limit you hit, and how far ahead limitcast warned
+						</li>
+						<li>Guard preview: what Pro would have blocked or switched</li>
+					</ul>
+					<a class="btn" href="#install">Install</a>
+				</div>
+				<div class="card featured">
+					<h3>Pro</h3>
+					<div class="price">$79 <small>/ year</small></div>
+					<p>
+						<small
+							>or $9 / month. 14 days free, then billed; cancel anytime before
+							and you pay nothing.</small
+						>
+					</p>
+					<ul>
+						<li>Everything in Free</li>
+						<li>Trim advisor: names what to cut and what each costs</li>
+						<li>
+							One command makes the cuts; one undoes them (Claude Code, Codex
+							and Grok)
+						</li>
+						<li>
+							Subagent guard: blocks runaway subagents, switches to Sonnet when
+							a window is tight
+						</li>
+						<li>
+							Pick the model each kind of subagent runs on, for example Explore
+							on Haiku
+						</li>
+						<li>
+							What each subagent cost, what that kind has cost before it starts,
+							and a subagent budget per window
+						</li>
+						<li>
+							Cold-cache warning before a message re-sends an expired context
+						</li>
+						<li>
+							Notifications on desktop, phone (ntfy) or Slack/Discord, and when
+							your limit itself changes
+						</li>
+						<li>Jobs that run after the reset</li>
+						<li>
+							Other-account pointer and a /compact nudge in the status line
+						</li>
+						<li>
+							Alerts when your starting context grows, a weekly summary, and a
+							notice when one tool result is very large
+						</li>
+						<li>
+							Burn report, with API-equivalent dollar cost, and dashboard across
+							Claude Code, Codex and Grok
+						</li>
+						<li>
+							Plan advisor: does a bigger or smaller Claude plan fit how you use
+							it, with the monthly price difference
+						</li>
+						<li>
+							Where your tokens went, by subagent type and model, and which
+							scheduled jobs start heaviest
+						</li>
+						<li>Grok dollar cap: forecast and guard for Grok</li>
+						<li>Email support</li>
+					</ul>
+					<div class="cta">
+						<a
+							class="btn primary"
+							data-checkout="annual"
+							data-goatcounter-click="checkout-annual"
+							href="#pricing"
+							>Start free trial: $79/yr</a
+						>
+						<a
+							class="btn"
+							data-checkout="monthly"
+							data-goatcounter-click="checkout-monthly"
+							href="#pricing"
+							>Monthly: $9/mo</a
+						>
+					</div>
+					<p>
+						<small
+							>Not ready to enter a card? <code>limitcast trial</code> gives you
+							Pro for 7 days, no card.</small
+						>
+					</p>
+				</div>
+				<div class="card">
+					<h3>Team</h3>
+					<div class="price">$69 <small>/ seat / year</small></div>
+					<p><small>3 seats minimum. 14 days free.</small></p>
+					<ul>
+						<li>Everything in Pro, for each person</li>
+						<li>Each teammate claims a seat and gets their own key</li>
+						<li>Add or remove seats any time</li>
+					</ul>
+					<a
+						class="btn"
+						data-checkout="team"
+						data-goatcounter-click="checkout-team"
+						href="#pricing"
+						>Start team trial</a
+					>
+				</div>
+			</div>
+			<p>
+				Yearly saves 27% over monthly. One key works on 3 computers. Cancel
+				anytime in Polar's customer portal. Charged by mistake? Email
+				support@limitcast.dev within 14 days of a charge for a refund.
+			</p>
 
-      <h2 id="faq">FAQ</h2>
-      <details>
-        <summary>Does it send my code or prompts anywhere?</summary>
-        <p>
-          No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk,
-          and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you
-          deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the
-          network, and Pro keeps working offline for 30 days after the last check. If you turn on phone or webhook notifications (Pro, off by default), each notification's text goes to the service you chose (ntfy.sh or your webhook), and nothing else does.
-        </p>
-      </details>
-      <details>
-        <summary>Does it use my Claude login?</summary>
-        <p>No. It never touches your subscription credentials, so it can't put your account at risk.</p>
-      </details>
-      <details>
-        <summary>I use extra usage past my limit. Will the guard block me?</summary>
-        <p>
-          No. Once a window is used up, limitcast steps aside and leaves it to Claude Code. The guard only acts while you're heading toward a limit.
-        </p>
-      </details>
-      <details>
-        <summary>Does it work with Codex and Grok?</summary>
-        <p>
-          Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: yes, the burn report, a status line,
-          the trim advisor and the subagent guard. Grok keeps no percentage used on disk, only spend, so the status line shows your 5-hour and 7-day
-          spend; set a dollar cap (<code>limitcast budget grok 20</code>, Pro) and limitcast forecasts that window and the guard blocks new Grok
-          subagents when it is on pace to run out.
-        </p>
-      </details>
-      <details>
-        <summary>Is the dollar figure what I actually pay?</summary>
-        <p>
-          No. The dollar figure is what the same tokens would cost at the API's list prices. A Claude subscription is a flat monthly fee, so the figure is a yardstick for how much your plan covers, not a bill. limitcast prices Claude models only: tokens on other models are left out and counted separately, never as zero. The prices are in the code as of 26 October 2026, and you can change them in a small file.
-        </p>
-      </details>
-      <details>
-        <summary>What if I have two Claude accounts?</summary>
-        <p>
-          Sessions of the same account share one history (matched by their limit reset times and usage that only rises), so even a short session gets a
-          forecast, and two accounts used in parallel never mix.
-        </p>
-      </details>
-      <details>
-        <summary>Will one heavy hour make it say I'll run out of my weekly limit?</summary>
-        <p>
-          No. The 5-hour window is forecast from the last hour's pace. The weekly window uses your average pace over the last full day, idle time included,
-          so a burst on Monday doesn't predict a runout by Wednesday. The exception is a burst that would use up the week within the next hour: that still
-          triggers the warning and the subagent guard.
-        </p>
-      </details>
-      <details>
-        <summary>How does the free trial work?</summary>
-        <p>
-          Pick yearly or monthly and you get Pro for 14 days at no charge: your license key is ready as soon as you check out, in Polar's customer
-          portal (linked from your confirmation email). Your card is charged when the trial ends. Cancel before then, in the same portal, and you pay
-          nothing and the key stops working.
-        </p>
-      </details>
-      <details>
-        <summary>Can I get a refund?</summary>
-        <p>
-          Yes, within 14 days of any charge, no questions asked. Email support@limitcast.dev from the address you bought with and we'll refund it and
-          cancel the subscription.
-        </p>
-      </details>
+			<h3 id="compare-plans">Free and Pro, line by line</h3>
+			<div class="table-wrap">
+				<table class="plans">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Free</th>
+							<th>Pro and Team</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td>
+								<a href="#f-statusline">Limits in the status line</a>, with
+								today's share of the week
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-forecast">Runout forecast</a>
+								for Claude Code and Codex, NEAR at 95%
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-results">Results</a>: limits hit, how far ahead it
+								warned, tokens not re-sent, priced against your 5-hour limit
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>Starting-context total and how much you never use</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								Daily health check, <code>doctor</code>, Claude Code plugin
+								commands
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-guard">Subagent guard</a>: stops subagents before a
+								window runs out
+							</td>
+							<td>Preview only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>Moves new subagents to Sonnet while a window is tight</td>
+							<td>Preview only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-daily">Daily share</a>: a notification at 80% of
+								today's share, and an optional hold on new subagents
+							</td>
+							<td>Preview only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-trim">Trim advisor</a>: names each unused server,
+								skill and hook, and its cost
+							</td>
+							<td>Totals only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<code>trim --apply</code>
+								/ <code>--undo</code>, for Claude Code, Codex and Grok
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-trim">Keep-list</a>: servers and skills
+								<code>trim --apply</code>
+								never touches
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-receipts">Subagent receipts</a>: what each finished
+								subagent cost against your window, and what that kind has cost
+								before a new one starts
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								Subagent budget per 5-hour window (<code
+									>limitcast budget subagents 15</code
+								>)
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-cold">Cold-cache warning</a>
+								before a message re-sends an expired context
+							</td>
+							<td>Preview only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-notify">Notifications</a>: desktop (macOS, Linux),
+								phone (ntfy), Slack or Discord webhook
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-limitchange">Limit-change alert</a>
+								when your tokens per 1% shift 15% or more
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td><a href="#f-after">Run a job after the reset</a></td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								Pointer to your other Claude account,
+								<code>/compact</code>
+								nudge
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-alerts">Starting-context alerts</a>
+								and a weekly summary
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-report">Burn report</a>: Claude Code, Codex and Grok
+								by day, project, model, session, with API-equivalent cost for
+								Claude
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-why">Where your tokens went</a>: subagents, session
+								starts, cache rebuilds, tool results, by subagent type and model
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-jobs">Heaviest scheduled-job starts</a>, with cold
+								starts per job
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td><a href="#f-models">A model for each kind of subagent</a></td>
+							<td>Preview only</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-plan">Plan advisor</a>: does a bigger or smaller
+								Claude plan fit
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-toolcheck">Large tool-output notice</a>, with what
+								to ask for instead
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="#f-grok">Grok</a>: status line, trim totals and a guard
+								preview
+							</td>
+							<td>✓</td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								Grok dollar cap: forecast and guard,
+								<code>trim --grok --apply</code>
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>
+								HTML dashboard: results, current windows and burn report on one
+								page
+							</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+						<tr>
+							<td>Email support</td>
+							<td></td>
+							<td>✓</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
-      <footer>
-        <p>
-          Source on <a href="https://github.com/SamStull9007/limitcast">GitHub</a> (Elastic License 2.0) ·
-          <a href="https://www.npmjs.com/package/limitcast">npm</a> ·
-          <a href="https://github.com/SamStull9007/homebrew-limitcast">Homebrew tap</a> ·
-          <a href="/guide/">Feature guide</a> · support@limitcast.dev
-        </p>
-        limitcast is an independent tool and is not affiliated with Anthropic or OpenAI. This site counts visits with GoatCounter: no cookies, no
-        personal data.
-      </footer>
-    </main>
-    <script>
-    // Polar checkout links (Products → Checkout Links).
-    const CHECKOUT = {
-      annual: 'https://buy.polar.sh/polar_cl_mODyL2toBGrw6OiIhFW1XrhAnhXkacurfpPpk0aNzJ6',
-      monthly: 'https://buy.polar.sh/polar_cl_W4gt2tEe7YBZBq3Lv7P92EKBxHYVUmdoJ6p232iTMqp',
-      team: 'https://buy.polar.sh/polar_cl_8FceCp0kAbBRaz6pn0rN90EuH0CESj9KuuS2w35l5F9',
-    };
-    for (const a of document.querySelectorAll('[data-checkout]')) {
-      const url = CHECKOUT[a.dataset.checkout];
-      if (url) a.href = url;
-    }
-    // Polar returns buyers to ?purchase=success: show how to activate.
-    if (new URLSearchParams(location.search).get('purchase') === 'success') {
-      document.getElementById('thanks').hidden = false;
-      const count = () => window.goatcounter.count({ path: 'purchase-success', event: true });
-      if (window.goatcounter?.count) count();
-      else addEventListener('load', () => window.goatcounter?.count && count());
-    }
-    </script>
-  </body>
+			<h2 id="faq">FAQ</h2>
+			<details>
+				<summary>Does it send my code or prompts anywhere?</summary>
+				<p>
+					No. limitcast reads the limit readings Claude Code passes to your
+					status line and the logs Claude Code and Codex already keep on your
+					disk, and none of that leaves your machine. The only network calls are
+					for a Pro license key: once to activate, a weekly re-check, and when
+					you deactivate. They send your license key and computer name to Polar,
+					our payment provider. The status line and hooks never wait on the
+					network, and Pro keeps working offline for 30 days after the last
+					check. If you turn on phone or webhook notifications (Pro, off by
+					default), each notification's text goes to the service you chose
+					(ntfy.sh or your webhook), and nothing else does.
+				</p>
+			</details>
+			<details>
+				<summary>Does it use my Claude login?</summary>
+				<p>
+					No. It never touches your subscription credentials, so it can't put
+					your account at risk.
+				</p>
+			</details>
+			<details>
+				<summary>
+					I use extra usage past my limit. Will the guard block me?
+				</summary>
+				<p>
+					No. Once a window is used up, limitcast steps aside and leaves it to
+					Claude Code. The guard only acts while you're heading toward a limit.
+				</p>
+			</details>
+			<details>
+				<summary>Does it work with Codex and Grok?</summary>
+				<p>
+					Codex: yes, forecasts, the subagent guard and the burn report, from
+					the logs Codex already writes. Grok: yes, the burn report, a status
+					line, the trim advisor and the subagent guard. Grok keeps no
+					percentage used on disk, only spend, so the status line shows your
+					5-hour and 7-day spend; set a dollar cap (<code
+						>limitcast budget grok 20</code
+					>, Pro) and limitcast forecasts that window and the guard blocks new
+					Grok subagents when it is on pace to run out.
+				</p>
+			</details>
+			<details>
+				<summary>Is the dollar figure what I actually pay?</summary>
+				<p>
+					No. The dollar figure is what the same tokens would cost at the API's
+					list prices. A Claude subscription is a flat monthly fee, so the
+					figure is a yardstick for how much your plan covers, not a bill.
+					limitcast prices Claude models only: tokens on other models are left
+					out and counted separately, never as zero. The prices are in the code
+					as of 26 October 2026, and you can change them in a small file.
+				</p>
+			</details>
+			<details>
+				<summary>What if I have two Claude accounts?</summary>
+				<p>
+					Sessions of the same account share one history (matched by their limit
+					reset times and usage that only rises), so even a short session gets a
+					forecast, and two accounts used in parallel never mix.
+				</p>
+			</details>
+			<details>
+				<summary>
+					Will one heavy hour make it say I'll run out of my weekly limit?
+				</summary>
+				<p>
+					No. The 5-hour window is forecast from the last hour's pace. The
+					weekly window uses your average pace over the last full day, idle time
+					included, so a burst on Monday doesn't predict a runout by Wednesday.
+					The exception is a burst that would use up the week within the next
+					hour: that still triggers the warning and the subagent guard.
+				</p>
+			</details>
+			<details>
+				<summary>How does the free trial work?</summary>
+				<p>
+					Pick yearly or monthly and you get Pro for 14 days at no charge: your
+					license key is ready as soon as you check out, in Polar's customer
+					portal (linked from your confirmation email). Your card is charged
+					when the trial ends. Cancel before then, in the same portal, and you
+					pay nothing and the key stops working.
+				</p>
+			</details>
+			<details>
+				<summary>Can I get a refund?</summary>
+				<p>
+					Yes, within 14 days of any charge, no questions asked. Email
+					support@limitcast.dev from the address you bought with and we'll
+					refund it and cancel the subscription.
+				</p>
+			</details>
+
+			<footer>
+				<p>
+					Source on
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+					(Elastic License 2.0) ·
+					<a href="https://www.npmjs.com/package/limitcast">npm</a>
+					·
+					<a href="https://github.com/SamStull9007/homebrew-limitcast"
+						>Homebrew tap</a
+					>
+					·
+					<a href="/guide/">Feature guide</a>
+					· support@limitcast.dev
+				</p>
+				limitcast is an independent tool and is not affiliated with Anthropic or
+				OpenAI. This site counts visits with GoatCounter: no cookies, no
+				personal data.
+			</footer>
+		</main>
+		<script>
+		document
+			.getElementById("copy-install")
+			.addEventListener("click", async () => {
+				const status = document.getElementById("copy-status");
+				try {
+					await navigator.clipboard.writeText(
+						document.getElementById("quick-install").innerText,
+					);
+					status.textContent = "Commands copied. Paste them in your terminal.";
+				} catch {
+					status.textContent =
+						"Select and copy the commands above, then paste them in your terminal.";
+				}
+			});
+		// Polar checkout links (Products → Checkout Links).
+		const CHECKOUT = {
+			annual:
+				"https://buy.polar.sh/polar_cl_mODyL2toBGrw6OiIhFW1XrhAnhXkacurfpPpk0aNzJ6",
+			monthly:
+				"https://buy.polar.sh/polar_cl_W4gt2tEe7YBZBq3Lv7P92EKBxHYVUmdoJ6p232iTMqp",
+			team: "https://buy.polar.sh/polar_cl_8FceCp0kAbBRaz6pn0rN90EuH0CESj9KuuS2w35l5F9",
+		};
+		for (const a of document.querySelectorAll("[data-checkout]")) {
+			const url = CHECKOUT[a.dataset.checkout];
+			if (url) a.href = url;
+		}
+		// Polar returns buyers to ?purchase=success: show how to activate.
+		if (new URLSearchParams(location.search).get("purchase") === "success") {
+			document.getElementById("thanks").hidden = false;
+			const count = () =>
+				window.goatcounter.count({ path: "purchase-success", event: true });
+			if (window.goatcounter?.count) count();
+			else addEventListener("load", () => window.goatcounter?.count && count());
+		}
+		</script>
+	</body>
 </html>
