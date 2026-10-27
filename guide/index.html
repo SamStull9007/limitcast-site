@@ -534,6 +534,13 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITC
 				<code>limitcast budget subagents</code> shows what's used so far.
 			</li>
 			<li>
+				New in 0.12. Before a new subagent starts, you see what that kind has
+				cost you so far (the median and the largest, as a share of a 5-hour
+				window). It appears once you have 3 priced runs, and only when a typical
+				run is over 1% of a window or the window is near its limit. It is shown
+				to you only and never blocks.
+			</li>
+			<li>
 				Pricing needs about a day of your own readings first; until then
 				nothing counts against the budget. <code>limitcast results</code>
 				totals your subagents and names the biggest.
@@ -616,6 +623,88 @@ Subagents used <b>21%</b> of Claude tokens.</pre>
 
 	<section class="feature">
 		<div class="feature-head">
+			<h3>Where your tokens went</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast report --why [--days N]</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.12. Sorts the new tokens (input, cache writes and output; cached
+				reads barely count against your limit) into subagents, session starts,
+				cache rebuilds after an idle pause, tool results by tool and model output.
+			</li>
+			<li>
+				Splits subagents by type and model, shows all new tokens by model, lists the
+				single steps that cost the most, and ends with what to ask for instead.
+				Models may count differently against your limit, so the model tables show
+				token counts, not window shares.
+			</li>
+			<li>
+				Claude Code only. Your transcripts are read once and cached, so later runs
+				only read what changed.
+			</li>
+		</ul>
+		<pre class="sample cols">$ limitcast report --why
+115.2M new tokens (input, cache writes and output; cached reads are left out).
+
+| where                                                  | new tokens | share | 5-hour windows |
+| Subagents                                              |      46.1M |   40% |           ≈3.1 |
+| Model output (generated, then cached on the next call) |      18.3M |   16% |           ≈1.2 |
+| Tool results                                           |      16.7M |   14% |           ≈1.1 |
+| Cache rebuilds after an idle pause                     |      15.5M |   13% |           ≈1.0 |
+| Session starts, headless runs (563)                    |      14.8M |   13% |           ≈1.0 |
+| Session starts, interactive (47)                       |       4.0M |    3% |           ≈0.3 |
+
+## What to try
+- mcp:linear (6.8M, 7.7k per call): ask for fewer fields and a smaller limit.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			you see what your window is really spent on (subagents, idle-cache rebuilds,
+			one chatty tool, a scheduled job) before you decide what to change.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Heaviest scheduled-job starts</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast report --jobs [--days N]</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.12. A script or scheduled job that calls <code>claude -p</code>
+				starts a fresh session every run and pays your whole starting context
+				again. limitcast groups those headless runs by the first 45 characters of
+				their prompt and shows runs, new tokens at start, starting prompt size,
+				cold starts and calls per run.
+			</li>
+			<li>
+				A start is cold when more than half of its prompt was new tokens, not
+				served from the prompt cache. The report shows how the gap since the
+				job's last run decides that, and what the cold runs cost beyond the same
+				job's warm ones.
+			</li>
+			<li>
+				It ends with how to launch a job leaner. Prompt text is shown on your
+				machine only: don't paste the report publicly unredacted.
+			</li>
+		</ul>
+		<pre class="sample cols">$ limitcast report --jobs
+566 headless runs spent 14.8M new tokens just starting: 13% of all new tokens.
+
+| job (first words of its prompt)        | runs | new at start | prompt | cold |
+| Prepare the nightly brief for the team |  283 |        25.6k |  34.4k |  99% |
+| Update the weekly status canvas        |  154 |        32.4k |  32.4k | 100% |
+| Review this change for security issues |  106 |        15.3k |  17.5k |  79% |</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			finds the scheduled job that quietly spends a slice of your plan on every
+			start. (Example job names changed.)
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
 			<h3>Starting-context alerts</h3>
 			<span class="tier pro">Pro</span>
 			<span class="cmd">limitcast install --alerts</span>
@@ -641,6 +730,33 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 			<strong>Benefit:</strong>
 			catches a new plugin, a growing CLAUDE.md or a chatty hook the day it
 			appears, not weeks later.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Large tool-output notice</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast install --alerts</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.12. A PostToolUse hook estimates each Bash, Read, Grep, WebFetch
+				and MCP tool result from its size. At about 20k tokens or more it tells
+				you, once per tool per session, with what to ask for next time.
+				<code>LIMITCAST_TOOL_TOKENS</code> changes the threshold.
+			</li>
+			<li>
+				Shown to you only, never to the model, and it adds about 30 ms per call.
+				If the hook fails, the call goes through. To add it to an existing
+				install, run <code>limitcast install --alerts</code> again.
+			</li>
+		</ul>
+		<pre class="sample">limitcast: that linear list_issues result was ≈25k tokens (≈0.17% of a 5-hour window to write, then re-read on every later call). Next time: ask for fewer fields and a smaller limit.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			one oversized result is easy to miss; this names it the moment it happens,
+			and what to ask for instead.
 		</p>
 	</section>
 
@@ -758,6 +874,41 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 
 	<section class="feature">
 		<div class="feature-head">
+			<h3>Grok</h3>
+			<span class="tier">Free</span>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">install · budget grok &lt;usd&gt; · trim --grok</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.12. <code>limitcast install</code> wraps Grok's status line (the
+				session model, context % and cost on one line, with the limitcast
+				forecast under it). <code>--guard</code> adds a guard for
+				<code>spawn_subagent</code>.
+			</li>
+			<li>
+				<code>limitcast trim --grok</code> measures Grok's system prompt and tool
+				definitions and the MCP servers in <code>~/.grok/config.toml</code> you
+				haven't used. <strong>Free</strong> shows totals; <strong>Pro</strong>
+				names them and turns them off (<code>--undo</code> restores the file).
+			</li>
+			<li>
+				Grok stores what you spent, not a percentage, so the status line shows
+				<code>grok 5h $X · 7d $Y</code> until you set a dollar cap with
+				<code>limitcast budget grok 20</code> (<strong>Pro</strong>). Then
+				<code>status</code> forecasts that window and the guard blocks new Grok
+				subagents when it is on pace to run out.
+			</li>
+		</ul>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			the same forecast, guard and trim for Grok, once you tell limitcast what a
+			5-hour window is worth to you.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
 			<h3>Setup and upkeep</h3>
 			<span class="tier">Free</span>
 			<span class="cmd">install · uninstall · doctor [--fix] · trial</span>
@@ -853,8 +1004,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				</tr>
 				<tr>
 					<td>
-						Starting-context total and how much you never use (Claude Code and
-						Codex)
+						Starting-context total and how much you never use (Claude Code, Codex
+						and Grok)
 					</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
@@ -882,7 +1033,22 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<td class="yes">✓</td>
 				</tr>
 				<tr>
-					<td>Subagent receipts and a subagent budget per window</td>
+					<td>Where your tokens went, scheduled-job starts, large tool-output notice</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Grok: status line, trim totals, guard preview</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Grok dollar cap (forecast and guard), <code>trim --grok --apply</code></td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Subagent receipts, a cost preview before each subagent, and a budget per window</td>
 					<td></td>
 					<td class="yes">✓</td>
 				</tr>
@@ -941,13 +1107,13 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<td>Runout forecast</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
-					<td class="muted">No limit data on disk</td>
+					<td class="muted">Spend only; forecast after a dollar cap</td>
 				</tr>
 				<tr>
 					<td>Subagent guard</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
-					<td class="muted">Never blocks</td>
+					<td class="muted">Blocks once a dollar cap is set</td>
 				</tr>
 				<tr>
 					<td>Burn report</td>
@@ -962,7 +1128,13 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<td class="muted">-</td>
 				</tr>
 				<tr>
-					<td>Trim advisor</td>
+					<td>Trim advisor (<code>--codex</code> and <code>--grok</code> for the others)</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Where your tokens went, scheduled-job starts, tool-output notice</td>
 					<td class="yes">✓</td>
 					<td class="muted">-</td>
 					<td class="muted">-</td>
