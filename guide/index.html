@@ -517,6 +517,47 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITC
 
 	<section class="feature">
 		<div class="feature-head">
+			<h3>Subagent models by type</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast subagent-model &lt;type&gt; &lt;model&gt;|off</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.13. Pin a kind of subagent to a model and every new subagent of
+				that kind runs on it: <code>limitcast subagent-model Explore haiku</code>.
+				The model can be <code>sonnet</code>, <code>opus</code>,
+				<code>haiku</code> or a full model id.
+			</li>
+			<li>
+				A spawn that names its own model keeps it. While a window is tight, a kind
+				pinned to Opus is still moved to Sonnet. With no arguments the command
+				lists what is pinned and the kinds you ran in the last 30 days.
+			</li>
+			<li>
+				Needs the guard (<code>limitcast install --guard</code>), which runs as a
+				PreToolUse hook on the Task and Agent tools. <code>results</code> counts
+				the subagents it moved; free installs record what it would have done.
+			</li>
+			<li>
+				limitcast cannot tell whether a cheaper model costs less of your limit per
+				token, so check <code>limitcast report --why</code> after a week.
+			</li>
+		</ul>
+		<pre class="sample">$ limitcast subagent-model Explore haiku
+Explore: haiku
+
+Types you ran in the last 30 days: general-purpose (86), Explore (39), fork (39)
+
+limitcast: Explore subagents run on haiku, the model you set for them.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			the subagents that only read and search stop running on your most
+			expensive model.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
 			<h3>Subagent receipts and budgets</h3>
 			<span class="tier pro">Pro</span>
 			<span class="cmd">limitcast budget subagents &lt;percent&gt;|off</span>
@@ -604,20 +645,82 @@ Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. On
 			</li>
 			<li>The share of tokens that went to subagents.</li>
 			<li>
+				New in 0.13. The API-equivalent cost: what the same tokens would cost at
+				the API's list prices (input, 5-minute and 1-hour cache writes, cache
+				reads and output), as a total and per tool, day, project, model and
+				session. It is a yardstick for how much your plan covers, not a bill.
+				Claude models are priced; tokens on any other model are left out and
+				counted separately, never as $0. Change a price or add a model in
+				<code>~/.local/state/limitcast/prices.json</code>.
+			</li>
+			<li>
 				Read from each tool's own local logs, including Grok's per-turn usage
 				records.
 			</li>
 		</ul>
 		<pre class="sample cols">$ limitcast report --days 7
-| tool   | tokens | output | cache reads | share |
-| claude | 863.6M |   2.9M |      840.8M |   99% |
-| codex  |  12.9M |  44.1k |       12.6M |    1% |
+| tool   | tokens | output | cache reads | share | API-equivalent |
+| claude | 863.6M |   2.9M |      840.8M |   99% |           $219 |
+| codex  |  12.9M |  44.1k |       12.6M |    1% |              - |
 
+<b>API-equivalent cost: $219</b> at list prices for Claude models, not what a
+subscription charges. 12.9M tokens on other models are not counted.
 Subagents used <b>21%</b> of Claude tokens.</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			shows which projects, models or habits use up your plan, across all three
 			tools in one report.
+		</p>
+	</section>
+
+	<section class="feature">
+		<div class="feature-head">
+			<h3>Plan advisor</h3>
+			<span class="tier pro">Pro</span>
+			<span class="cmd">limitcast plan [--days N] · plan set &lt;pro|max5|max20&gt;</span>
+		</div>
+		<ul>
+			<li>
+				New in 0.13. Does your Claude plan fit how much you use? limitcast keeps
+				the peak of every 5-hour and weekly window (for 120 days, starting when
+				you install this version) and compares them with your plan.
+			</li>
+			<li>
+				It points to the next plan, with the monthly price difference, if you
+				reached a limit three or more times (or the weekly limit once). It points
+				to a smaller plan if that plan's limits would have held your busiest
+				window and week with room to spare. It also shows what your Claude Code
+				tokens would cost at API list prices, against your plan's price.
+			</li>
+			<li>
+				Tell it your plan first: <code>limitcast plan set max20</code>. It needs a
+				week or two of history before it recommends anything. Prices (Pro $20, Max
+				5x $100, Max 20x $200) and the 5x and 20x multipliers are from
+				claude.com/pricing on 26 October 2026; the Max 20x price was not on that
+				page, and you can change any price in
+				<code>~/.local/state/limitcast/prices.json</code>.
+			</li>
+			<li>
+				Anthropic states the multiplier for the 5-hour session; the advisor
+				assumes weekly limits scale the same way. It cannot see paid extra usage,
+				which may cost less than a bigger plan if you rarely reach a limit.
+			</li>
+		</ul>
+		<pre class="sample cols">$ limitcast plan
+Claude plan: Max 20x, $200 a month
+
+Over 16 days: 63 five-hour windows with use (0 reached the limit, busiest
+20%), 2 weekly windows (0 reached the limit, busiest 15%).
+Max 5x would have fit: it has 1/4 of the usage per session, so your busiest
+5-hour window (20%) would have been about 80% and your busiest week about
+60%. That saves $100 a month ($100 vs $200).
+
+At API list prices your Claude Code tokens of the last 16 days would have
+cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pre>
+		<p class="gain">
+			<strong>Benefit:</strong>
+			a recommendation in dollars, from your own usage, instead of guessing which
+			plan to pay for. (Example output; your numbers will differ.)
 		</p>
 	</section>
 
@@ -1038,6 +1141,16 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<td class="yes">✓</td>
 				</tr>
 				<tr>
+					<td>Plan advisor, API-equivalent cost in the burn report</td>
+					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>A model for each kind of subagent</td>
+					<td class="muted">Preview</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
 					<td>Grok: status line, trim totals, guard preview</td>
 					<td class="yes">✓</td>
 					<td class="yes">✓</td>
@@ -1135,6 +1248,18 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				</tr>
 				<tr>
 					<td>Where your tokens went, scheduled-job starts, tool-output notice</td>
+					<td class="yes">✓</td>
+					<td class="muted">-</td>
+					<td class="muted">-</td>
+				</tr>
+				<tr>
+					<td>Plan advisor, a model for each kind of subagent</td>
+					<td class="yes">✓</td>
+					<td class="muted">-</td>
+					<td class="muted">-</td>
+				</tr>
+				<tr>
+					<td>API-equivalent cost in the burn report</td>
 					<td class="yes">✓</td>
 					<td class="muted">-</td>
 					<td class="muted">-</td>

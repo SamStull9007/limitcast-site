@@ -101,6 +101,14 @@
     },
     {
       "@type": "Question",
+      "name": "Is the dollar figure what I actually pay?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. The dollar figure is what the same tokens would cost at the API's list prices. A Claude subscription is a flat monthly fee, so the figure is a yardstick for how much your plan covers, not a bill. limitcast prices Claude models only: tokens on other models are left out and counted separately, never as zero. The prices are in the code as of 26 October 2026, and you can change them in a small file."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "What if I have two Claude accounts?",
       "acceptedAnswer": {
         "@type": "Answer",
@@ -584,6 +592,29 @@ limitcast: Claude 5h limit is 88% used; this subagent runs on
 Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
       </section>
 
+      <section class="feature" id="f-models">
+        <div>
+          <h3>A model for each kind of subagent <span class="badge pro">Pro</span> <span class="badge">New in 0.13</span></h3>
+          <p>
+            Most subagents just read and search, and they inherit your main model. Pin a kind to a cheaper one and every new subagent of that kind
+            runs on it, for example <code>Explore</code> on Haiku. A spawn that names its own model is left alone, and while a window is tight a kind
+            pinned to Opus still moves to Sonnet. <code>results</code> counts the subagents it moved.
+          </p>
+          <p class="pro-note">
+            Needs <code>limitcast install --guard</code>. Free installs record what it would have done. Whether a cheaper model costs less of your
+            limit per token isn't something limitcast can tell, so check <code>report --why</code> after a week.
+          </p>
+        </div>
+        <pre>$ limitcast subagent-model Explore haiku
+Explore: haiku
+
+Types you ran in the last 30 days: general-purpose (86), Explore (39), fork (39)
+New subagents of these types run on that model unless the spawn names one itself.
+
+<span class="dim"># the next Explore subagent:</span>
+limitcast: Explore subagents run on haiku, the model you set for them.</pre>
+      </section>
+
       <section class="feature" id="f-receipts">
         <div>
           <h3>Subagent receipts and budgets <span class="badge pro">Pro</span> <span class="badge">New in 0.11</span></h3>
@@ -704,17 +735,51 @@ $ limitcast trim --grok</pre>
             Claude Code, Codex and Grok tokens by tool, day, project, model and session, read from each tool's own logs, plus the share that went to
             subagents. See which project or habit is eating your plan.
           </p>
+          <p>
+            <b>New in 0.13:</b> the API-equivalent cost: what the same tokens would cost at the API's list prices, per tool, day, project, model and
+            session. It's a yardstick for how much your plan covers, not a bill. Claude models are priced; any other model is left out and counted
+            separately, never as $0. The dollar figure in the example is illustrative.
+          </p>
         </div>
         <pre class="cols">$ limitcast report --days 7
-| tool   | tokens | output | cache reads | share |
-| claude | 863.6M |   2.9M |      840.8M |   99% |
-| codex  |  12.9M |  44.1k |       12.6M |    1% |
+| tool   | tokens | output | cache reads | share | API-equivalent |
+| claude | 863.6M |   2.9M |      840.8M |   99% |           $219 |
+| codex  |  12.9M |  44.1k |       12.6M |    1% |              - |
 
+<b>API-equivalent cost: $219</b> at list prices for Claude models, not what a
+subscription charges. 12.9M tokens on other models are not counted.
 Subagents used <b>21%</b> of Claude tokens.
 
 ## Top projects
 | ~/work/api     | 305.4M | 35% |
 | ~/work/web     |  80.8M |  9% |</pre>
+      </section>
+
+      <section class="feature" id="f-plan">
+        <div>
+          <h3>Does your plan fit? <span class="badge pro">Pro</span> <span class="badge">New in 0.13</span></h3>
+          <p>
+            limitcast keeps the peak of every 5-hour and weekly window you have. Tell it your plan and it says whether you reached your limits often
+            enough to look at the next one, or used so little that a smaller one would have fit, with the monthly price difference. It also shows what
+            your tokens would cost at API list prices, so you can see what your plan covers.
+          </p>
+          <p class="pro-note">
+            It needs a week or two of history before it recommends anything, and it cannot see extra-usage spend. Anthropic states the 5-hour
+            multiplier for Max (5x or 20x Pro); the advisor assumes weekly limits scale the same way. Example output below; your numbers will differ.
+          </p>
+        </div>
+        <pre class="cols">$ limitcast plan set max20
+$ limitcast plan
+Claude plan: Max 20x, $200 a month
+
+Over 16 days: 63 five-hour windows with use (0 reached the limit, busiest
+20%), 2 weekly windows (0 reached the limit, busiest 15%).
+Max 5x would have fit: it has 1/4 of the usage per session, so your busiest
+5-hour window (20%) would have been about 80% and your busiest week about
+60%. That saves $100 a month ($100 vs $200).
+
+At API list prices your Claude Code tokens of the last 16 days would have
+cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pre>
       </section>
 
       <section class="feature" id="f-why">
@@ -981,13 +1046,15 @@ limitcast doctor</pre>
             <li>Trim advisor: names what to cut and what each costs</li>
             <li>One command makes the cuts; one undoes them (Claude Code, Codex and Grok)</li>
             <li>Subagent guard: blocks runaway subagents, switches to Sonnet when a window is tight</li>
+            <li>Pick the model each kind of subagent runs on, for example Explore on Haiku</li>
             <li>What each subagent cost, what that kind has cost before it starts, and a subagent budget per window</li>
             <li>Cold-cache warning before a message re-sends an expired context</li>
             <li>Notifications on desktop, phone (ntfy) or Slack/Discord, and when your limit itself changes</li>
             <li>Jobs that run after the reset</li>
             <li>Other-account pointer and a /compact nudge in the status line</li>
             <li>Alerts when your starting context grows, a weekly summary, and a notice when one tool result is very large</li>
-            <li>Burn report and dashboard across Claude Code, Codex and Grok</li>
+            <li>Burn report, with API-equivalent dollar cost, and dashboard across Claude Code, Codex and Grok</li>
+            <li>Plan advisor: does a bigger or smaller Claude plan fit how you use it, with the monthly price difference</li>
             <li>Where your tokens went, by subagent type and model, and which scheduled jobs start heaviest</li>
             <li>Grok dollar cap: forecast and guard for Grok</li>
             <li>Email support</li>
@@ -1043,9 +1110,11 @@ limitcast doctor</pre>
             <tr><td><a href="#f-after">Run a job after the reset</a></td><td></td><td>✓</td></tr>
             <tr><td>Pointer to your other Claude account, <code>/compact</code> nudge</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-alerts">Starting-context alerts</a> and a weekly summary</td><td></td><td>✓</td></tr>
-            <tr><td><a href="#f-report">Burn report</a>: Claude Code, Codex and Grok by day, project, model, session</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-report">Burn report</a>: Claude Code, Codex and Grok by day, project, model, session, with API-equivalent cost for Claude</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-why">Where your tokens went</a>: subagents, session starts, cache rebuilds, tool results, by subagent type and model</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-jobs">Heaviest scheduled-job starts</a>, with cold starts per job</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-models">A model for each kind of subagent</a></td><td>Preview only</td><td>✓</td></tr>
+            <tr><td><a href="#f-plan">Plan advisor</a>: does a bigger or smaller Claude plan fit</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-toolcheck">Large tool-output notice</a>, with what to ask for instead</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-grok">Grok</a>: status line, trim totals and a guard preview</td><td>✓</td><td>✓</td></tr>
             <tr><td>Grok dollar cap: forecast and guard, <code>trim --grok --apply</code></td><td></td><td>✓</td></tr>
@@ -1082,6 +1151,12 @@ limitcast doctor</pre>
           the trim advisor and the subagent guard. Grok keeps no percentage used on disk, only spend, so the status line shows your 5-hour and 7-day
           spend; set a dollar cap (<code>limitcast budget grok 20</code>, Pro) and limitcast forecasts that window and the guard blocks new Grok
           subagents when it is on pace to run out.
+        </p>
+      </details>
+      <details>
+        <summary>Is the dollar figure what I actually pay?</summary>
+        <p>
+          No. The dollar figure is what the same tokens would cost at the API's list prices. A Claude subscription is a flat monthly fee, so the figure is a yardstick for how much your plan covers, not a bill. limitcast prices Claude models only: tokens on other models are left out and counted separately, never as zero. The prices are in the code as of 26 October 2026, and you can change them in a small file.
         </p>
       </details>
       <details>
