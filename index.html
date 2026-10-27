@@ -564,12 +564,18 @@ limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact</pre>
             Burn rate and the clock time each 5-hour and weekly window runs out, for Claude Code and Codex, and for Grok once you set a dollar cap. The
             weekly window is paced over the last full day, nights included, so one busy hour doesn't cry wolf. <b>NEAR</b> at 95%, even before there's a rate.
           </p>
+          <p>
+            <b>New in 0.14:</b> when a window is on pace to run out, <code>status</code> ends with one line that names the one that runs out first and
+            where else there is room.
+          </p>
         </div>
         <pre class="cols">$ limitcast status
 window     used  burn      runs out  resets     today     status
 claude 5h  71%   +18.2%/h  16:40     17:00      -         <span class="warn">AT_RISK</span>
 claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   <span class="ok">OK</span>
-codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</span></pre>
+codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</span>
+
+You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
       </section>
 
       <section class="feature" id="f-guard">
@@ -590,6 +596,29 @@ or set LIMITCAST_ALLOW=1 to spawn anyway.
 <span class="dim"># a new subagent while the window is tight:</span>
 limitcast: Claude 5h limit is 88% used; this subagent runs on
 Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
+      </section>
+
+      <section class="feature" id="f-daily">
+        <div>
+          <h3>Your week, paced by the day <span class="badge pro">Pro</span> <span class="badge">Free preview</span> <span class="badge">New in 0.14</span></h3>
+          <p>
+            The <code>today</code> figure in your status line is your share of what is left of the week, split evenly over the days until it resets.
+            Now it acts: with notifications on, you get one message a day when you have used 80% of today's share. Turn on
+            <code>limitcast budget today on</code> and the guard also holds new subagents once today's share is used up, until local midnight.
+          </p>
+          <p class="pro-note">
+            The hold is off by default. A window already at 100% is left to the tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free installs
+            record what Pro would have held, and <code>results</code> shows it.
+          </p>
+        </div>
+        <pre><span class="dim"># once a day, at 80% of today's share:</span>
+limitcast: Claude 7d: 80% of today's share used, 1% left today.
+
+<span class="dim"># a new subagent, with the hold on:</span>
+limitcast: today's share of your Claude 7d limit is used up (6% of
+5%). New subagents are held until midnight. Turn this off:
+`limitcast budget today off`, or set LIMITCAST_ALLOW=1 to
+spawn anyway.</pre>
       </section>
 
       <section class="feature" id="f-models">
@@ -684,6 +713,10 @@ ahead, or run /compact first to shrink it.</pre>
             <code>trim --codex</code>, and <b>new in 0.12</b> Grok has <code>trim --grok</code>: its system prompt and the MCP servers in
             <code>~/.grok/config.toml</code> you haven't used.
           </p>
+          <p>
+            <b>New in 0.14:</b> <code>limitcast trim keep ego-browser</code> puts a server or skill on a keep-list that no <code>--apply</code> ever
+            turns off or hides, for Claude Code, Codex and Grok. It is free to set, and <code>trim</code> shows what it would keep.
+          </p>
           <p class="pro-note"><span class="badge">Free</span> shows the totals: your starting context and how much of it you never use.</p>
         </div>
         <pre>$ limitcast trim --apply
@@ -693,7 +726,10 @@ Takes effect in your next Claude Code session. Undo: `limitcast trim --undo`
 
 $ limitcast trim --codex --apply
 ✓ Turned off 3 Codex MCP servers (enabled = false in ~/.codex/config.toml):
-  firecrawl, icm, node_repl</pre>
+  firecrawl, icm, node_repl
+
+$ limitcast trim keep ego-browser
+Kept by `trim --apply`: ego-browser</pre>
       </section>
 
       <section class="feature" id="f-grok">
@@ -1100,8 +1136,10 @@ limitcast doctor</pre>
             <tr><td>Daily health check, <code>doctor</code>, Claude Code plugin commands</td><td>✓</td><td>✓</td></tr>
             <tr><td><a href="#f-guard">Subagent guard</a>: stops subagents before a window runs out</td><td>Preview only</td><td>✓</td></tr>
             <tr><td>Moves new subagents to Sonnet while a window is tight</td><td>Preview only</td><td>✓</td></tr>
+            <tr><td><a href="#f-daily">Daily share</a>: a notification at 80% of today's share, and an optional hold on new subagents</td><td>Preview only</td><td>✓</td></tr>
             <tr><td><a href="#f-trim">Trim advisor</a>: names each unused server, skill and hook, and its cost</td><td>Totals only</td><td>✓</td></tr>
             <tr><td><code>trim --apply</code> / <code>--undo</code>, for Claude Code, Codex and Grok</td><td></td><td>✓</td></tr>
+            <tr><td><a href="#f-trim">Keep-list</a>: servers and skills <code>trim --apply</code> never touches</td><td>✓</td><td>✓</td></tr>
             <tr><td><a href="#f-receipts">Subagent receipts</a>: what each finished subagent cost against your window, and what that kind has cost before a new one starts</td><td></td><td>✓</td></tr>
             <tr><td>Subagent budget per 5-hour window (<code>limitcast budget subagents 15</code>)</td><td></td><td>✓</td></tr>
             <tr><td><a href="#f-cold">Cold-cache warning</a> before a message re-sends an expired context</td><td>Preview only</td><td>✓</td></tr>

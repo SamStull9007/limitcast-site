@@ -377,12 +377,19 @@ Every Claude Code session starts at 102.7k tokens before your first message.
 				and how much of it today used: <code>7d 41% · today 6% left</code> in
 				the status line, a <code>today</code> column in <code>status</code>.
 			</li>
+			<li>
+				<strong>Which window first:</strong>
+				when a window is on pace to run out, <code>status</code> ends with one
+				line naming the one that runs out first and where else there is room.
+			</li>
 		</ul>
 		<pre class="sample cols">$ limitcast status
 window     used  burn      runs out  resets     today     status
 claude 5h  71%   +18.2%/h  16:40     17:00      -         <span class="warn">AT_RISK</span>
 claude 7d  41%   +0.6%/h   -         Sun 03:00  6% left   <span class="ok">OK</span>
 codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</span>
+
+You'll hit Claude 5h first (16:40). Codex 5h has 78% left.
 
 <span class="dim"># in the status line:</span>
 5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left</pre>
@@ -445,6 +452,14 @@ codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</s
 					>enabled = false</code
 				>) and <code>--undo</code> restores the file exactly.
 			</li>
+			<li>
+				<code>trim keep &lt;name&gt;[,&lt;name&gt;]</code>
+				(free) puts servers or skills on a keep-list that <code>--apply</code>
+				never turns off or hides, in Claude Code, Codex and Grok, whatever the
+				spelling (<code>ego-browser</code> and <code>ego_browser</code> match).
+				<code>trim</code> shows what it would keep, <code>trim keep --remove
+				&lt;name&gt;</code> drops one, and <code>trim keep</code> alone lists them.
+			</li>
 		</ul>
 		<pre class="sample">$ limitcast trim --apply
 ✓ Hid 66 skills from the model (`/name` still works): dataviz, block-kit, …
@@ -452,7 +467,10 @@ codex 5h   22%   +4.1%/h   -         18:12      -         <span class="ok">OK</s
 Takes effect in your next Claude Code session. Undo: `limitcast trim --undo`
 
 $ limitcast trim --codex --apply
-✓ Turned off 3 Codex MCP servers (enabled = false in ~/.codex/config.toml): firecrawl, icm, node_repl</pre>
+✓ Turned off 3 Codex MCP servers (enabled = false in ~/.codex/config.toml): firecrawl, icm, node_repl
+
+$ limitcast trim keep ego-browser
+Kept by `trim --apply`: ego-browser</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			every token you cut is saved on every turn of every session and every
@@ -499,6 +517,15 @@ $ limitcast trim --codex --apply
 				overrides it.
 			</li>
 			<li>
+				<strong>Daily hold</strong>
+				(Pro, off by default): <code>limitcast budget today on</code> also holds
+				new subagents once today's share of a weekly window is used up, until
+				local midnight. With notifications on you get one message a day at 80%
+				of today's share. A window already at 100% is left alone,
+				<code>LIMITCAST_ALLOW=1</code> overrides it, and free installs see what it
+				would have held in <code>limitcast results</code>.
+			</li>
+			<li>
 				In Codex it is added after your existing hooks, so the ones you've
 				already approved keep their approval.
 			</li>
@@ -507,7 +534,10 @@ $ limitcast trim --codex --apply
 limitcast: Claude 5h limit is 93% used and on pace to run out in ~21 min, before it resets. Finish with the agents already running, or set LIMITCAST_ALLOW=1 to spawn anyway.
 
 <span class="dim"># a new subagent while the window is tight:</span>
-limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
+limitcast: Claude 5h limit is 88% used; this subagent runs on Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.
+
+<span class="dim"># a new subagent once today's share is used up (budget today on):</span>
+limitcast: today's share of your Claude 7d limit is used up (6% of 5%). New subagents are held until midnight. Turn this off: `limitcast budget today off`, or set LIMITCAST_ALLOW=1 to spawn anyway.</pre>
 		<p class="gain">
 			<strong>Benefit:</strong>
 			stops the most common way people lose the end of a window: a burst of
@@ -1128,6 +1158,16 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 						Names each item to cut, and cuts it (<code>trim --apply</code>)
 					</td>
 					<td></td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Keep-list: servers and skills <code>trim --apply</code> never touches</td>
+					<td class="yes">✓</td>
+					<td class="yes">✓</td>
+				</tr>
+				<tr>
+					<td>Daily share: a notification at 80% and an optional hold on new subagents</td>
+					<td class="muted">Preview</td>
 					<td class="yes">✓</td>
 				</tr>
 				<tr>
