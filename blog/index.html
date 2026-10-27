@@ -1,0 +1,292 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>limitcast blog: Claude Code usage limits, measured</title>
+		<meta
+			name="description"
+			content="Posts on Claude Code usage limits from real readings: how the 5-hour and weekly limits work, how many tokens 1% is, what subagents cost, and why the prompt cache makes an idle pause expensive."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="website">
+		<meta property="og:url" content="https://limitcast.dev/blog/">
+		<meta
+			property="og:title"
+			content="limitcast blog: Claude Code usage limits, measured"
+		>
+		<meta
+			property="og:description"
+			content="Claude Code usage limits from real readings: the 5-hour and weekly limits, tokens per percent, subagent cost, and the prompt cache."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "limitcast blog",
+      "url": "https://limitcast.dev/blog/",
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "blogPost": [
+        {
+          "@type": "BlogPosting",
+          "headline": "Claude Code usage limit reached: how the 5-hour and weekly limits work",
+          "datePublished": "2026-10-26",
+          "url": "https://limitcast.dev/blog/claude-code-usage-limits/"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "Why a long idle pause costs you: Claude Code's prompt cache",
+          "datePublished": "2026-10-26",
+          "url": "https://limitcast.dev/blog/prompt-cache-idle/"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "How many tokens is 1% of your Claude Code limit?",
+          "datePublished": "2026-10-25",
+          "url": "https://limitcast.dev/blog/tokens-per-percent/"
+        },
+        {
+          "@type": "BlogPosting",
+          "headline": "Do subagents burn your Claude Code limit faster?",
+          "datePublished": "2026-10-25",
+          "url": "https://limitcast.dev/blog/subagents/"
+        }
+      ]
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header a[aria-current="page"] {
+			color: var(--fg);
+			font-weight: 600;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		.lede {
+			color: var(--muted);
+			margin: 0 0 32px;
+		}
+		a {
+			color: var(--accent);
+		}
+		.posts {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+		}
+		.posts li {
+			padding: 20px 0;
+			border-top: 1px solid var(--line);
+		}
+		.posts h2 {
+			font-size: 1.3rem;
+			letter-spacing: -0.02em;
+			line-height: 1.25;
+			margin: 0 0 6px;
+			text-wrap: balance;
+		}
+		.posts h2 a {
+			color: var(--fg);
+			text-decoration: none;
+		}
+		.posts h2 a:hover {
+			color: var(--accent);
+			text-decoration: underline;
+		}
+		.posts time {
+			display: block;
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-bottom: 6px;
+		}
+		.posts p {
+			margin: 0;
+			color: var(--muted);
+			font-size: 1rem;
+		}
+		.cta {
+			margin-top: 40px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		.cta p:last-child {
+			margin-bottom: 0;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> ·
+					<a href="/blog/" aria-current="page">Blog</a>
+					·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+
+			<h1>limitcast blog</h1>
+			<p class="lede">
+				What Claude Code's usage limits really cost, measured from real readings
+				rather than guessed.
+			</p>
+
+			<ul class="posts">
+				<li>
+					<time datetime="2026-10-26">26 October 2026</time>
+					<h2>
+						<a href="/blog/claude-code-usage-limits/"
+							>Claude Code usage limit reached: how the 5-hour and weekly limits
+							work</a
+						>
+					</h2>
+					<p>
+						How the 5-hour session limit and the weekly limit reset, which
+						tokens move the meter (new ones, far more than cached ones), and how
+						to see the runout coming.
+					</p>
+				</li>
+				<li>
+					<time datetime="2026-10-26">26 October 2026</time>
+					<h2>
+						<a href="/blog/prompt-cache-idle/"
+							>Why a long idle pause costs you: Claude Code's prompt cache</a
+						>
+					</h2>
+					<p>
+						Come back to a long session after a break and your next message can
+						cost over 60 times more of your limit. Why the cache expires, and
+						when to <code>/compact</code> first.
+					</p>
+				</li>
+				<li>
+					<time datetime="2026-10-25">25 October 2026</time>
+					<h2>
+						<a href="/blog/tokens-per-percent/"
+							>How many tokens is 1% of your Claude Code limit?</a
+						>
+					</h2>
+					<p>
+						From two days of real readings: 1% of the 5-hour limit is about 166k
+						new tokens or 11 million cached ones.
+					</p>
+				</li>
+				<li>
+					<time datetime="2026-10-25">25 October 2026</time>
+					<h2>
+						<a href="/blog/subagents/"
+							>Do subagents burn your Claude Code limit faster?</a
+						>
+					</h2>
+					<p>
+						A subagent call costs about the same share of the 5-hour limit as a
+						main-thread call. A typical subagent costs about 2% of a window;
+						five in parallel, about 10%.
+					</p>
+				</li>
+			</ul>
+
+			<div class="cta">
+				<p>
+					limitcast forecasts when each Claude Code, Codex and Grok limit runs
+					out, and its Pro plan stops runaway subagents before they burn the
+					rest of it.
+				</p>
+				<p>
+					<a href="/">See what limitcast does</a>
+					· <a href="/#pricing">Pricing</a> ·
+					<a href="/guide/">Feature guide</a>
+				</p>
+			</div>
+
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
