@@ -48,7 +48,7 @@
   },
   "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
   "isAccessibleForFree": true,
-  "softwareVersion": "0.15.0"
+  "softwareVersion": "0.16.0"
 }
 </script>
 		<script type="application/ld+json">
@@ -501,7 +501,7 @@
 			</p>
 			<pre
 				id="quick-install"
-			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.15.0/limitcast-0.15.0.tgz
+			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.16.0/limitcast-0.16.0.tgz
 limitcast onboard</code></pre>
 			<button
 				class="btn"
@@ -905,6 +905,41 @@ $ limitcast trim keep ego-browser
 Kept by `trim --apply`: ego-browser</pre>
 			</section>
 
+			<section class="feature" id="f-memory">
+				<div>
+					<h3>
+						Memory check <span class="badge">Free</span>
+
+						<span class="badge">New in 0.16</span>
+					</h3>
+					<p>
+						Claude Code loads only the first 200 lines or 25 KB of
+						<code>MEMORY.md</code>
+						into every session, so a note past that is never read.
+						<code>limitcast memory</code>
+						shows how much of the index fits, which links are broken, which topic
+						files nothing links to and which are over 150 lines.
+						<code>doctor</code>
+						flags an index that is over the cap.
+					</p>
+					<p>
+						In Claude Code,
+						<code>/limitcast:memory-audit</code>
+						takes the sweep further (stale, contradictory and unlinked notes,
+						with fixes proposed and nothing changed until you agree), and
+						<code>/limitcast:memory-split</code>
+						splits an oversized file into a short hub plus topic files after you
+						approve the boundary.
+					</p>
+				</div>
+				<pre>$ limitcast memory
+Memory: ~/.claude/projects/-Users-you-app/memory
+Index: MEMORY.md 62 / 200 lines, 7.1 / 25 KB
+Topic files: 18
+Not linked from the index (2): old-notes.md, scratch.md
+Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
+			</section>
+
 			<section class="feature" id="f-grok">
 				<div>
 					<h3>
@@ -1196,8 +1231,9 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 						exactly. A daily background check tells you in the status line if
 						anything breaks, including a Claude Code, Codex or Grok log-format
 						change. Hooks survive Node upgrades. In Claude Code, the plugin adds
-						<code>/limitcast:status</code>, <code>/limitcast:results</code> and
-						<code>/limitcast:trim</code>.
+						<code>/limitcast:status</code>, <code>/limitcast:results</code>,
+						<code>/limitcast:trim</code>, <code>/limitcast:memory-audit</code> and
+						<code>/limitcast:memory-split</code>.
 					</p>
 				</div>
 				<pre class="cols">$ limitcast doctor
@@ -1206,7 +1242,8 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 ✓ Claude Code subagent guard installed
 ✓ Codex subagent guard installed and trusted
 ✓ Last Claude reading 0 min ago
-✓ Claude Code status-line feed: limit readings present</pre>
+✓ Claude Code status-line feed: limit readings present
+✓ Memory: 18 files, index 62/200 lines, 7/25 KB, no problems</pre>
 			</section>
 
 			<h2 id="buy">Free to install, yours to control</h2>
@@ -1339,7 +1376,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 
 			<h2 id="install">Get your first useful result</h2>
 			<pre
-			>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.15.0/limitcast-0.15.0.tgz
+			>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.16.0/limitcast-0.16.0.tgz
 limitcast onboard          # read-only checks and your next useful step
 limitcast install          # backs up settings and adds the recorder</pre>
 			<ol>

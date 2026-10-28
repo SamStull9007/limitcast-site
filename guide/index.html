@@ -327,7 +327,7 @@ This example Claude Code session started at 102.7k tokens before the first messa
 
 			<h2>Start with your own setup</h2>
 			<pre
-			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.15.0/limitcast-0.15.0.tgz
+			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.16.0/limitcast-0.16.0.tgz
 limitcast onboard</code></pre>
 			<p>
 				<code>onboard</code>
@@ -560,6 +560,54 @@ Kept by `trim --apply`: ego-browser</pre>
 					<strong>Benefit:</strong>
 					every token you cut is saved on every turn of every session and every
 					subagent. The numbers come from your own transcripts, not estimates.
+				</p>
+			</section>
+
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Memory check</h3>
+
+					<span class="cmd">limitcast memory [dir]</span>
+				</div>
+				<ul>
+					<li>
+						Claude Code loads only the first 200 lines or 25 KB of
+						<code>MEMORY.md</code>
+						into every session. A note past that is never read.
+					</li>
+					<li>
+						Reads this project's memory folder
+						(<code>~/.claude/projects/&lt;project&gt;/memory</code>) and reports
+						how much of the index fits, links that point at a missing file,
+						topic files nothing links to, and files over 150 lines. It changes
+						nothing.
+					</li>
+					<li>
+						<code>doctor</code>
+						shows the same as one line and fails it only when the index is past
+						the cap. The daily background check leaves it out, because memory
+						belongs to one project.
+					</li>
+					<li>
+						In Claude Code,
+						<code>/limitcast:memory-audit</code>
+						goes through stale, contradictory and unlinked notes and proposes
+						the fixes, and
+						<code>/limitcast:memory-split</code>
+						splits an oversized file into a short hub plus topic files after you
+						approve the boundary. Neither changes a note until you agree.
+					</li>
+				</ul>
+				<pre class="sample">$ limitcast memory
+Memory: ~/.claude/projects/-Users-you-app/memory
+Index: MEMORY.md 62 / 200 lines, 7.1 / 25 KB
+Topic files: 18
+Not linked from the index (2): old-notes.md, scratch.md
+Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					you find the notes that fell off the end of the index, and keep each
+					topic file small enough that a task reads only what it needs.
 				</p>
 			</section>
 
@@ -1327,7 +1375,7 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 
 			<h2>Get started</h2>
 			<pre
-			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.15.0/limitcast-0.15.0.tgz     <span class="dim"># or: brew trust samstull9007/limitcast &amp;&amp; brew install samstull9007/limitcast/limitcast</span>
+			><code>npm install -g https://github.com/SamStull9007/limitcast/releases/download/v0.16.0/limitcast-0.16.0.tgz     <span class="dim"># or: brew trust samstull9007/limitcast &amp;&amp; brew install samstull9007/limitcast/limitcast</span>
 limitcast install            <span class="dim"># free: status-line recorder</span>
 limitcast install --guard    <span class="dim"># the subagent guard, free for everyone</span>
 limitcast doctor
