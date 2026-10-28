@@ -1,350 +1,430 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Do subagents burn your Claude Code limit faster?</title>
-    <meta name="description" content="Measured on a real account: a subagent call costs about the same share of the 5-hour limit as a main-thread call. A typical subagent costs about 2% of a window; five in parallel, about 10%.">
-    <link rel="canonical" href="https://limitcast.dev/blog/subagents/">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://limitcast.dev/blog/subagents/">
-    <meta property="og:title" content="Do subagents burn your Claude Code limit faster?">
-    <meta
-      property="og:description"
-      content="A typical subagent cost about 2% of a 5-hour Claude Code window. Per call it costs about the same as the main thread; the count is what burns the limit."
-    >
-    <meta property="og:image" content="https://limitcast.dev/og.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="article:published_time" content="2026-10-25">
-    <script
-      data-goatcounter="https://limitcast.goatcounter.com/count"
-      async
-      src="https://gc.zgo.at/count.v4.js"
-      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
-      crossorigin="anonymous"
-    ></script>
-    <style>
-    :root {
-      --bg: #fbfaf7;
-      --fg: #1d1c1a;
-      --muted: #5f5c55;
-      --line: #e4e0d8;
-      --card: #ffffff;
-      --accent: #c2410c;
-      --cached: #a8a399;
-      --code-bg: #1d1c1a;
-      --code-fg: #f3efe6;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141312;
-        --fg: #eeeae2;
-        --muted: #a8a399;
-        --line: #2c2a27;
-        --card: #1b1a18;
-        --accent: #f97316;
-        --cached: #5f5c55;
-        --code-bg: #0c0b0a;
-        --code-fg: #eeeae2;
-      }
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font:
-        18px / 1.65 ui-sans-serif,
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        sans-serif;
-    }
-    main {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 16px 72px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px 16px;
-      flex-wrap: wrap;
-      padding: 20px 0;
-      font-size: 0.95rem;
-    }
-    header a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-    header .logo {
-      color: var(--fg);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    h1 {
-      font-size: clamp(1.9rem, 5vw, 2.6rem);
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      margin: 40px 0 10px;
-      text-wrap: balance;
-    }
-    h2 {
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      margin: 44px 0 10px;
-      text-wrap: balance;
-    }
-    .byline {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin: 0 0 28px;
-    }
-    .answer {
-      border-left: 3px solid var(--accent);
-      padding: 4px 0 4px 16px;
-      font-size: 1.15rem;
-      margin: 24px 0;
-    }
-    a {
-      color: var(--accent);
-    }
-    code {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 0.88em;
-    }
-    pre {
-      background: var(--code-bg);
-      color: var(--code-fg);
-      padding: 16px 18px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font:
-        14px / 1.55 ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        monospace;
-    }
-    .table-wrap {
-      overflow-x: auto;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.95rem;
-      font-variant-numeric: tabular-nums;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-    }
-    td.n,
-    th.n {
-      text-align: right;
-    }
-    figure {
-      margin: 28px 0;
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-    }
-    figcaption {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 12px;
-    }
-    .bar-label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 14px 0 6px;
-    }
-    .bar-label:first-child {
-      margin-top: 0;
-    }
-    .bar {
-      display: flex;
-      height: 30px;
-      border-radius: 6px;
-      overflow: hidden;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .bar span {
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      white-space: nowrap;
-      min-width: 0;
-    }
-    .bar .new {
-      background: var(--accent);
-      color: #fff;
-    }
-    .bar .cached {
-      background: var(--cached);
-      color: var(--fg);
-      justify-content: flex-end;
-    }
-    .legend {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-    .legend i {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-      margin-right: 6px;
-      vertical-align: 0;
-    }
-    .cta {
-      margin-top: 48px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--card);
-    }
-    .cta p {
-      margin: 0 0 10px;
-    }
-    footer {
-      margin-top: 48px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <a class="logo" href="/">limitcast</a>
-        <nav><a href="/#how">Features</a> · <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> · <a href="https://github.com/SamStull9007/limitcast">GitHub</a></nav>
-      </header>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Do subagents burn your Claude Code limit faster?</title>
+		<meta
+			name="description"
+			content="Measured on a real account: a subagent call costs about the same share of the 5-hour limit as a main-thread call. A typical subagent costs about 2% of a window; five in parallel, about 10%."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/subagents/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://limitcast.dev/blog/subagents/">
+		<meta
+			property="og:title"
+			content="Do subagents burn your Claude Code limit faster?"
+		>
+		<meta
+			property="og:description"
+			content="A typical subagent cost about 2% of a 5-hour Claude Code window. Per call it costs about the same as the main thread; the count is what burns the limit."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-10-25">
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			border-left: 3px solid var(--accent);
+			padding: 4px 0 4px 16px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.bar-label {
+			font-size: 0.9rem;
+			font-weight: 600;
+			margin: 14px 0 6px;
+		}
+		.bar-label:first-child {
+			margin-top: 0;
+		}
+		.bar {
+			display: flex;
+			height: 30px;
+			border-radius: 6px;
+			overflow: hidden;
+			font-size: 0.8rem;
+			font-weight: 600;
+		}
+		.bar span {
+			display: flex;
+			align-items: center;
+			padding: 0 8px;
+			white-space: nowrap;
+			min-width: 0;
+		}
+		.bar .new {
+			background: var(--accent);
+			color: #fff;
+		}
+		.bar .cached {
+			background: var(--cached);
+			color: var(--fg);
+			justify-content: flex-end;
+		}
+		.legend {
+			display: flex;
+			gap: 16px;
+			flex-wrap: wrap;
+			font-size: 0.85rem;
+			color: var(--muted);
+			margin-top: 10px;
+		}
+		.legend i {
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			border-radius: 2px;
+			margin-right: 6px;
+			vertical-align: 0;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p class="pro-note">
+				Historical article. Since version 0.15.0, all Limitcast features are
+				free under the MIT License.
+				<a href="/#install">Install the current release</a>.
+			</p>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
 
-      <article>
-        <h1>Do subagents burn your Claude Code limit faster?</h1>
-        <p class="byline">Sam Stull · 25 October 2026</p>
+			<article>
+				<h1>Do subagents burn your Claude Code limit faster?</h1>
+				<p class="byline">Sam Stull · 25 October 2026</p>
 
-        <p>
-          Subagents are the usual suspect when a Claude Code limit runs out early. I measured what they actually cost on my account, using the
-          same fit as in <a href="/blog/tokens-per-percent/">How many tokens is 1% of your Claude Code limit?</a>
-        </p>
+				<p>
+					Subagents are the usual suspect when a Claude Code limit runs out
+					early. I measured what they actually cost on my account, using the
+					same fit as in
+					<a href="/blog/tokens-per-percent/"
+						>How many tokens is 1% of your Claude Code limit?</a
+					>
+				</p>
 
-        <p class="answer">
-          <b>Per model call, no.</b> A subagent call cost about the same share of my 5-hour limit as a main-thread call: roughly 0.07%. Subagents
-          burn the limit because of how many calls they make. A typical subagent cost about 2% of a 5-hour window, so five in parallel cost
-          about 10%.
-        </p>
+				<p class="answer">
+					<b>Per model call, no.</b>
+					A subagent call cost about the same share of my 5-hour limit as a
+					main-thread call: roughly 0.07%. Subagents burn the limit because of
+					how many calls they make. A typical subagent cost about 2% of a 5-hour
+					window, so five in parallel cost about 10%.
+				</p>
 
-        <h2>Per call: about the same</h2>
-        <p>Over two days (23–25 October), on one account:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th></th>
-                <th class="n">Model calls</th>
-                <th class="n">New tokens per call</th>
-                <th class="n">Cached tokens per call</th>
-                <th class="n">Limit per call</th>
-                <th class="n">Share of the limit used</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr><td>Main thread</td><td class="n">4,234</td><td class="n">6.6k</td><td class="n">353k</td><td class="n">0.072%</td><td class="n">≈ 60%</td></tr>
-              <tr><td>Subagents</td><td class="n">2,895</td><td class="n">8.4k</td><td class="n">223k</td><td class="n">0.071%</td><td class="n">≈ 40%</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p class="byline">These two days end a few hours later than the ones in the first post, so its subagent share (42%) and this one (40%) differ slightly.</p>
-        <p>
-          The two cancel out. The main thread re-reads a bigger context on every call (353k cached tokens against 223k), but cached tokens
-          count about 1/67 as much as new ones. Each subagent writes its own context into the cache from scratch, so its calls carry more new
-          tokens (8.4k against 6.6k), and new tokens are what move the meter.
-        </p>
+				<h2>Per call: about the same</h2>
+				<p>Over two days (23–25 October), on one account:</p>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th class="n">Model calls</th>
+								<th class="n">New tokens per call</th>
+								<th class="n">Cached tokens per call</th>
+								<th class="n">Limit per call</th>
+								<th class="n">Share of the limit used</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Main thread</td>
+								<td class="n">4,234</td>
+								<td class="n">6.6k</td>
+								<td class="n">353k</td>
+								<td class="n">0.072%</td>
+								<td class="n">≈ 60%</td>
+							</tr>
+							<tr>
+								<td>Subagents</td>
+								<td class="n">2,895</td>
+								<td class="n">8.4k</td>
+								<td class="n">223k</td>
+								<td class="n">0.071%</td>
+								<td class="n">≈ 40%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p class="byline">
+					These two days end a few hours later than the ones in the first post,
+					so its subagent share (42%) and this one (40%) differ slightly.
+				</p>
+				<p>
+					The two cancel out. The main thread re-reads a bigger context on every
+					call (353k cached tokens against 223k), but cached tokens count about
+					1/67 as much as new ones. Each subagent writes its own context into
+					the cache from scratch, so its calls carry more new tokens (8.4k
+					against 6.6k), and new tokens are what move the meter.
+				</p>
 
-        <h2>Per subagent: about 2% of a window</h2>
-        <p>The same two days had 93 subagents. Priced against the 5-hour limit:</p>
-        <div class="table-wrap">
-          <table>
-            <tbody>
-              <tr><td>Typical subagent (median)</td><td class="n">16 calls</td><td class="n">≈ 1.9% of a 5-hour window</td></tr>
-              <tr><td>Average</td><td class="n"></td><td class="n">≈ 2.3%</td></tr>
-              <tr><td>1 in 10 cost more than</td><td class="n"></td><td class="n">≈ 4.1%</td></tr>
-              <tr><td>Largest</td><td class="n">86 calls</td><td class="n">≈ 10.1%</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          The costliest tenth of subagents used 29% of everything subagents used. Most subagents are cheap; a few long ones are not, and a
-          batch of them started at once is what ends a window early.
-        </p>
+				<h2>Per subagent: about 2% of a window</h2>
+				<p>
+					The same two days had 93 subagents. Priced against the 5-hour limit:
+				</p>
+				<div class="table-wrap">
+					<table>
+						<tbody>
+							<tr>
+								<td>Typical subagent (median)</td>
+								<td class="n">16 calls</td>
+								<td class="n">≈ 1.9% of a 5-hour window</td>
+							</tr>
+							<tr>
+								<td>Average</td>
+								<td class="n"></td>
+								<td class="n">≈ 2.3%</td>
+							</tr>
+							<tr>
+								<td>1 in 10 cost more than</td>
+								<td class="n"></td>
+								<td class="n">≈ 4.1%</td>
+							</tr>
+							<tr>
+								<td>Largest</td>
+								<td class="n">86 calls</td>
+								<td class="n">≈ 10.1%</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					The costliest tenth of subagents used 29% of everything subagents
+					used. Most subagents are cheap; a few long ones are not, and a batch
+					of them started at once is what ends a window early.
+				</p>
 
-        <h2>What to do with this</h2>
-        <ul>
-          <li>
-            <b>Count before you fan out.</b> Budget roughly 2% of a 5-hour window per subagent. Ten parallel subagents near the end of a window
-            are a fifth of it.
-          </li>
-          <li>
-            <b>Watch the long ones.</b> A subagent that keeps working for 80+ calls costs as much as five typical ones. Give it a narrow task
-            and a clear stopping point.
-          </li>
-          <li>
-            <b>Don't count on the model alone.</b> 97% of my subagent calls already ran on Sonnet, and they were still 40% of the limit. The
-            number of calls matters more.
-          </li>
-          <li>
-            <b>Stop new ones when the window is nearly gone.</b> That's what limitcast's guard does: when a window is on pace to run out within
-            30 minutes, it blocks new subagents in Claude Code and Codex, and while a window is tight it starts them on Sonnet.
-          </li>
-        </ul>
+				<h2>What to do with this</h2>
+				<ul>
+					<li>
+						<b>Count before you fan out.</b>
+						Budget roughly 2% of a 5-hour window per subagent. Ten parallel
+						subagents near the end of a window are a fifth of it.
+					</li>
+					<li>
+						<b>Watch the long ones.</b>
+						A subagent that keeps working for 80+ calls costs as much as five
+						typical ones. Give it a narrow task and a clear stopping point.
+					</li>
+					<li>
+						<b>Don't count on the model alone.</b>
+						97% of my subagent calls already ran on Sonnet, and they were still
+						40% of the limit. The number of calls matters more.
+					</li>
+					<li>
+						<b>Stop new ones when the window is nearly gone.</b>
+						That's what limitcast's guard does: when a window is on pace to run
+						out within 30 minutes, it blocks new subagents in Claude Code and
+						Codex, and while a window is tight it starts them on Sonnet.
+					</li>
+				</ul>
 
-        <h2>The caveats</h2>
-        <ul>
-          <li>One account, one plan, about two days. Your mix of work will give different numbers.</li>
-          <li>
-            The fit doesn't separate models. My main thread ran a lot of Opus and my subagents almost all Sonnet. If Anthropic counts Opus
-            tokens more heavily, the main thread's real share is higher than shown and the subagents' lower.
-          </li>
-          <li>
-            "Limit per call" applies the measured weights to each call's tokens; it isn't read off the meter call by call. The readings are
-            whole percentages.
-          </li>
-        </ul>
+				<h2>The caveats</h2>
+				<ul>
+					<li>
+						One account, one plan, about two days. Your mix of work will give
+						different numbers.
+					</li>
+					<li>
+						The fit doesn't separate models. My main thread ran a lot of Opus
+						and my subagents almost all Sonnet. If Anthropic counts Opus tokens
+						more heavily, the main thread's real share is higher than shown and
+						the subagents' lower.
+					</li>
+					<li>
+						"Limit per call" applies the measured weights to each call's tokens;
+						it isn't read off the meter call by call. The readings are whole
+						percentages.
+					</li>
+				</ul>
 
-        <h2>Measure your own</h2>
-        <pre>npm install -g limitcast
+				<h2>Measure your own</h2>
+				<pre>npm install -g limitcast
 limitcast install      # records your limit readings from the status line
 # use Claude Code for a day or two, then:
 limitcast results      # what moves your meter: new vs cached tokens
 limitcast report       # Pro: tokens by day, project, model and session, and the subagent share</pre>
-        <p>The free version is local-only and never uses your Claude login.</p>
+				<p>The free version is local-only and never uses your Claude login.</p>
 
-        <div class="cta">
-          <p>
-            limitcast forecasts when each Claude Code and Codex window runs out, and its Pro plan stops new subagents before they burn the rest
-            of it.
-          </p>
-          <p><a href="/">See what limitcast does</a> · <a href="/blog/tokens-per-percent/">How many tokens is 1% of your limit?</a></p>
-        </div>
-      </article>
+				<div class="cta">
+					<p>
+						limitcast forecasts when each Claude Code and Codex window runs out,
+						and its Pro plan stops new subagents before they burn the rest of
+						it.
+					</p>
+					<p>
+						<a href="/">See what limitcast does</a>
+						·
+						<a href="/blog/tokens-per-percent/"
+							>How many tokens is 1% of your limit?</a
+						>
+					</p>
+				</div>
+			</article>
 
-      <footer>limitcast is an independent tool and is not affiliated with Anthropic. Questions or your own numbers: support@limitcast.dev</footer>
-    </main>
-  </body>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
 </html>

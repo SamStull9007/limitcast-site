@@ -1,365 +1,460 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>How many tokens is 1% of your Claude Code limit?</title>
-    <meta
-      name="description"
-      content="Measured from two days of real Claude Code readings: 1% of the 5-hour limit is about 166k new tokens or 11 million cached ones. New tokens were 2.5% of what I used and about 63% of the limit."
-    >
-    <link rel="canonical" href="https://limitcast.dev/blog/tokens-per-percent/">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://limitcast.dev/blog/tokens-per-percent/">
-    <meta property="og:title" content="How many tokens is 1% of your Claude Code limit?">
-    <meta
-      property="og:description"
-      content="About 166k new tokens or 11 million cached ones. New tokens were 2.5% of what I used and about 63% of the limit."
-    >
-    <meta property="og:image" content="https://limitcast.dev/og.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="article:published_time" content="2026-10-25">
-    <script
-      data-goatcounter="https://limitcast.goatcounter.com/count"
-      async
-      src="https://gc.zgo.at/count.v4.js"
-      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
-      crossorigin="anonymous"
-    ></script>
-    <style>
-    :root {
-      --bg: #fbfaf7;
-      --fg: #1d1c1a;
-      --muted: #5f5c55;
-      --line: #e4e0d8;
-      --card: #ffffff;
-      --accent: #c2410c;
-      --cached: #a8a399;
-      --code-bg: #1d1c1a;
-      --code-fg: #f3efe6;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141312;
-        --fg: #eeeae2;
-        --muted: #a8a399;
-        --line: #2c2a27;
-        --card: #1b1a18;
-        --accent: #f97316;
-        --cached: #5f5c55;
-        --code-bg: #0c0b0a;
-        --code-fg: #eeeae2;
-      }
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font:
-        18px / 1.65 ui-sans-serif,
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        sans-serif;
-    }
-    main {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 16px 72px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px 16px;
-      flex-wrap: wrap;
-      padding: 20px 0;
-      font-size: 0.95rem;
-    }
-    header a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-    header .logo {
-      color: var(--fg);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    h1 {
-      font-size: clamp(1.9rem, 5vw, 2.6rem);
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      margin: 40px 0 10px;
-      text-wrap: balance;
-    }
-    h2 {
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      margin: 44px 0 10px;
-      text-wrap: balance;
-    }
-    .byline {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin: 0 0 28px;
-    }
-    .answer {
-      border-left: 3px solid var(--accent);
-      padding: 4px 0 4px 16px;
-      font-size: 1.15rem;
-      margin: 24px 0;
-    }
-    a {
-      color: var(--accent);
-    }
-    code {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 0.88em;
-    }
-    pre {
-      background: var(--code-bg);
-      color: var(--code-fg);
-      padding: 16px 18px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font:
-        14px / 1.55 ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        monospace;
-    }
-    .table-wrap {
-      overflow-x: auto;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.95rem;
-      font-variant-numeric: tabular-nums;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-    }
-    td.n,
-    th.n {
-      text-align: right;
-    }
-    figure {
-      margin: 28px 0;
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-    }
-    figcaption {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 12px;
-    }
-    .bar-label {
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 14px 0 6px;
-    }
-    .bar-label:first-child {
-      margin-top: 0;
-    }
-    .bar {
-      display: flex;
-      height: 30px;
-      border-radius: 6px;
-      overflow: hidden;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .bar span {
-      display: flex;
-      align-items: center;
-      padding: 0 8px;
-      white-space: nowrap;
-      min-width: 0;
-    }
-    .bar .new {
-      background: var(--accent);
-      color: #fff;
-    }
-    .bar .cached {
-      background: var(--cached);
-      color: var(--fg);
-      justify-content: flex-end;
-    }
-    .legend {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 10px;
-    }
-    .legend i {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-      margin-right: 6px;
-      vertical-align: 0;
-    }
-    .cta {
-      margin-top: 48px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--card);
-    }
-    .cta p {
-      margin: 0 0 10px;
-    }
-    footer {
-      margin-top: 48px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <a class="logo" href="/">limitcast</a>
-        <nav><a href="/#how">Features</a> · <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> · <a href="https://github.com/SamStull9007/limitcast">GitHub</a></nav>
-      </header>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>How many tokens is 1% of your Claude Code limit?</title>
+		<meta
+			name="description"
+			content="Measured from two days of real Claude Code readings: 1% of the 5-hour limit is about 166k new tokens or 11 million cached ones. New tokens were 2.5% of what I used and about 63% of the limit."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/tokens-per-percent/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/tokens-per-percent/"
+		>
+		<meta
+			property="og:title"
+			content="How many tokens is 1% of your Claude Code limit?"
+		>
+		<meta
+			property="og:description"
+			content="About 166k new tokens or 11 million cached ones. New tokens were 2.5% of what I used and about 63% of the limit."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-10-25">
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			border-left: 3px solid var(--accent);
+			padding: 4px 0 4px 16px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.bar-label {
+			font-size: 0.9rem;
+			font-weight: 600;
+			margin: 14px 0 6px;
+		}
+		.bar-label:first-child {
+			margin-top: 0;
+		}
+		.bar {
+			display: flex;
+			height: 30px;
+			border-radius: 6px;
+			overflow: hidden;
+			font-size: 0.8rem;
+			font-weight: 600;
+		}
+		.bar span {
+			display: flex;
+			align-items: center;
+			padding: 0 8px;
+			white-space: nowrap;
+			min-width: 0;
+		}
+		.bar .new {
+			background: var(--accent);
+			color: #fff;
+		}
+		.bar .cached {
+			background: var(--cached);
+			color: var(--fg);
+			justify-content: flex-end;
+		}
+		.legend {
+			display: flex;
+			gap: 16px;
+			flex-wrap: wrap;
+			font-size: 0.85rem;
+			color: var(--muted);
+			margin-top: 10px;
+		}
+		.legend i {
+			display: inline-block;
+			width: 10px;
+			height: 10px;
+			border-radius: 2px;
+			margin-right: 6px;
+			vertical-align: 0;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p class="pro-note">
+				Historical article. Since version 0.15.0, all Limitcast features are
+				free under the MIT License.
+				<a href="/#install">Install the current release</a>.
+			</p>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
 
-      <article>
-        <h1>How many tokens is 1% of your Claude Code limit?</h1>
-        <p class="byline">Sam Stull · 25 October 2026</p>
+			<article>
+				<h1>How many tokens is 1% of your Claude Code limit?</h1>
+				<p class="byline">Sam Stull · 25 October 2026</p>
 
-        <p>
-          Anthropic shows how much of your 5-hour and weekly limit you've used, as a percentage. It doesn't say how many tokens that percentage
-          is, and it doesn't say how different kinds of tokens count. So I measured it on my own account.
-        </p>
+				<p>
+					Anthropic shows how much of your 5-hour and weekly limit you've used,
+					as a percentage. It doesn't say how many tokens that percentage is,
+					and it doesn't say how different kinds of tokens count. So I measured
+					it on my own account.
+				</p>
 
-        <p class="answer">
-          <b>1% of the 5-hour limit was about 166,000 new tokens, or about 11 million cached tokens.</b> A cached token counted roughly 1/67 as much
-          as a new one.
-        </p>
+				<p class="answer">
+					<b
+						>1% of the 5-hour limit was about 166,000 new tokens, or about 11
+						million cached tokens.</b
+					>
+					A cached token counted roughly 1/67 as much as a new one.
+				</p>
 
-        <p>
-          That ratio changes what's worth optimizing. Over the two days I measured, new tokens were 2.5% of everything Claude Code sent, and they
-          used about 63% of my limit.
-        </p>
+				<p>
+					That ratio changes what's worth optimizing. Over the two days I
+					measured, new tokens were 2.5% of everything Claude Code sent, and
+					they used about 63% of my limit.
+				</p>
 
-        <figure>
-          <div class="bar-label">Share of tokens</div>
-          <div class="bar" role="img" aria-label="New tokens 2.5%, cached tokens 97.5% of all tokens">
-            <span class="new" style="width: 2.5%"></span><span class="cached" style="width: 97.5%">cached 97.5%</span>
-          </div>
-          <div class="bar-label">Share of the limit they used (estimated)</div>
-          <div class="bar" role="img" aria-label="New tokens about 63%, cached tokens about 37% of the limit used">
-            <span class="new" style="width: 63%">new ≈ 63%</span><span class="cached" style="width: 37%">≈ 37%</span>
-          </div>
-          <div class="legend"><span><i style="background: var(--accent)"></i>new: input, cache writes, output</span><span><i style="background: var(--cached)"></i>cached: cache reads</span></div>
-          <figcaption>
-            My Claude Code usage, 23–25 October 2026: 53.7M new tokens and 2,103.5M cached tokens. The limit share applies the fit below to those
-            totals.
-          </figcaption>
-        </figure>
+				<figure>
+					<div class="bar-label">Share of tokens</div>
+					<div
+						class="bar"
+						role="img"
+						aria-label="New tokens 2.5%, cached tokens 97.5% of all tokens"
+					>
+						<span class="new" style="width: 2.5%"></span
+						><span class="cached" style="width: 97.5%">cached 97.5%</span>
+					</div>
+					<div class="bar-label">Share of the limit they used (estimated)</div>
+					<div
+						class="bar"
+						role="img"
+						aria-label="New tokens about 63%, cached tokens about 37% of the limit used"
+					>
+						<span class="new" style="width: 63%">new ≈ 63%</span
+						><span class="cached" style="width: 37%">≈ 37%</span>
+					</div>
+					<div class="legend">
+						<span
+							><i style="background: var(--accent)"></i>new: input, cache
+							writes, output</span
+						><span
+							><i style="background: var(--cached)"></i>cached: cache
+							reads</span
+						>
+					</div>
+					<figcaption>
+						My Claude Code usage, 23–25 October 2026: 53.7M new tokens and
+						2,103.5M cached tokens. The limit share applies the fit below to
+						those totals.
+					</figcaption>
+				</figure>
 
-        <h2>How I measured it</h2>
-        <p>
-          Claude Code passes your limit readings to the status line: percent used of each window and when it resets. Its transcripts record
-          every model call's tokens: input, cache writes, cache reads and output. Put the two side by side and you can see how many tokens it
-          took to move the meter.
-        </p>
-        <p>
-          Each time the 5-hour reading rose between two status-line updates, I took the rise and the tokens my sessions on that account used in
-          between, split into <b>new tokens</b> (input, cache writes and output) and <b>cached tokens</b> (cache reads). Then a least-squares
-          fit with no intercept:
-        </p>
-        <pre>rise in % ≈ a × new tokens + b × cached tokens</pre>
-        <p>With 61 such observations, the fit gave:</p>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr><th></th><th class="n">% of the 5-hour limit per million</th><th class="n">Tokens per 1%</th></tr>
-            </thead>
-            <tbody>
-              <tr><td>New tokens</td><td class="n">6.04%</td><td class="n">≈ 166k</td></tr>
-              <tr><td>Cached tokens</td><td class="n">0.090%</td><td class="n">≈ 11.2M</td></tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          A fit on the previous day's readings gave about 200k and 10.7M, so treat these as a range rather than constants: roughly 165–200k new
-          tokens, or 10.7–11.2M cached tokens, per 1%.
-        </p>
+				<h2>How I measured it</h2>
+				<p>
+					Claude Code passes your limit readings to the status line: percent
+					used of each window and when it resets. Its transcripts record every
+					model call's tokens: input, cache writes, cache reads and output. Put
+					the two side by side and you can see how many tokens it took to move
+					the meter.
+				</p>
+				<p>
+					Each time the 5-hour reading rose between two status-line updates, I
+					took the rise and the tokens my sessions on that account used in
+					between, split into <b>new tokens</b> (input, cache writes and output)
+					and <b>cached tokens</b> (cache reads). Then a least-squares fit with
+					no intercept:
+				</p>
+				<pre>rise in % ≈ a × new tokens + b × cached tokens</pre>
+				<p>With 61 such observations, the fit gave:</p>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th></th>
+								<th class="n">% of the 5-hour limit per million</th>
+								<th class="n">Tokens per 1%</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>New tokens</td>
+								<td class="n">6.04%</td>
+								<td class="n">≈ 166k</td>
+							</tr>
+							<tr>
+								<td>Cached tokens</td>
+								<td class="n">0.090%</td>
+								<td class="n">≈ 11.2M</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					A fit on the previous day's readings gave about 200k and 10.7M, so
+					treat these as a range rather than constants: roughly 165–200k new
+					tokens, or 10.7–11.2M cached tokens, per 1%.
+				</p>
 
-        <h2>What it means in practice</h2>
-        <p>
-          <b>Subagents are expensive.</b> Each subagent starts its own context and writes it into the cache from scratch. Subagents sent about a
-          third of my tokens (33%), but nearly half of my new tokens (48%), and used an estimated 42% of my limit.
-        </p>
-        <p>
-          <b>Your starting context is cheap per call, but it adds up.</b> My sessions start at about 100k tokens before I type: system prompt,
-          tools, MCP servers, skills, CLAUDE.md. Written once into the cache, that's about 0.6% of the limit. After that, each model call
-          re-reads it from the cache for about 0.009%. A session with 300 model calls spends about 3% of a window re-reading that starting
-          context. Trimming 4k tokens of unused skills and MCP servers from mine saved about 0.3% of a window over 1,100 calls: real, but small.
-        </p>
-        <p>
-          <b>Cache misses are where it gets expensive.</b> This one is an inference from the ratio rather than something I measured directly: when
-          the prompt cache expires (after a pause, for example), the next call writes the whole context again as new tokens. In a session that
-          has grown to 200k tokens, that single call is more than 1% of the limit.
-        </p>
-        <p>
-          <b>So the order of what to watch is:</b> how many subagents you start, how long your sessions run between pauses, and only then how big
-          your CLAUDE.md is.
-        </p>
+				<h2>What it means in practice</h2>
+				<p>
+					<b>Subagents are expensive.</b>
+					Each subagent starts its own context and writes it into the cache from
+					scratch. Subagents sent about a third of my tokens (33%), but nearly
+					half of my new tokens (48%), and used an estimated 42% of my limit.
+				</p>
+				<p>
+					<b>Your starting context is cheap per call, but it adds up.</b>
+					My sessions start at about 100k tokens before I type: system prompt,
+					tools, MCP servers, skills, CLAUDE.md. Written once into the cache,
+					that's about 0.6% of the limit. After that, each model call re-reads
+					it from the cache for about 0.009%. A session with 300 model calls
+					spends about 3% of a window re-reading that starting context. Trimming
+					4k tokens of unused skills and MCP servers from mine saved about 0.3%
+					of a window over 1,100 calls: real, but small.
+				</p>
+				<p>
+					<b>Cache misses are where it gets expensive.</b>
+					This one is an inference from the ratio rather than something I
+					measured directly: when the prompt cache expires (after a pause, for
+					example), the next call writes the whole context again as new tokens.
+					In a session that has grown to 200k tokens, that single call is more
+					than 1% of the limit.
+				</p>
+				<p>
+					<b>So the order of what to watch is:</b>
+					how many subagents you start, how long your sessions run between
+					pauses, and only then how big your CLAUDE.md is.
+				</p>
 
-        <h2>The caveats</h2>
-        <ul>
-          <li>This is one person's account on one plan, over about two days. Your numbers will differ.</li>
-          <li>
-            The fit doesn't separate models. If Anthropic weights Opus and Sonnet differently, my mix of the two is baked into these numbers.
-          </li>
-          <li>Cache writes are counted as new tokens. They may be weighted differently from input and output.</li>
-          <li>The readings are whole percentages, so each observation is noisy. It takes dozens of them before the fit settles.</li>
-          <li>Anthropic can change how limits are counted at any time; a measurement like this is a snapshot.</li>
-        </ul>
+				<h2>The caveats</h2>
+				<ul>
+					<li>
+						This is one person's account on one plan, over about two days. Your
+						numbers will differ.
+					</li>
+					<li>
+						The fit doesn't separate models. If Anthropic weights Opus and
+						Sonnet differently, my mix of the two is baked into these numbers.
+					</li>
+					<li>
+						Cache writes are counted as new tokens. They may be weighted
+						differently from input and output.
+					</li>
+					<li>
+						The readings are whole percentages, so each observation is noisy. It
+						takes dozens of them before the fit settles.
+					</li>
+					<li>
+						Anthropic can change how limits are counted at any time; a
+						measurement like this is a snapshot.
+					</li>
+				</ul>
 
-        <h2>Measure your own</h2>
-        <p>
-          I built this measurement into limitcast, a free command-line tool for Claude Code and Codex. It reads only the files Claude Code
-          already writes on your machine and sends nothing anywhere.
-        </p>
-        <pre>npm install -g limitcast
+				<h2>Measure your own</h2>
+				<p>
+					I built this measurement into limitcast, a free command-line tool for
+					Claude Code and Codex. It reads only the files Claude Code already
+					writes on your machine and sends nothing anywhere.
+				</p>
+				<pre>npm install -g limitcast
 limitcast install      # records your limit readings from the status line
 # use Claude Code as normal for a day or two, then:
 limitcast results</pre>
-        <p>
-          Once it has about 30 observations, <code>limitcast results</code> prints your own numbers: how many new and cached tokens move your
-          meter by 1%. The fit is in
-          <a href="https://github.com/SamStull9007/limitcast/blob/main/src/calibrate.mjs"><code>src/calibrate.mjs</code></a> if you want to
-          check it.
-        </p>
+				<p>
+					Once it has about 30 observations,
+					<code>limitcast results</code>
+					prints your own numbers: how many new and cached tokens move your
+					meter by 1%. The fit is in
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/main/src/calibrate.mjs"
+						><code>src/calibrate.mjs</code></a
+					>
+					if you want to check it.
+				</p>
 
-        <div class="cta">
-          <p>
-            limitcast also forecasts when each window runs out, and its Pro plan stops new subagents when a window is about to run out. That's the
-            biggest lever in the data above.
-          </p>
-          <p><a href="/blog/subagents/">Next: do subagents burn your limit faster?</a> · <a href="/">See what limitcast does</a></p>
-        </div>
-      </article>
+				<div class="cta">
+					<p>
+						limitcast also forecasts when each window runs out, and its Pro plan
+						stops new subagents when a window is about to run out. That's the
+						biggest lever in the data above.
+					</p>
+					<p>
+						<a href="/blog/subagents/"
+							>Next: do subagents burn your limit faster?</a
+						>
+						· <a href="/">See what limitcast does</a>
+					</p>
+				</div>
+			</article>
 
-      <footer>limitcast is an independent tool and is not affiliated with Anthropic. Questions or your own numbers: support@limitcast.dev</footer>
-    </main>
-  </body>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
 </html>

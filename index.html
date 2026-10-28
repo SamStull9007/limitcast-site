@@ -40,34 +40,17 @@
   "description": "Forecasts when each Claude Code and Codex usage limit runs out, measures and trims the context every session loads, stops runaway subagents, and shows where your tokens go. Also covers Grok. Runs locally.",
   "image": "https://limitcast.dev/og.png",
   "downloadUrl": "https://www.npmjs.com/package/limitcast",
-  "offers": [
-    {
-      "@type": "Offer",
-      "name": "Free",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    {
-      "@type": "Offer",
-      "name": "Pro, monthly",
-      "price": "9",
-      "priceCurrency": "USD"
-    },
-    {
-      "@type": "Offer",
-      "name": "Pro, yearly",
-      "price": "79",
-      "priceCurrency": "USD"
-    },
-    {
-      "@type": "Offer",
-      "name": "Team, per seat per year (3 seats minimum)",
-      "price": "69",
-      "priceCurrency": "USD"
-    }
-  ]
+  "offers": {
+    "@type": "Offer",
+    "name": "All features \u2014 free",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
+  "isAccessibleForFree": true,
+  "softwareVersion": "0.15.0"
 }
-    </script>
+</script>
 		<script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -78,7 +61,7 @@
       "name": "Does it send my code or prompts anywhere?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. limitcast reads the limit readings Claude Code passes to your status line and the logs Claude Code and Codex already keep on your disk, and none of that leaves your machine. The only network calls are for a Pro license key: once to activate, a weekly re-check, and when you deactivate. They send your license key and computer name to Polar, our payment provider. The status line and hooks never wait on the network, and Pro keeps working offline for 30 days after the last check. If you turn on phone or webhook notifications (Pro, off by default), each notification's text goes to the service you chose (ntfy.sh or your webhook), and nothing else does."
+        "text": "Limitcast reads usage and session logs locally. No license key or payment-service connection is required. Code and prompts are not uploaded. Optional phone or webhook notifications send notification text to the service you configure; they are off by default."
       }
     },
     {
@@ -102,7 +85,7 @@
       "name": "Does it work with Codex and Grok?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: yes, the burn report, a status line, the trim advisor and the subagent guard. Grok keeps no percentage used on disk, only spend, so the status line shows your 5-hour and 7-day spend; set a dollar cap (limitcast budget grok 20, Pro) and limitcast forecasts that window and the guard blocks new Grok subagents when it is on pace to run out."
+        "text": "Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: yes, the burn report, a status line, the trim advisor and the subagent guard. Grok keeps no percentage used on disk, only spend, so the status line shows your 5-hour and 7-day spend; set a dollar cap (limitcast budget grok 20) and limitcast forecasts that window and the guard blocks new Grok subagents when it is on pace to run out."
       }
     },
     {
@@ -131,23 +114,23 @@
     },
     {
       "@type": "Question",
-      "name": "How does the free trial work?",
+      "name": "Do I need a subscription or license key?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Pick yearly or monthly and you get Pro for 14 days at no charge: your license key is ready as soon as you check out, in Polar's customer portal (linked from your confirmation email). Your card is charged when the trial ends. Cancel before then, in the same portal, and you pay nothing and the key stops working."
+        "text": "All Limitcast features are free and open source under the MIT License. No subscription, card, account, license key or trial is required."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I get a refund?",
+      "name": "What happens to an older license?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes, within 14 days of any charge, no questions asked. Email support@limitcast.dev from the address you bought with and we'll refund it and cancel the subscription."
+        "text": "Update to Limitcast 0.15.0 or later. All features work without a license key, and older local license files are left untouched. For help with a previous purchase, contact support@limitcast.dev."
       }
     }
   ]
 }
-    </script>
+</script>
 		<script
 			data-goatcounter="https://limitcast.goatcounter.com/count"
 			async
@@ -489,31 +472,11 @@
 				<span class="logo">limitcast</span>
 				<nav>
 					<a href="#how">Features</a><a href="#compare">Compare</a
-					><a href="#pricing">Pricing</a><a href="#faq">FAQ</a
+					><a href="#pricing">Free &amp; MIT</a><a href="#faq">FAQ</a
 					><a href="/guide/">Guide</a><a href="/blog/">Blog</a
 					><a href="https://github.com/SamStull9007/limitcast">GitHub</a>
 				</nav>
 			</header>
-
-			<section id="thanks" class="card featured" hidden>
-				<h3>Thanks for buying limitcast Pro.</h3>
-				<p>
-					Get your license key: open the confirmation email from Polar, click
-					<b>Access purchase</b>, and copy the key under
-					<b>limitcast Pro license</b>
-					(it starts with <code>LIMITCAST-</code>). Activate it:
-				</p>
-				<pre>npm install -g limitcast
-limitcast activate LIMITCAST-your-key
-limitcast install --guard --alerts
-limitcast notify on
-limitcast trim --apply</pre>
-				<p>
-					One key works on up to 3 computers.
-					<code>limitcast deactivate</code>
-					frees one. Questions: support@limitcast.dev
-				</p>
-			</section>
 
 			<h1>Get more work from your AI coding plan.</h1>
 			<p class="lede">
@@ -528,11 +491,13 @@ limitcast trim --apply</pre>
 					data-goatcounter-click="install-intent"
 					>Install free — no card</a
 				>
-				<a class="btn" href="#pricing">Try Pro</a>
+				<a class="btn" href="https://github.com/SamStull9007/limitcast"
+					>View on GitHub</a
+				>
 			</div>
 			<p class="pro-note">
 				Your code and prompts stay on your machine. No AI account credentials
-				required. Pro controls remain optional.
+				required. Protection and configuration changes remain optional.
 			</p>
 			<pre id="quick-install"><code>npm install -g limitcast
 limitcast onboard</code></pre>
@@ -546,8 +511,8 @@ limitcast onboard</code></pre>
 			</button>
 			<span id="copy-status" role="status" aria-live="polite"></span>
 			<p class="pro-note">
-				Start with the free checks. CLI Pro trial: 7 days, no card. Polar
-				checkout trial: 14 days, then your chosen subscription is billed.
+				All Limitcast features are free and open source under the MIT License.
+				No subscription, card, account, license key or trial is required.
 			</p>
 			<p>
 				<strong>Predict:</strong>
@@ -555,7 +520,7 @@ limitcast onboard</code></pre>
 				<strong>Protect:</strong>
 				control new subagents when capacity is tight.
 				<strong>Trim:</strong>
-				inspect unused context and apply reversible cuts with Pro.
+				inspect unused context and apply reversible cuts.
 			</p>
 
 			<video
@@ -668,16 +633,15 @@ Every Claude Code session starts at <b>102.7k tokens</b> before your first messa
 						adds to it.
 					</p>
 					<p class="pro-note">
-						<span class="badge pro">Pro</span>
-						adds a pointer to your other Claude account when this one is nearly
-						out, and a <code>/compact</code>
+						Also shows your other Claude account when this one is nearly out,
+						and a <code>/compact</code>
 						nudge once a session re-sends more than ~150k tokens per call.
 					</p>
 				</div>
 				<pre
 				>5h 71% <span class="warn">⚠ out 16:40</span> · 7d 41% · today 6% left
 
-<span class="dim"># Pro, when you need it:</span>
+<span class="dim"># when you need it:</span>
 5h 96% <span class="warn">⚠ near limit</span> · 7d 58% · today 2% over
 limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact</pre>
 			</section>
@@ -710,10 +674,7 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
 
 			<section class="feature" id="f-guard">
 				<div>
-					<h3>
-						Subagent guard <span class="badge pro">Pro</span>
-						<span class="badge">Free preview</span>
-					</h3>
+					<h3>Subagent guard</h3>
 					<p>
 						A burst of subagents is the most common way to lose the end of a
 						window. When a window is on pace to run out within 30 minutes, the
@@ -723,9 +684,9 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
 						100% it steps aside, so paid extra usage keeps working.
 					</p>
 					<p class="pro-note">
-						Free installs run it as a preview: it never acts, and
-						<code>results</code>
-						shows what it would have stopped.
+						Available to everyone. Install with
+						<code>limitcast install --guard</code>. The guard acts on new
+						spawns; <code>LIMITCAST_ALLOW=1</code> overrides it.
 					</p>
 				</div>
 				<pre
@@ -742,8 +703,8 @@ Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
 			<section class="feature" id="f-daily">
 				<div>
 					<h3>
-						Your week, paced by the day <span class="badge pro">Pro</span>
-						<span class="badge">Free preview</span>
+						Your week, paced by the day
+
 						<span class="badge">New in 0.14</span>
 					</h3>
 					<p>
@@ -757,8 +718,9 @@ Sonnet. Set LIMITCAST_ALLOW=1 to keep the main model.</pre>
 					</p>
 					<p class="pro-note">
 						The hold is off by default. A window already at 100% is left to the
-						tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free installs
-						record what Pro would have held, and <code>results</code> shows it.
+						tool, and <code>LIMITCAST_ALLOW=1</code> overrides it.
+						<code>results</code>
+						shows applied holds separately from historical previews.
 					</p>
 				</div>
 				<pre><span class="dim"># once a day, at 80% of today's share:</span>
@@ -774,7 +736,7 @@ spawn anyway.</pre>
 			<section class="feature" id="f-models">
 				<div>
 					<h3>
-						A model for each kind of subagent <span class="badge pro">Pro</span>
+						A model for each kind of subagent
 						<span class="badge">New in 0.13</span>
 					</h3>
 					<p>
@@ -787,9 +749,10 @@ spawn anyway.</pre>
 						counts the subagents it moved.
 					</p>
 					<p class="pro-note">
-						Needs <code>limitcast install --guard</code>. Free installs record
-						what it would have done. Whether a cheaper model costs less of your
-						limit per token isn't something limitcast can tell, so check
+						Needs <code>limitcast install --guard</code>. All features are free;
+						<code>results</code>
+						records the actions taken. Whether a cheaper model costs less of
+						your limit per token isn't something limitcast can tell, so check
 						<code>report --why</code>
 						after a week.
 					</p>
@@ -807,7 +770,7 @@ limitcast: Explore subagents run on haiku, the model you set for them.</pre>
 			<section class="feature" id="f-receipts">
 				<div>
 					<h3>
-						Subagent receipts and budgets <span class="badge pro">Pro</span>
+						Subagent receipts and budgets
 						<span class="badge">New in 0.11</span>
 					</h3>
 					<p>
@@ -838,7 +801,7 @@ Once it's spent, the guard holds new subagents until the window resets.</pre>
 			<section class="feature" id="f-cold">
 				<div>
 					<h3>
-						Cold-cache warning <span class="badge pro">Pro</span>
+						Cold-cache warning
 						<span class="badge">New in 0.11</span>
 					</h3>
 					<p>
@@ -865,10 +828,7 @@ ahead, or run /compact first to shrink it.</pre>
 
 			<section class="feature" id="f-notify">
 				<div>
-					<h3>
-						Notifications: desktop, phone or Slack
-						<span class="badge pro">Pro</span>
-					</h3>
+					<h3>Notifications: desktop, phone or Slack</h3>
 					<p>
 						One notification when a Claude window turns NEAR, AT_RISK or HIT,
 						and one when it resets after a HIT, so you can step away and come
@@ -901,9 +861,7 @@ ahead, or run /compact first to shrink it.</pre>
 
 			<section class="feature" id="f-trim">
 				<div>
-					<h3>
-						Trim advisor, with apply and undo <span class="badge pro">Pro</span>
-					</h3>
+					<h3>Trim advisor, with apply and undo</h3>
 					<p>
 						Measures what your latest session loaded before you typed (hook
 						output, MCP servers, tool names, skills, agents, instruction files),
@@ -949,7 +907,7 @@ Kept by `trim --apply`: ego-browser</pre>
 				<div>
 					<h3>
 						Grok <span class="badge">Free</span>
-						<span class="badge pro">Pro budget</span>
+
 						<span class="badge">New in 0.12</span>
 					</h3>
 					<p>
@@ -964,9 +922,8 @@ Kept by `trim --apply`: ego-browser</pre>
 					<p>
 						Grok stores what you spent, not a percentage, so the status line
 						shows your 5-hour and 7-day spend until you set a dollar cap. With a
-						cap (<span class="badge pro">Pro</span>), limitcast forecasts that
-						window and the guard blocks new Grok subagents when it is on pace to
-						run out.
+						cap, limitcast forecasts that window and the guard blocks new Grok
+						subagents when it is on pace to run out.
 					</p>
 				</div>
 				<pre>$ limitcast install --guard
@@ -976,10 +933,7 @@ $ limitcast trim --grok</pre>
 
 			<section class="feature" id="f-results">
 				<div>
-					<h3>
-						Results and the dashboard <span class="badge">Free</span>
-						<span class="badge pro">Pro dashboard</span>
-					</h3>
+					<h3>Results and the dashboard <span class="badge">Free</span></h3>
 					<p>
 						Evidence from your own data: every limit you hit and how far ahead
 						limitcast warned, the tokens your smaller starting context saved,
@@ -987,8 +941,7 @@ $ limitcast trim --grok</pre>
 						(free: would have stopped) and whether that window then ran out.
 					</p>
 					<p class="pro-note">
-						<span class="badge pro">Pro</span>
-						puts results, the current windows and the burn report on one page:
+						Put results, the current windows and the burn report on one page:
 						<code>limitcast results --html</code>.
 					</p>
 				</div>
@@ -1004,7 +957,7 @@ $ limitcast trim --grok</pre>
 
 			<section class="feature" id="f-report">
 				<div>
-					<h3>Burn report <span class="badge pro">Pro</span></h3>
+					<h3>Burn report</h3>
 					<p>
 						Claude Code, Codex and Grok tokens by tool, day, project, model and
 						session, read from each tool's own logs, plus the share that went to
@@ -1039,7 +992,7 @@ Subagents used <b>21%</b> of Claude tokens.
 			<section class="feature" id="f-plan">
 				<div>
 					<h3>
-						Does your plan fit? <span class="badge pro">Pro</span>
+						Does your plan fit?
 						<span class="badge">New in 0.13</span>
 					</h3>
 					<p>
@@ -1075,7 +1028,7 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 			<section class="feature" id="f-why">
 				<div>
 					<h3>
-						Where your tokens went <span class="badge pro">Pro</span>
+						Where your tokens went
 						<span class="badge">New in 0.12</span>
 					</h3>
 					<p>
@@ -1112,7 +1065,7 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 			<section class="feature" id="f-jobs">
 				<div>
 					<h3>
-						Heaviest scheduled-job starts <span class="badge pro">Pro</span>
+						Heaviest scheduled-job starts
 						<span class="badge">New in 0.12</span>
 					</h3>
 					<p>
@@ -1146,9 +1099,7 @@ prompt was new tokens, not served from the prompt cache.</pre>
 
 			<section class="feature" id="f-alerts">
 				<div>
-					<h3>
-						Alerts and a weekly summary <span class="badge pro">Pro</span>
-					</h3>
+					<h3>Alerts and a weekly summary</h3>
 					<p>
 						At the start of a session, a message to you (never the model) when
 						your starting context grew by ~1k tokens or more, naming what grew:
@@ -1169,7 +1120,7 @@ guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent.</pre>
 			<section class="feature" id="f-toolcheck">
 				<div>
 					<h3>
-						Large tool-output notice <span class="badge pro">Pro</span>
+						Large tool-output notice
 						<span class="badge">New in 0.12</span>
 					</h3>
 					<p>
@@ -1196,7 +1147,7 @@ ask for fewer fields and a smaller limit.</pre>
 			<section class="feature" id="f-limitchange">
 				<div>
 					<h3>
-						Limit-change alert <span class="badge pro">Pro</span>
+						Limit-change alert
 						<span class="badge">New in 0.11</span>
 					</h3>
 					<p>
@@ -1221,7 +1172,7 @@ ask for fewer fields and a smaller limit.</pre>
 
 			<section class="feature" id="f-after">
 				<div>
-					<h3>Run it after the reset <span class="badge pro">Pro</span></h3>
+					<h3>Run it after the reset</h3>
 					<p>
 						Out of room with a long job still to run? Queue it: limitcast waits
 						for the window to reset and starts it in the background.
@@ -1256,32 +1207,29 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 ✓ Claude Code status-line feed: limit readings present</pre>
 			</section>
 
-			<h2 id="buy">What happens when you buy</h2>
+			<h2 id="buy">Free to install, yours to control</h2>
 			<ol class="steps">
 				<li>
-					<b>Start the trial.</b>
-					Pick yearly or monthly; Polar handles checkout. Nothing is charged for
-					14 days.
+					<b>Install.</b>
+					Run <code>npm install -g limitcast</code>, then
+					<code>limitcast onboard</code>.
 				</li>
 				<li>
-					<b>Get your key.</b>
-					It's in Polar's customer portal, linked from your confirmation email,
-					and starts with <code>LIMITCAST-</code>.
+					<b>Inspect.</b>
+					Check your setup with <code>doctor</code> and your context with
+					<code>trim</code>.
 				</li>
 				<li>
-					<b>Turn on Pro, in one minute.</b>
-					<code>limitcast activate &lt;key&gt;</code>, then
-					<code>limitcast install --guard --alerts</code>
-					and
-					<code>limitcast notify on</code>. Restart Claude Code.
+					<b>Enable protection.</b>
+					Run <code>limitcast install --guard --alerts</code>, restart your
+					coding tool and approve the Codex hook when asked.
 				</li>
 				<li>
-					<b>Check it in a week.</b> <code>limitcast results</code> shows what
-					it warned you about, stopped and saved. Not worth it? Cancel in the
-					portal before day 14 and pay nothing.
+					<b>Review.</b>
+					Use <code>limitcast results</code> to see usage, context-reduction
+					estimates and applied controls. No purchase or activation required.
 				</li>
 			</ol>
-
 			<h2 id="compare">How it compares</h2>
 			<div class="table-wrap">
 				<table class="compare">
@@ -1299,7 +1247,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 					<tbody>
 						<tr>
 							<td>Price</td>
-							<td>Free core; Pro $9/mo or $79/yr, 14 days free</td>
+							<td>Free; all features, MIT License</td>
 							<td>Free</td>
 							<td>Free</td>
 							<td>Free</td>
@@ -1402,21 +1350,21 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				<li>
 					<strong>Find an opportunity.</strong>
 					Run <code>limitcast trim</code>, <code>limitcast trim --codex</code>,
-					or <code>limitcast trim --grok</code>. Free shows totals. Nothing is
-					trimmed until you explicitly use Pro <code>--apply</code>.
+					or <code>limitcast trim --grok</code>. Names and estimates are
+					included. Nothing is trimmed until you explicitly use
+					<code>--apply</code>.
 				</li>
 				<li>
 					<strong>Try protection.</strong>
-					Choose <code>limitcast trial</code> for 7 days of Pro without a card.
-					Then run <code>limitcast install --guard --alerts</code>, restart, and
-					approve the Codex hook if asked. Free guard installs record previews
-					and never block.
+					Run <code>limitcast install --guard --alerts</code>, restart, and
+					approve the Codex hook if asked. The installed guard can hold new
+					agents when the forecast or an enabled budget calls for it.
 				</li>
 				<li>
 					<strong>Review recurring value.</strong>
 					Run <code>limitcast results</code> after a week: recorded usage,
-					estimated context reduction, applied controls and potential Pro
-					actions. Share totals voluntarily with
+					estimated context reduction, applied controls and historical actions.
+					Share totals voluntarily with
 					<code>limitcast results --share</code>.
 				</li>
 			</ol>
@@ -1441,385 +1389,39 @@ limitcast install          # backs up settings and adds the recorder</pre>
 					href="mailto:support@limitcast.dev?subject=Limitcast%20founding-user%20pilot"
 					>Ask about the founding-user pilot</a
 				>. Feedback and follow-up are voluntary. Share totals only; keep your
-				prompts and source code private. The current trial terms above apply.
+				prompts and source code private. All features are free; no trial is
+				needed.
 			</p>
 
-			<h2 id="pricing">Pricing</h2>
-			<div class="grid">
-				<div class="card">
-					<h3>Free</h3>
-					<div class="price">$0</div>
-					<ul>
-						<li>Runout forecast for Claude Code and Codex</li>
-						<li>Daily allowance: today's share of the week</li>
-						<li>Status-line readout</li>
-						<li>
-							Your starting context, and how much of it you never use (Claude
-							Code, Codex and Grok)
-						</li>
-						<li>
-							Results: every limit you hit, and how far ahead limitcast warned
-						</li>
-						<li>Guard preview: what Pro would have blocked or switched</li>
-					</ul>
-					<a class="btn" href="#install">Install</a>
-				</div>
-				<div class="card featured">
-					<h3>Pro</h3>
-					<div class="price">$79 <small>/ year</small></div>
-					<p>
-						<small
-							>or $9 / month. 14 days free, then billed; cancel anytime before
-							and you pay nothing.</small
-						>
-					</p>
-					<ul>
-						<li>Everything in Free</li>
-						<li>Trim advisor: names what to cut and what each costs</li>
-						<li>
-							One command makes the cuts; one undoes them (Claude Code, Codex
-							and Grok)
-						</li>
-						<li>
-							Subagent guard: blocks runaway subagents, switches to Sonnet when
-							a window is tight
-						</li>
-						<li>
-							Pick the model each kind of subagent runs on, for example Explore
-							on Haiku
-						</li>
-						<li>
-							What each subagent cost, what that kind has cost before it starts,
-							and a subagent budget per window
-						</li>
-						<li>
-							Cold-cache warning before a message re-sends an expired context
-						</li>
-						<li>
-							Notifications on desktop, phone (ntfy) or Slack/Discord, and when
-							your limit itself changes
-						</li>
-						<li>Jobs that run after the reset</li>
-						<li>
-							Other-account pointer and a /compact nudge in the status line
-						</li>
-						<li>
-							Alerts when your starting context grows, a weekly summary, and a
-							notice when one tool result is very large
-						</li>
-						<li>
-							Burn report, with API-equivalent dollar cost, and dashboard across
-							Claude Code, Codex and Grok
-						</li>
-						<li>
-							Plan advisor: does a bigger or smaller Claude plan fit how you use
-							it, with the monthly price difference
-						</li>
-						<li>
-							Where your tokens went, by subagent type and model, and which
-							scheduled jobs start heaviest
-						</li>
-						<li>Grok dollar cap: forecast and guard for Grok</li>
-						<li>Email support</li>
-					</ul>
-					<div class="cta">
-						<a
-							class="btn primary"
-							data-checkout="annual"
-							data-goatcounter-click="checkout-annual"
-							href="#pricing"
-							>Start free trial: $79/yr</a
-						>
-						<a
-							class="btn"
-							data-checkout="monthly"
-							data-goatcounter-click="checkout-monthly"
-							href="#pricing"
-							>Monthly: $9/mo</a
-						>
-					</div>
-					<p>
-						<small
-							>Not ready to enter a card? <code>limitcast trial</code> gives you
-							Pro for 7 days, no card.</small
-						>
-					</p>
-				</div>
-				<div class="card">
-					<h3>Team</h3>
-					<div class="price">$69 <small>/ seat / year</small></div>
-					<p><small>3 seats minimum. 14 days free.</small></p>
-					<ul>
-						<li>Everything in Pro, for each person</li>
-						<li>Each teammate claims a seat and gets their own key</li>
-						<li>Add or remove seats any time</li>
-					</ul>
-					<a
-						class="btn"
-						data-checkout="team"
-						data-goatcounter-click="checkout-team"
-						href="#pricing"
-						>Start team trial</a
-					>
-				</div>
+			<h2 id="pricing">All features. Free.</h2>
+			<div class="card">
+				<h3>Free and open source</h3>
+				<div class="price">$0</div>
+				<p>
+					Forecasts, agent protection, model controls, budgets, reversible
+					trimming, notifications and reports are all included. No account,
+					card, trial, subscription or license key.
+				</p>
+				<p id="compare-plans">
+					Created by <a href="https://github.com/SamStull9007">Sam Stull</a>.
+					Use, study, modify and redistribute Limitcast under the
+					<a href="https://github.com/SamStull9007/limitcast/blob/main/LICENSE"
+						>MIT License</a
+					>.
+				</p>
+				<a class="btn primary" href="#install">Install Limitcast</a>
+				<a class="btn" href="https://github.com/SamStull9007/limitcast"
+					>View source on GitHub</a
+				>
 			</div>
-			<p>
-				Yearly saves 27% over monthly. One key works on 3 computers. Cancel
-				anytime in Polar's customer portal. Charged by mistake? Email
-				support@limitcast.dev within 14 days of a charge for a refund.
-			</p>
-
-			<h3 id="compare-plans">Free and Pro, line by line</h3>
-			<div class="table-wrap">
-				<table class="plans">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Free</th>
-							<th>Pro and Team</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr>
-							<td>
-								<a href="#f-statusline">Limits in the status line</a>, with
-								today's share of the week
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-forecast">Runout forecast</a>
-								for Claude Code and Codex, NEAR at 95%
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-results">Results</a>: limits hit, how far ahead it
-								warned, tokens not re-sent, priced against your 5-hour limit
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>Starting-context total and how much you never use</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								Daily health check, <code>doctor</code>, Claude Code plugin
-								commands
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-guard">Subagent guard</a>: stops subagents before a
-								window runs out
-							</td>
-							<td>Preview only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>Moves new subagents to Sonnet while a window is tight</td>
-							<td>Preview only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-daily">Daily share</a>: a notification at 80% of
-								today's share, and an optional hold on new subagents
-							</td>
-							<td>Preview only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-trim">Trim advisor</a>: names each unused server,
-								skill and hook, and its cost
-							</td>
-							<td>Totals only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<code>trim --apply</code>
-								/ <code>--undo</code>, for Claude Code, Codex and Grok
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-trim">Keep-list</a>: servers and skills
-								<code>trim --apply</code>
-								never touches
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-receipts">Subagent receipts</a>: what each finished
-								subagent cost against your window, and what that kind has cost
-								before a new one starts
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								Subagent budget per 5-hour window (<code
-									>limitcast budget subagents 15</code
-								>)
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-cold">Cold-cache warning</a>
-								before a message re-sends an expired context
-							</td>
-							<td>Preview only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-notify">Notifications</a>: desktop (macOS, Linux),
-								phone (ntfy), Slack or Discord webhook
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-limitchange">Limit-change alert</a>
-								when your tokens per 1% shift 15% or more
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td><a href="#f-after">Run a job after the reset</a></td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								Pointer to your other Claude account,
-								<code>/compact</code>
-								nudge
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-alerts">Starting-context alerts</a>
-								and a weekly summary
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-report">Burn report</a>: Claude Code, Codex and Grok
-								by day, project, model, session, with API-equivalent cost for
-								Claude
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-why">Where your tokens went</a>: subagents, session
-								starts, cache rebuilds, tool results, by subagent type and model
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-jobs">Heaviest scheduled-job starts</a>, with cold
-								starts per job
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td><a href="#f-models">A model for each kind of subagent</a></td>
-							<td>Preview only</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-plan">Plan advisor</a>: does a bigger or smaller
-								Claude plan fit
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-toolcheck">Large tool-output notice</a>, with what
-								to ask for instead
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								<a href="#f-grok">Grok</a>: status line, trim totals and a guard
-								preview
-							</td>
-							<td>✓</td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								Grok dollar cap: forecast and guard,
-								<code>trim --grok --apply</code>
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>
-								HTML dashboard: results, current windows and burn report on one
-								page
-							</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-						<tr>
-							<td>Email support</td>
-							<td></td>
-							<td>✓</td>
-						</tr>
-					</tbody>
-				</table>
-			</div>
-
 			<h2 id="faq">FAQ</h2>
 			<details>
 				<summary>Does it send my code or prompts anywhere?</summary>
 				<p>
-					No. limitcast reads the limit readings Claude Code passes to your
-					status line and the logs Claude Code and Codex already keep on your
-					disk, and none of that leaves your machine. The only network calls are
-					for a Pro license key: once to activate, a weekly re-check, and when
-					you deactivate. They send your license key and computer name to Polar,
-					our payment provider. The status line and hooks never wait on the
-					network, and Pro keeps working offline for 30 days after the last
-					check. If you turn on phone or webhook notifications (Pro, off by
-					default), each notification's text goes to the service you chose
-					(ntfy.sh or your webhook), and nothing else does.
+					Limitcast reads usage and session logs locally. No license key or
+					payment-service connection is required. Code and prompts are not
+					uploaded. Optional phone or webhook notifications send notification
+					text to the service you configure; they are off by default.
 				</p>
 			</details>
 			<details>
@@ -1847,8 +1449,8 @@ limitcast install          # backs up settings and adds the recorder</pre>
 					percentage used on disk, only spend, so the status line shows your
 					5-hour and 7-day spend; set a dollar cap (<code
 						>limitcast budget grok 20</code
-					>, Pro) and limitcast forecasts that window and the guard blocks new
-					Grok subagents when it is on pace to run out.
+					>) and limitcast forecasts that window and the guard blocks new Grok
+					subagents when it is on pace to run out.
 				</p>
 			</details>
 			<details>
@@ -1883,29 +1485,27 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				</p>
 			</details>
 			<details>
-				<summary>How does the free trial work?</summary>
+				<summary>Do I need a subscription or license key?</summary>
 				<p>
-					Pick yearly or monthly and you get Pro for 14 days at no charge: your
-					license key is ready as soon as you check out, in Polar's customer
-					portal (linked from your confirmation email). Your card is charged
-					when the trial ends. Cancel before then, in the same portal, and you
-					pay nothing and the key stops working.
+					All Limitcast features are free and open source under the MIT License.
+					No subscription, card, account, license key or trial is required.
 				</p>
 			</details>
 			<details>
-				<summary>Can I get a refund?</summary>
+				<summary>What happens to an older license?</summary>
 				<p>
-					Yes, within 14 days of any charge, no questions asked. Email
-					support@limitcast.dev from the address you bought with and we'll
-					refund it and cancel the subscription.
+					Update to Limitcast 0.15.0 or later. All features work without a
+					license key, and older local license files are left untouched. For
+					help with a previous purchase, contact support@limitcast.dev.
 				</p>
 			</details>
 
 			<footer>
 				<p>
+					Created by <a href="https://github.com/SamStull9007">Sam Stull</a>.
 					Source on
 					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
-					(Elastic License 2.0) ·
+					(MIT License) ·
 					<a href="https://www.npmjs.com/package/limitcast">npm</a>
 					·
 					<a href="https://github.com/SamStull9007/homebrew-limitcast"
@@ -1935,26 +1535,6 @@ limitcast install          # backs up settings and adds the recorder</pre>
 						"Select and copy the commands above, then paste them in your terminal.";
 				}
 			});
-		// Polar checkout links (Products → Checkout Links).
-		const CHECKOUT = {
-			annual:
-				"https://buy.polar.sh/polar_cl_mODyL2toBGrw6OiIhFW1XrhAnhXkacurfpPpk0aNzJ6",
-			monthly:
-				"https://buy.polar.sh/polar_cl_W4gt2tEe7YBZBq3Lv7P92EKBxHYVUmdoJ6p232iTMqp",
-			team: "https://buy.polar.sh/polar_cl_8FceCp0kAbBRaz6pn0rN90EuH0CESj9KuuS2w35l5F9",
-		};
-		for (const a of document.querySelectorAll("[data-checkout]")) {
-			const url = CHECKOUT[a.dataset.checkout];
-			if (url) a.href = url;
-		}
-		// Polar returns buyers to ?purchase=success: show how to activate.
-		if (new URLSearchParams(location.search).get("purchase") === "success") {
-			document.getElementById("thanks").hidden = false;
-			const count = () =>
-				window.goatcounter.count({ path: "purchase-success", event: true });
-			if (window.goatcounter?.count) count();
-			else addEventListener("load", () => window.goatcounter?.count && count());
-		}
 		</script>
 	</body>
 </html>

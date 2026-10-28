@@ -1,26 +1,38 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>limitcast 0.14: pace your week by the day, and keep what trim must not touch</title>
-    <meta name="description" content="limitcast 0.14: a keep-list for trim, a daily share of your weekly Claude Code limit that can hold new subagents, and which window runs out first.">
-    <link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-14/">
-    <link rel="icon" type="image/png" href="/icon.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-    <meta property="og:type" content="article">
-    <meta property="og:url" content="https://limitcast.dev/blog/limitcast-0-14/">
-    <meta property="og:title" content="limitcast 0.14: pace your week by the day, and keep what trim must not touch">
-    <meta
-      property="og:description"
-      content="A keep-list for trim, a daily share of your weekly limit that can hold new subagents, and one status line that says which window runs out first."
-    >
-    <meta property="og:image" content="https://limitcast.dev/og.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta name="twitter:card" content="summary_large_image">
-    <meta property="article:published_time" content="2026-10-27">
-    <script type="application/ld+json">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			limitcast 0.14: pace your week by the day, and keep what trim must not
+			touch
+		</title>
+		<meta
+			name="description"
+			content="limitcast 0.14: a keep-list for trim, a daily share of your weekly Claude Code limit that can hold new subagents, and which window runs out first."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-14/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/limitcast-0-14/"
+		>
+		<meta
+			property="og:title"
+			content="limitcast 0.14: pace your week by the day, and keep what trim must not touch"
+		>
+		<meta
+			property="og:description"
+			content="A keep-list for trim, a daily share of your weekly limit that can hold new subagents, and one status line that says which window runs out first."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-10-27">
+		<script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "BlogPosting",
@@ -32,242 +44,295 @@
       "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-14/"
     }
     </script>
-    <script
-      data-goatcounter="https://limitcast.goatcounter.com/count"
-      async
-      src="https://gc.zgo.at/count.v4.js"
-      integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
-      crossorigin="anonymous"
-    ></script>
-    <style>
-    :root {
-      --bg: #fbfaf7;
-      --fg: #1d1c1a;
-      --muted: #5f5c55;
-      --line: #e4e0d8;
-      --card: #ffffff;
-      --accent: #c2410c;
-      --cached: #a8a399;
-      --code-bg: #1d1c1a;
-      --code-fg: #f3efe6;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #141312;
-        --fg: #eeeae2;
-        --muted: #a8a399;
-        --line: #2c2a27;
-        --card: #1b1a18;
-        --accent: #f97316;
-        --cached: #5f5c55;
-        --code-bg: #0c0b0a;
-        --code-fg: #eeeae2;
-      }
-    }
-    * {
-      box-sizing: border-box;
-    }
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--fg);
-      font:
-        18px / 1.65 ui-sans-serif,
-        system-ui,
-        -apple-system,
-        "Segoe UI",
-        sans-serif;
-    }
-    main {
-      max-width: 720px;
-      margin: 0 auto;
-      padding: 0 16px 72px;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px 16px;
-      flex-wrap: wrap;
-      padding: 20px 0;
-      font-size: 0.95rem;
-    }
-    header a {
-      color: var(--muted);
-      text-decoration: none;
-    }
-    header .logo {
-      color: var(--fg);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    h1 {
-      font-size: clamp(1.9rem, 5vw, 2.6rem);
-      line-height: 1.12;
-      letter-spacing: -0.03em;
-      margin: 40px 0 10px;
-      text-wrap: balance;
-    }
-    h2 {
-      font-size: 1.35rem;
-      letter-spacing: -0.02em;
-      margin: 44px 0 10px;
-      text-wrap: balance;
-    }
-    .byline {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin: 0 0 28px;
-    }
-    .answer {
-      border-left: 3px solid var(--accent);
-      padding: 4px 0 4px 16px;
-      font-size: 1.15rem;
-      margin: 24px 0;
-    }
-    a {
-      color: var(--accent);
-    }
-    code {
-      font-family: ui-monospace, Menlo, monospace;
-      font-size: 0.88em;
-    }
-    pre {
-      background: var(--code-bg);
-      color: var(--code-fg);
-      padding: 16px 18px;
-      border-radius: 10px;
-      overflow-x: auto;
-      font:
-        14px / 1.55 ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        monospace;
-    }
-    .table-wrap {
-      overflow-x: auto;
-    }
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.95rem;
-      font-variant-numeric: tabular-nums;
-    }
-    th,
-    td {
-      text-align: left;
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--line);
-    }
-    td.n,
-    th.n {
-      text-align: right;
-    }
-    figure {
-      margin: 28px 0;
-      padding: 18px;
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: 12px;
-    }
-    figcaption {
-      color: var(--muted);
-      font-size: 0.9rem;
-      margin-top: 12px;
-    }
-    .cta {
-      margin-top: 48px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: var(--card);
-    }
-    .cta p {
-      margin: 0 0 10px;
-    }
-    footer {
-      margin-top: 48px;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <a class="logo" href="/">limitcast</a>
-        <nav><a href="/#how">Features</a> · <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> · <a href="https://github.com/SamStull9007/limitcast">GitHub</a></nav>
-      </header>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			border-left: 3px solid var(--accent);
+			padding: 4px 0 4px 16px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<p class="pro-note">
+				Historical article. Since version 0.15.0, all Limitcast features are
+				free under the MIT License.
+				<a href="/#install">Install the current release</a>.
+			</p>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
 
-      <article>
-        <h1>limitcast 0.14: pace your week by the day, and keep what trim must not touch</h1>
-        <p class="byline">Sam Stull · 27 October 2026</p>
+			<article>
+				<h1>
+					limitcast 0.14: pace your week by the day, and keep what trim must not
+					touch
+				</h1>
+				<p class="byline">Sam Stull · 27 October 2026</p>
 
-        <p>
-          limitcast 0.14 adds three things: a keep-list so <code>trim</code> never touches what you rely on, a daily share of your weekly limit
-          that can now hold new subagents, and a status line that says which limit you will hit first.
-        </p>
+				<p>
+					limitcast 0.14 adds three things: a keep-list so
+					<code>trim</code>
+					never touches what you rely on, a daily share of your weekly limit
+					that can now hold new subagents, and a status line that says which
+					limit you will hit first.
+				</p>
 
-        <p class="answer">
-          <b>0.14 makes limitcast's advice safer to apply and harder to ignore.</b> <code>trim</code> can be told what to leave alone, the
-          daily pace acts instead of only showing, and <code>status</code> names the window that runs out first.
-        </p>
+				<p class="answer">
+					<b
+						>0.14 makes limitcast's advice safer to apply and harder to
+						ignore.</b
+					> <code>trim</code> can be told what to leave alone, the daily pace
+					acts instead of only showing, and <code>status</code> names the window
+					that runs out first.
+				</p>
 
-        <h2>A keep-list for trim</h2>
-        <p>
-          <code>limitcast trim --apply</code> turns off MCP servers and hides skills you have not used. Some are rare but essential. Put them on
-          the keep-list and no <code>--apply</code> will touch them, in Claude Code, Codex or Grok:
-        </p>
-        <pre>$ limitcast trim keep ego-browser
+				<h2>A keep-list for trim</h2>
+				<p>
+					<code>limitcast trim --apply</code>
+					turns off MCP servers and hides skills you have not used. Some are
+					rare but essential. Put them on the keep-list and no
+					<code>--apply</code>
+					will touch them, in Claude Code, Codex or Grok:
+				</p>
+				<pre>$ limitcast trim keep ego-browser
 Kept by `trim --apply`: ego-browser</pre>
-        <p>
-          Spelling does not matter: <code>ego-browser</code> and <code>ego_browser</code> match. <code>limitcast trim</code> shows what it would
-          keep, <code>limitcast trim keep --remove &lt;name&gt;</code> drops one, and <code>limitcast trim keep</code> on its own lists them.
-          It is free.
-        </p>
+				<p>
+					Spelling does not matter: <code>ego-browser</code> and
+					<code>ego_browser</code>
+					match. <code>limitcast trim</code> shows what it would keep,
+					<code>limitcast trim keep --remove &lt;name&gt;</code>
+					drops one, and
+					<code>limitcast trim keep</code>
+					on its own lists them. It is free.
+				</p>
 
-        <h2>Your week, paced by the day</h2>
-        <p>
-          The <code>today</code> column in <code>limitcast status</code> is your share of what is left of a weekly window, split evenly over
-          the days until it resets. In 0.14 it acts (Pro). With notifications on, you get one message a day when you have used 80% of today's
-          share:
-        </p>
-        <pre>limitcast: Claude 7d: 80% of today's share used, 1% left today.</pre>
-        <p>
-          Turn on <code>limitcast budget today on</code> and the subagent guard also holds new subagents once today's share is used up, until
-          local midnight:
-        </p>
-        <pre>limitcast: today's share of your Claude 7d limit is used up (6% of 5%).
+				<h2>Your week, paced by the day</h2>
+				<p>
+					The <code>today</code> column in <code>limitcast status</code> is your
+					share of what is left of a weekly window, split evenly over the days
+					until it resets. In 0.14 it acts (Pro). With notifications on, you get
+					one message a day when you have used 80% of today's share:
+				</p>
+				<pre
+				>limitcast: Claude 7d: 80% of today's share used, 1% left today.</pre>
+				<p>
+					Turn on <code>limitcast budget today on</code> and the subagent guard
+					also holds new subagents once today's share is used up, until local
+					midnight:
+				</p>
+				<pre
+				>limitcast: today's share of your Claude 7d limit is used up (6% of 5%).
 New subagents are held until midnight. Turn this off:
 `limitcast budget today off`, or set LIMITCAST_ALLOW=1 to spawn anyway.</pre>
-        <p>
-          The <code>(6% of 5%)</code> reads as 6% used against a 5% share for today. The hold is off by default. A window already at 100% is
-          left to the tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free installs record what Pro would have held, and
-          <code>limitcast results</code> shows it.
-        </p>
+				<p>
+					The <code>(6% of 5%)</code> reads as 6% used against a 5% share for
+					today. The hold is off by default. A window already at 100% is left to
+					the tool, and <code>LIMITCAST_ALLOW=1</code> overrides it. Free
+					installs record what Pro would have held, and
+					<code>limitcast results</code>
+					shows it.
+				</p>
 
-        <h2>Which window runs out first</h2>
-        <p>
-          When a window is on pace to run out, <code>limitcast status</code> now ends with one line naming the one that hits the wall first and
-          where else there is room:
-        </p>
-        <pre>You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
-        <p>If you split work across Claude Code, Codex and Grok, that line tells you where to send the next task.</p>
+				<h2>Which window runs out first</h2>
+				<p>
+					When a window is on pace to run out, <code>limitcast status</code> now
+					ends with one line naming the one that hits the wall first and where
+					else there is room:
+				</p>
+				<pre>You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
+				<p>
+					If you split work across Claude Code, Codex and Grok, that line tells
+					you where to send the next task.
+				</p>
 
-        <h2>Upgrade</h2>
-        <pre>npm install -g limitcast
+				<h2>Upgrade</h2>
+				<pre>npm install -g limitcast
 limitcast status</pre>
-        <p>Local only, never uses your Claude login. <a href="/guide/">Feature guide</a> · <a href="/#pricing">Pro plans</a></p>
+				<p>
+					Local only, never uses your Claude login.
+					<a href="/guide/">Feature guide</a>
+					·
+					<a href="/#pricing">Pro plans</a>
+				</p>
 
-        <div class="cta">
-          <p>limitcast forecasts when each Claude Code, Codex and Grok window runs out, and its Pro plan stops runaway subagents before they burn the rest of it.</p>
-          <p>
-            <a href="/">See what limitcast does</a> · <a href="/blog/">More posts</a> · <a href="/blog/claude-code-usage-limits/">How the 5-hour and weekly limits work</a>
-          </p>
-        </div>
-      </article>
+				<div class="cta">
+					<p>
+						limitcast forecasts when each Claude Code, Codex and Grok window
+						runs out, and its Pro plan stops runaway subagents before they burn
+						the rest of it.
+					</p>
+					<p>
+						<a href="/">See what limitcast does</a>
+						· <a href="/blog/">More posts</a> ·
+						<a href="/blog/claude-code-usage-limits/"
+							>How the 5-hour and weekly limits work</a
+						>
+					</p>
+				</div>
+			</article>
 
-      <footer>limitcast is an independent tool and is not affiliated with Anthropic. Questions or your own numbers: support@limitcast.dev</footer>
-    </main>
-  </body>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
 </html>
