@@ -315,7 +315,8 @@
 				limitcast is a command-line tool that shows what fills your context,
 				warns you before a usage window runs out, and stops new subagents that
 				would use up the rest of it. Then it separates recorded actions from
-				estimated context reduction. It reads data already on your machine and, unless you turn on Grok's weekly usage, uses no logins.
+				estimated context reduction. It reads data already on your machine and,
+				unless you turn on Grok's weekly usage, uses no logins.
 			</p>
 
 			<pre><code><span class="dim">$</span> limitcast trim
@@ -326,8 +327,7 @@ This example Claude Code session started at 102.7k tokens before the first messa
 - Hide 66 skills from the model (~5.3k): dataviz, block-kit, ...</code></pre>
 
 			<h2>Start with your own setup</h2>
-			<pre
-			><code>npm install -g limitcast
+			<pre><code>npm install -g limitcast
 limitcast onboard</code></pre>
 			<p>
 				<code>onboard</code>
@@ -339,10 +339,13 @@ limitcast onboard</code></pre>
 				tool and complete a normal turn before expecting live readings.
 			</p>
 			<p>
-				All features are free under the MIT License, with no account, license key or trial. Protection needs
+				All features are free under the MIT License, with no account, license
+				key or trial. Protection needs
 				<code>limitcast install --guard --alerts</code>, a restart, and Codex
-				hook approval when requested. A configured hook is not proof it has
-				acted.
+				hook approval when requested. Use <code>--host claude</code>,
+				<code>--host codex</code>
+				or <code>--host grok</code> to choose one tool. Codex reads its existing
+				logs without a recorder. A configured hook is not proof it has acted.
 			</p>
 			<p>
 				Installed guards act when the forecast or an enabled budget requires it.
@@ -575,11 +578,11 @@ Kept by `trim --apply`: ego-browser</pre>
 						into every session. A note past that is never read.
 					</li>
 					<li>
-						Reads this project's memory folder
-						(<code>~/.claude/projects/&lt;project&gt;/memory</code>) and reports
-						how much of the index fits, links that point at a missing file,
-						topic files nothing links to, and files over 150 lines. It changes
-						nothing.
+						Reads this project's memory folder (<code
+							>~/.claude/projects/&lt;project&gt;/memory</code
+						>) and reports how much of the index fits, links that point at a
+						missing file, topic files nothing links to, and files over 150
+						lines. It changes nothing.
 					</li>
 					<li>
 						<code>doctor</code>
@@ -626,7 +629,10 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 					<li>
 						Blocks the spawn only when that tool's own window is on pace to run
 						out within 30 minutes and before it resets. The margin is set by
-						<code>LIMITCAST_GUARD_MINUTES</code>.
+						<code>LIMITCAST_GUARD_MINUTES</code>. Readings older than 15 minutes
+						are labeled <code>STALE</code>; forecast-based holds and model
+						changes pause until fresh observations arrive. Explicit budgets
+						retain their own rules.
 					</li>
 					<li>
 						While a Claude window is tight (NEAR or AT_RISK) but not about to
@@ -703,8 +709,7 @@ limitcast: today's share of your Claude 7d limit is used up (6% of 5%). New suba
 						Needs the guard (<code>limitcast install --guard</code>), which runs
 						as a PreToolUse hook on the Task and Agent tools.
 						<code>results</code>
-						counts the subagents it moved; free installs record what it would
-						have done.
+						counts applied model changes separately from historical previews.
 					</li>
 					<li>
 						limitcast cannot tell whether a cheaper model costs less of your
@@ -799,8 +804,8 @@ Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. On
 						<code>/compact</code>
 						or
 						<code>/clear</code>. If the hook fails, the message goes through.
-						<strong>Free</strong>
-						installs record what it would have held.
+						Enabled guards hold that first prompt once. Historical previews
+						remain labeled separately in results.
 					</li>
 				</ul>
 				<pre
@@ -1214,14 +1219,17 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 						it is on pace to run out.
 					</li>
 					<li>
-						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real weekly
-						percentage instead. About every 5 minutes limitcast reads the login Grok
-						keeps in <code>~/.grok/auth.json</code> and asks grok.com for your billing cycle. The login goes only to grok.com
-						(redirects are refused) and is never stored or logged. The readings feed
-						<code>status</code>, Grok's status line, the guard and <code>doctor</code>,
-						and a weekly dollar cap steps aside for them.
-						<code>limitcast grok-usage off</code> stops it. It is off by default, and
-						it tracks weekly plans only.
+						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real
+						weekly percentage instead. About every 5 minutes limitcast reads the
+						login Grok keeps in <code>~/.grok/auth.json</code> and asks grok.com
+						for your billing cycle. The login goes only to grok.com (redirects
+						are refused) and is never stored or logged. The readings feed
+						<code>status</code>, Grok's status line, the guard,
+						<code>doctor</code>
+						and <code>results</code>, and a weekly dollar cap steps aside for
+						them.
+						<code>limitcast grok-usage off</code>
+						stops it. It is off by default, and it tracks weekly plans only.
 					</li>
 				</ul>
 				<p class="gain">
@@ -1306,8 +1314,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				<li>
 					Grok's weekly usage is off by default. When enabled with
 					<code>limitcast grok-usage on</code>, the login in
-					<code>~/.grok/auth.json</code> is sent to grok.com, and nowhere else, to
-					ask for your usage.
+					<code>~/.grok/auth.json</code>
+					is sent to grok.com, and nowhere else, to ask for your usage.
 				</li>
 				<li>Hooks do not wait for notification delivery.</li>
 			</ul>
@@ -1316,7 +1324,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				All features are included at no charge under the
 				<a href="https://github.com/SamStull9007/limitcast/blob/main/LICENSE"
 					>MIT License</a
-				>, with no trial, subscription, activation key or device limit. Created by
+				>, with no trial, subscription, activation key or device limit. Created
+				by
 				<a href="https://github.com/SamStull9007">Sam Stull</a>.
 			</p>
 			<h2>What works with which tool</h2>
@@ -1335,13 +1344,18 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 							<td>Runout forecast</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Spend; forecast after a dollar cap, or the real weekly % with grok-usage on</td>
+							<td class="muted">
+								Spend; forecast after a dollar cap, or the real weekly % with
+								grok-usage on
+							</td>
 						</tr>
 						<tr>
 							<td>Subagent guard</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Blocks once a dollar cap is set or grok-usage is on</td>
+							<td class="muted">
+								Blocks once a dollar cap is set or grok-usage is on
+							</td>
 						</tr>
 						<tr>
 							<td>Burn report</td>

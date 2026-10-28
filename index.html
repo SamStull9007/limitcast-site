@@ -85,7 +85,7 @@
       "name": "Does it work with Codex and Grok?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: yes, the burn report, a status line, the trim advisor and the subagent guard. Grok keeps no percentage used on disk, only spend, so the status line shows your 5-hour and 7-day spend; set a dollar cap (limitcast budget grok 20) and limitcast forecasts that window and the guard blocks new Grok subagents when it is on pace to run out."
+        "text": "Codex: yes, forecasts, the subagent guard and the burn report, from the logs Codex already writes. Grok: yes, the burn report, a status line, the trim advisor and the subagent guard. Grok supports optional weekly quota readings with limitcast grok-usage on, using the login Grok already holds, or spending caps with limitcast budget grok 20. Readings are local; opt-in weekly quota requests go to grok.com. The guard can hold new Grok subagents when a supported window is on pace to run out."
       }
     },
     {
@@ -500,9 +500,7 @@
 				required, unless you turn on Grok's weekly usage, which is off by
 				default. Protection and configuration changes remain optional.
 			</p>
-			<pre
-				id="quick-install"
-			><code>npm install -g limitcast
+			<pre id="quick-install"><code>npm install -g limitcast
 limitcast onboard</code></pre>
 			<button
 				class="btn"
@@ -514,7 +512,8 @@ limitcast onboard</code></pre>
 			</button>
 			<span id="copy-status" role="status" aria-live="polite"></span>
 			<p class="pro-note">
-				All Limitcast features are free and open source under the MIT License, with no subscription, card, account, license key or trial.
+				All Limitcast features are free and open source under the MIT License,
+				with no subscription, card, account, license key or trial.
 			</p>
 			<p>
 				<strong>Predict:</strong>
@@ -653,10 +652,11 @@ limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact</pre>
 					<h3>Runout forecast <span class="badge">Free</span></h3>
 					<p>
 						Burn rate and the clock time each 5-hour and weekly window runs out,
-						for Claude Code and Codex, and for Grok once you set a dollar cap or turn on its weekly usage.
-						The weekly window is paced over the last full day, nights included,
-						so one busy hour doesn't cry wolf. <b>NEAR</b> at 95%, even before
-						there's a rate.
+						for Claude Code and Codex, and for Grok once you set a dollar cap or
+						turn on its weekly usage. The weekly window is paced over the last
+						full day, nights included, so one busy hour doesn't cry wolf.
+						<b>NEAR</b>
+						at 95%, even before there's a rate.
 					</p>
 					<p>
 						<b>New in 0.14:</b>
@@ -680,15 +680,18 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
 					<p>
 						A burst of subagents is the most common way to lose the end of a
 						window. When a window is on pace to run out within 30 minutes, the
-						guard stops new subagents in Claude Code and Codex (and in Grok once
-						you set a dollar cap). While a Claude window is merely tight, new
-						subagents run on Sonnet instead of your main model. Once you're past
-						100% it steps aside, so paid extra usage keeps working.
+						guard stops new subagents in Claude Code and Codex (and in Grok with
+						weekly quota readings or a spending cap). While a Claude window is
+						merely tight, new subagents run on Sonnet instead of your main
+						model. Once you're past 100% it steps aside, so paid extra usage
+						keeps working.
 					</p>
 					<p class="pro-note">
 						Available to everyone. Install with
 						<code>limitcast install --guard</code>. The guard acts on new
-						spawns; <code>LIMITCAST_ALLOW=1</code> overrides it.
+						spawns; <code>LIMITCAST_ALLOW=1</code> overrides it. Readings older
+						than 15 minutes are labeled stale and do not trigger forecast-based
+						holds or model changes. Explicit budgets retain their own rules.
 					</p>
 				</div>
 				<pre
@@ -816,9 +819,9 @@ Once it's spent, the guard holds new subagents until the window resets.</pre>
 						>).
 					</p>
 					<p class="pro-note">
-						Free installs record what it would have held;
+						Enabled protection holds that prompt once.
 						<code>results</code>
-						shows it.
+						shows applied holds separately from historical previews.
 					</p>
 				</div>
 				<pre
@@ -917,8 +920,8 @@ Kept by `trim --apply`: ego-browser</pre>
 						<code>MEMORY.md</code>
 						into every session, so a note past that is never read.
 						<code>limitcast memory</code>
-						shows how much of the index fits, which links are broken, which topic
-						files nothing links to and which are over 150 lines.
+						shows how much of the index fits, which links are broken, which
+						topic files nothing links to and which are over 150 lines.
 						<code>doctor</code>
 						flags an index that is over the cap.
 					</p>
@@ -966,12 +969,12 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 						<b>New in 0.17:</b>
 						<code>limitcast grok-usage on</code>
 						shows Grok's real weekly percentage. About every 5 minutes limitcast
-						asks grok.com for your billing cycle with the login Grok already keeps
-						in <code>~/.grok/auth.json</code>.
-						It is off by default, because it is the one place limitcast uses a
-						login: the login goes only to grok.com and is never stored or logged.
-						<code>status</code>, Grok's status line and the guard then forecast the
-						weekly window like the Claude and Codex ones.
+						asks grok.com for your billing cycle with the login Grok already
+						keeps in <code>~/.grok/auth.json</code>. It is off by default,
+						because it is the one place limitcast uses a login: the login goes
+						only to grok.com and is never stored or logged.
+						<code>status</code>, Grok's status line and the guard then forecast
+						the weekly window like the Claude and Codex ones.
 					</p>
 				</div>
 				<pre>$ limitcast install --guard
@@ -985,12 +988,14 @@ $ limitcast trim --grok</pre>
 					<h3>Results and the dashboard <span class="badge">Free</span></h3>
 					<p>
 						Evidence from your own data: every limit you hit and how far ahead
-						limitcast warned, the tokens your smaller starting context saved,
-						priced against your own 5-hour limit, and what the guard stopped
-						(free: would have stopped) and whether that window then ran out.
+						limitcast warned, the estimated context reduction versus your
+						recorded baseline, and what the guard stopped and whether that
+						window then ran out. Historical previews stay separate from applied
+						controls.
 					</p>
 					<p class="pro-note">
-						Put results, the current windows and the burn report on one page:
+						Put results, current Claude, Codex and Grok windows, and the burn
+						report on one page:
 						<code>limitcast results --html</code>.
 					</p>
 				</div>
@@ -1244,7 +1249,9 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 						anything breaks, including a Claude Code, Codex or Grok log-format
 						change. Hooks survive Node upgrades. In Claude Code, the plugin adds
 						<code>/limitcast:status</code>, <code>/limitcast:results</code>,
-						<code>/limitcast:trim</code>, <code>/limitcast:memory-audit</code> and
+						<code>/limitcast:trim</code>,
+						<code>/limitcast:memory-audit</code>
+						and
 						<code>/limitcast:memory-split</code>.
 					</p>
 				</div>
@@ -1272,8 +1279,11 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 				</li>
 				<li>
 					<b>Enable protection.</b>
-					Run <code>limitcast install --guard --alerts</code>, restart your
-					coding tool and approve the Codex hook when asked.
+					Run <code>limitcast install --guard --alerts</code> for detected tools
+					(or select one with <code>--host claude</code>,
+					<code>--host codex</code>
+					or <code>--host grok</code>), restart your coding tool and approve the
+					Codex hook when asked.
 				</li>
 				<li>
 					<b>Review.</b>
@@ -1337,9 +1347,9 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 						<tr>
 							<td>Stops subagents before you run out</td>
 							<td>
-								Yes, Claude Code, Codex and Grok (with a dollar cap or its weekly usage on); on a tight
-								window, moves new Claude subagents to Sonnet; optional subagent
-								budget per 5-hour window
+								Yes, Claude Code, Codex and Grok (with a dollar cap or its
+								weekly usage on); on a tight window, moves new Claude subagents
+								to Sonnet; optional subagent budget per 5-hour window
 							</td>
 							<td>No</td>
 							<td>No (hooks observe only)</td>
@@ -1387,8 +1397,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 			</p>
 
 			<h2 id="install">Get your first useful result</h2>
-			<pre
-			>npm install -g limitcast
+			<pre>npm install -g limitcast
 limitcast onboard          # read-only checks and your next useful step
 limitcast install          # backs up settings and adds the recorder</pre>
 			<ol>
@@ -1451,7 +1460,8 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				<div class="price">$0</div>
 				<p>
 					Forecasts, agent protection, model controls, budgets, reversible
-					trimming, notifications and reports are all included, with no account, card, trial, subscription or license key.
+					trimming, notifications and reports are all included, with no account,
+					card, trial, subscription or license key.
 				</p>
 				<p id="compare-plans">
 					Created by <a href="https://github.com/SamStull9007">Sam Stull</a>.
@@ -1469,7 +1479,12 @@ limitcast install          # backs up settings and adds the recorder</pre>
 			<details>
 				<summary>Does it send my code or prompts anywhere?</summary>
 				<p>
-					Limitcast reads usage and session logs locally, needs no license key or payment-service connection, and does not upload code or prompts. Optional phone or webhook notifications send notification text to the service you configure; they are off by default. Grok's weekly usage is also off by default; when you turn it on, your Grok login goes to grok.com, and nowhere else, to ask for your usage.
+					Limitcast reads usage and session logs locally, needs no license key
+					or payment-service connection, and does not upload code or prompts.
+					Optional phone or webhook notifications send notification text to the
+					service you configure; they are off by default. Grok's weekly usage is
+					also off by default; when you turn it on, your Grok login goes to
+					grok.com, and nowhere else, to ask for your usage.
 				</p>
 			</details>
 			<details>
@@ -1493,12 +1508,12 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				<p>
 					Codex: yes, forecasts, the subagent guard and the burn report, from
 					the logs Codex already writes. Grok: yes, the burn report, a status
-					line, the trim advisor and the subagent guard. Grok keeps no
-					percentage used on disk, only spend, so the status line shows your
-					5-hour and 7-day spend; set a dollar cap (<code
-						>limitcast budget grok 20</code
-					>) and limitcast forecasts that window and the guard blocks new Grok
-					subagents when it is on pace to run out.
+					line, the trim advisor and the subagent guard. Enable optional weekly
+					quota readings with <code>limitcast grok-usage on</code>, which uses
+					the login Grok already holds and contacts grok.com, or set a spending
+					cap with <code>limitcast budget grok 20</code>. Both can support
+					forecasts and new-agent protection. Weekly quota collection is off by
+					default.
 				</p>
 			</details>
 			<details>
@@ -1535,7 +1550,8 @@ limitcast install          # backs up settings and adds the recorder</pre>
 			<details>
 				<summary>Do I need a subscription or license key?</summary>
 				<p>
-					All Limitcast features are free and open source under the MIT License, with no subscription, card, account, license key or trial.
+					All Limitcast features are free and open source under the MIT License,
+					with no subscription, card, account, license key or trial.
 				</p>
 			</details>
 			<details>
