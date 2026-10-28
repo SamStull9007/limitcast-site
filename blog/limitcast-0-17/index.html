@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>limitcast 0.17: Grok weekly usage percentage, off by default</title>
+		<meta name="description" content="limitcast 0.17 shows Grok's real weekly usage percentage and forecasts it like Claude and Codex. It is off by default because it uses your Grok login.">
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-17/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://limitcast.dev/blog/limitcast-0-17/">
+		<meta property="og:title" content="limitcast 0.17: Grok weekly usage percentage, off by default">
+		<meta
+			property="og:description"
+      content="limitcast 0.17 shows Grok's real weekly usage percentage and forecasts it like Claude and Codex. It is off by default because it uses your Grok login."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-10-27">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "limitcast 0.17: Grok weekly usage percentage, off by default",
+      "datePublished": "2026-10-27",
+      "author": { "@type": "Person", "name": "Sam Stull" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-17/"
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			border-left: 3px solid var(--accent);
+			padding: 4px 0 4px 16px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+
+			<article>
+        <h1>limitcast 0.17: Grok weekly usage percentage, off by default</h1>
+        <p class="byline">Sam Stull · 27 October 2026</p>
+
+<p>
+	Until now limitcast could show what Grok cost you, but not how close you were to
+	its limit. 0.17 adds Grok's weekly usage percentage. It is the first limitcast
+	feature that uses a login, so it is off by default.
+</p>
+
+<p class="answer">
+	<b>Run <code>limitcast grok-usage on</code> and Grok's weekly window is forecast
+	like Claude's and Codex's.</b> On my account it reads 9% used, resetting on Sunday
+	at 19:34.
+</p>
+
+<h2>Why Grok had no percentage</h2>
+<p>
+	Grok writes what each session cost to disk, not a share of your limit. So limitcast
+	could show dollars, and could only forecast once you set a dollar cap with
+	<code>limitcast budget grok</code>.
+</p>
+<p>
+	I first tried asking the Grok CLI itself. It speaks JSON-RPC over stdio, and its
+	billing method, <code>x.ai/billing</code>, answers "Method not found" in Grok
+	1.0.70. The percentage is held by grok.com's billing service, so that is where
+	limitcast asks. I found the call by reading how a usage monitor I already run gets
+	the same number, and my figure matched its 9%.
+</p>
+
+<h2>What it does</h2>
+<pre>$ limitcast grok-usage
+Grok weekly: 9% used, resets 11/1/2026, 7:34:33 PM
+
+$ limitcast status
+window     used  burn     runs out   resets     today     status
+grok 7d    9%    +0.0%/h  -          Sun 19:34  16% left  OK</pre>
+<p>
+	About every 5 minutes, limitcast reads the login Grok keeps in
+	<code>~/.grok/auth.json</code> and asks grok.com for your billing cycle. The
+	refresh runs in the background, so a status line never waits on the network. The
+	login goes only to grok.com, a redirect to any other host is refused, and it is
+	never stored or logged. The readings are kept in
+	<code>~/.local/state/limitcast/grok-quota.json</code>, which is what lets limitcast
+	work out a burn rate.
+</p>
+<p>
+	The request identifies itself as limitcast. 0.17.0 sent a Grok client's User-Agent
+	instead; 0.17.1 fixes that, and grok.com gave the same answer either way.
+</p>
+
+<h2>What it adds</h2>
+<ul>
+	<li>
+		A <code>grok 7d</code> row in <code>limitcast status</code>, with runout time,
+		reset and today's share, and the same figure on Grok's status line.
+	</li>
+	<li>
+		The guard can hold a new Grok subagent when the weekly window is on pace to run
+		out, as it does for Claude and Codex.
+	</li>
+	<li>
+		A line in <code>limitcast doctor</code>: <code>✓ Grok weekly: 9% used (checked
+		0 min ago)</code>. If the login has expired or the reply changes, it says why
+		instead.
+	</li>
+	<li>
+		A weekly dollar cap from <code>limitcast budget grok</code> steps aside for the
+		real percentage. A 5-hour cap still works as before.
+	</li>
+</ul>
+<p>
+	It tracks weekly plans. If your plan reports monthly credits, limitcast shows the
+	figure but does not forecast it.
+</p>
+
+<h2>Why it is off by default</h2>
+<p>
+	limitcast's promise so far was that it reads files already on your machine. This
+	feature sends a login to a server, which is a different kind of thing, so you turn
+	it on yourself and <code>limitcast grok-usage off</code> turns it off again. It also
+	depends on a billing endpoint that xAI can change. If that happens,
+	<code>doctor</code> says "Grok usage unavailable" with the reason, and the dollar-cap
+	forecast keeps working.
+</p>
+
+<h2>Measure your own numbers</h2>
+<pre>npm install -g limitcast
+limitcast grok-usage on
+limitcast status
+limitcast doctor</pre>
+<p>
+	The <a href="/guide/">guide</a> has the rest, the
+	<a href="https://github.com/SamStull9007/limitcast/releases/tag/v0.17.1">0.17.1
+	release</a> has the tarball, and the <a href="/blog/limitcast-0-16/">0.16 post</a>
+	covers the previous release.
+</p>
+
+        <div class="cta">
+					<p>
+          limitcast forecasts when each Claude Code, Codex and Grok window runs out, and holds runaway subagents before they burn the rest of it. It is free and MIT licensed.
+        </p>
+					<p>
+						<a href="/">See what limitcast does</a>
+						· <a href="/blog/">More posts</a> ·
+						<a href="/blog/claude-code-usage-limits/"
+							>How the 5-hour and weekly limits work</a
+						>
+					</p>
+				</div>
+      </article>
+
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
