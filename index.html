@@ -61,7 +61,7 @@
       "name": "Does it send my code or prompts anywhere?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Limitcast reads usage and session logs locally. No license key or payment-service connection is required. Code and prompts are not uploaded. Optional phone or webhook notifications send notification text to the service you configure; they are off by default."
+        "text": "Limitcast reads usage and session logs locally, needs no license key or payment-service connection, and does not upload code or prompts. Optional phone or webhook notifications send notification text to the service you configure; they are off by default. Grok's weekly usage is also off by default; when you turn it on, your Grok login goes to grok.com, and nowhere else, to ask for your usage."
       }
     },
     {
@@ -117,7 +117,7 @@
       "name": "Do I need a subscription or license key?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "All Limitcast features are free and open source under the MIT License. No subscription, card, account, license key or trial is required."
+        "text": "All Limitcast features are free and open source under the MIT License, with no subscription, card, account, license key or trial."
       }
     },
     {
@@ -514,8 +514,7 @@ limitcast onboard</code></pre>
 			</button>
 			<span id="copy-status" role="status" aria-live="polite"></span>
 			<p class="pro-note">
-				All Limitcast features are free and open source under the MIT License.
-				No subscription, card, account, license key or trial is required.
+				All Limitcast features are free and open source under the MIT License, with no subscription, card, account, license key or trial.
 			</p>
 			<p>
 				<strong>Predict:</strong>
@@ -968,7 +967,7 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 						<code>limitcast grok-usage on</code>
 						shows Grok's real weekly percentage. About every 5 minutes limitcast
 						asks grok.com for your billing cycle with the login Grok already keeps
-						in <code>~/.grok/auth.json</code>, the same request Grok Build makes.
+						in <code>~/.grok/auth.json</code>.
 						It is off by default, because it is the one place limitcast uses a
 						login: the login goes only to grok.com and is never stored or logged.
 						<code>status</code>, Grok's status line and the guard then forecast the
@@ -1279,7 +1278,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 				<li>
 					<b>Review.</b>
 					Use <code>limitcast results</code> to see usage, context-reduction
-					estimates and applied controls. No purchase or activation required.
+					estimates and applied controls, with no purchase or activation step.
 				</li>
 			</ol>
 			<h2 id="compare">How it compares</h2>
@@ -1452,8 +1451,7 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				<div class="price">$0</div>
 				<p>
 					Forecasts, agent protection, model controls, budgets, reversible
-					trimming, notifications and reports are all included. No account,
-					card, trial, subscription or license key.
+					trimming, notifications and reports are all included, with no account, card, trial, subscription or license key.
 				</p>
 				<p id="compare-plans">
 					Created by <a href="https://github.com/SamStull9007">Sam Stull</a>.
@@ -1471,10 +1469,7 @@ limitcast install          # backs up settings and adds the recorder</pre>
 			<details>
 				<summary>Does it send my code or prompts anywhere?</summary>
 				<p>
-					Limitcast reads usage and session logs locally. No license key or
-					payment-service connection is required. Code and prompts are not
-					uploaded. Optional phone or webhook notifications send notification
-					text to the service you configure; they are off by default.
+					Limitcast reads usage and session logs locally, needs no license key or payment-service connection, and does not upload code or prompts. Optional phone or webhook notifications send notification text to the service you configure; they are off by default. Grok's weekly usage is also off by default; when you turn it on, your Grok login goes to grok.com, and nowhere else, to ask for your usage.
 				</p>
 			</details>
 			<details>
@@ -1540,8 +1535,7 @@ limitcast install          # backs up settings and adds the recorder</pre>
 			<details>
 				<summary>Do I need a subscription or license key?</summary>
 				<p>
-					All Limitcast features are free and open source under the MIT License.
-					No subscription, card, account, license key or trial is required.
+					All Limitcast features are free and open source under the MIT License, with no subscription, card, account, license key or trial.
 				</p>
 			</details>
 			<details>

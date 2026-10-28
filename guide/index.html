@@ -249,9 +249,10 @@
 			margin-bottom: 4px;
 		}
 		.gain {
-			margin: 4px 0 0;
-			padding-left: 14px;
-			border-left: 3px solid var(--accent);
+			margin: 8px 0 0;
+			padding: 8px 14px;
+			border-radius: 8px;
+			background: color-mix(in srgb, var(--accent) 8%, transparent);
 		}
 		.gain strong {
 			color: var(--accent);
@@ -314,8 +315,7 @@
 				limitcast is a command-line tool that shows what fills your context,
 				warns you before a usage window runs out, and stops new subagents that
 				would use up the rest of it. Then it separates recorded actions from
-				estimated context reduction. It reads data already on your machine. No
-				logins.
+				estimated context reduction. It reads data already on your machine and, unless you turn on Grok's weekly usage, uses no logins.
 			</p>
 
 			<pre><code><span class="dim">$</span> limitcast trim
@@ -339,8 +339,7 @@ limitcast onboard</code></pre>
 				tool and complete a normal turn before expecting live readings.
 			</p>
 			<p>
-				All features are free under the MIT License. No account, license key or
-				trial is required. Protection needs
+				All features are free under the MIT License, with no account, license key or trial. Protection needs
 				<code>limitcast install --guard --alerts</code>, a restart, and Codex
 				hook approval when requested. A configured hook is not proof it has
 				acted.
@@ -1217,8 +1216,7 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<li>
 						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real weekly
 						percentage instead. About every 5 minutes limitcast reads the login Grok
-						keeps in <code>~/.grok/auth.json</code> and asks grok.com for your billing
-						cycle, the same request Grok Build makes. The login goes only to grok.com
+						keeps in <code>~/.grok/auth.json</code> and asks grok.com for your billing cycle. The login goes only to grok.com
 						(redirects are refused) and is never stored or logged. The readings feed
 						<code>status</code>, Grok's status line, the guard and <code>doctor</code>,
 						and a weekly dollar cap steps aside for them.
@@ -1318,7 +1316,7 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				All features are included at no charge under the
 				<a href="https://github.com/SamStull9007/limitcast/blob/main/LICENSE"
 					>MIT License</a
-				>. No trial, subscription, activation key or device limit. Created by
+				>, with no trial, subscription, activation key or device limit. Created by
 				<a href="https://github.com/SamStull9007">Sam Stull</a>.
 			</p>
 			<h2>What works with which tool</h2>
