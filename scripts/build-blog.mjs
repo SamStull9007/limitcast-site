@@ -42,13 +42,18 @@ const posts = readdirSync(join(root, "blog"), { withFileTypes: true })
 			)?.[1] ?? published;
 		return {
 			slug,
-			title: need(html, /<title>([^<]+)<\/title>/, slug, "<title>"),
+			// A formatter may wrap the title across lines; keep one line of text.
+			title: need(html, /<title>([^<]+)<\/title>/, slug, "<title>")
+				.replace(/\s+/g, " ")
+				.trim(),
 			description: need(
 				html,
 				/<meta\s+name="description"\s+content="([^"]+)"/,
 				slug,
 				"meta description",
-			),
+			)
+				.replace(/\s+/g, " ")
+				.trim(),
 			published,
 			modified,
 		};

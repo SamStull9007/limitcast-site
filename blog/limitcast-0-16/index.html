@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>limitcast 0.16: find the notes Claude Code never loads, and split big memory files</title>
+		<meta name="description" content="limitcast 0.16 checks the part of your Claude Code memory that is never loaded, and adds /limitcast:memory-audit and /limitcast:memory-split to clean it up.">
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-16/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta property="og:url" content="https://limitcast.dev/blog/limitcast-0-16/">
+		<meta property="og:title" content="limitcast 0.16: find the notes Claude Code never loads, and split big memory files">
+		<meta
+			property="og:description"
+      content="limitcast 0.16 checks the part of your Claude Code memory that is never loaded, and adds /limitcast:memory-audit and /limitcast:memory-split to clean it up."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-10-27">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "limitcast 0.16: find the notes Claude Code never loads, and split big memory files",
+      "datePublished": "2026-10-27",
+      "author": { "@type": "Person", "name": "Sam Stull" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-16/"
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			border-left: 3px solid var(--accent);
+			padding: 4px 0 4px 16px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+
+			<article>
+        <h1>limitcast 0.16: find the notes Claude Code never loads, and split big memory files</h1>
+        <p class="byline">Sam Stull · 27 October 2026</p>
+
+<p>
+	Claude Code keeps notes for each project in a <code>MEMORY.md</code> index plus
+	topic files, and it reads only the start of that index at the beginning of every
+	session. limitcast 0.16 shows how much of yours fits, and adds two Claude Code
+	commands to tidy the rest.
+</p>
+
+<p class="answer">
+	<b>Anything past line 200 or 25 KB of MEMORY.md is never loaded, and 0.16 tells
+	you when you are there.</b> <code>limitcast memory</code> and
+	<code>limitcast doctor</code> report it, and <code>/limitcast:memory-audit</code>
+	and <code>/limitcast:memory-split</code> help you fix it.
+</p>
+
+<h2>What Claude Code loads</h2>
+<p>
+	The <a href="https://docs.claude.com/en/docs/claude-code/memory">memory
+	documentation</a> says the first 200 lines of <code>MEMORY.md</code>, or the first
+	25 KB, whichever comes first, are loaded at the start of every conversation, and
+	that content beyond that is not loaded at session start. It also says Claude Code
+	checks the file after Claude writes to it, and asks Claude to shorten an index
+	that is near or over a limit.
+</p>
+<p>
+	That covers an index Claude just wrote. An index that grew over months, or was
+	edited by hand, can still be past the cap with nobody told. The documentation
+	describes that check for the index; it does not describe one for broken links,
+	files nothing points at, or topic files that have grown large.
+</p>
+
+<h2>limitcast memory</h2>
+<p>
+	Run it in a project and it reads that project's memory folder and changes
+	nothing. This is a made-up folder with a few problems built in:
+</p>
+<pre>$ limitcast memory
+Memory: ~/.claude/projects/-home-you-app/memory
+Index: MEMORY.md 21 / 200 lines, 0.8 / 25 KB
+Topic files: 16
+Not linked from the index (2): old-notes.md, scratch.md
+Broken links (1): MEMORY.md -&gt; deploy-notes.md
+Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 8 KB)</pre>
+<p>
+	The index line is used lines and bytes against the cap. Below it are a link in the
+	index that points at a missing file, two topic files nothing links to, and a file
+	long enough that every task that opens it reads all 312 lines.
+</p>
+<p>
+	<code>limitcast doctor</code> shows the same as one line. It fails only when the
+	index is past the cap, because that is the one case where Claude is missing notes
+	you wrote. Here it is for that folder, and for an index of 214 lines:
+</p>
+<pre>✓ Memory: 16 files, index 21/200 lines, 1/25 KB; 2 not linked from the index, 1 broken link, 1 file over 150 lines. Run /limitcast:memory-audit, then /limitcast:memory-split
+✗ Memory index 214/200 lines, 6/25 KB: Claude Code loads only the first 200 lines or 25 KB of MEMORY.md, so the rest is never read. Fix: /limitcast:memory-audit</pre>
+<p>
+	The daily background check leaves the memory line out, because memory belongs to
+	one project. Run <code>limitcast doctor</code> inside the project to see it.
+</p>
+
+<h2>Audit and split from inside Claude Code</h2>
+<p>
+	The plugin adds two commands. Both start from the same sweep and change nothing
+	until you agree.
+</p>
+<ul>
+	<li>
+		<code>/limitcast:memory-audit</code> goes through the index cap, broken links,
+		files nothing links to, notes that name a file, flag or command that no longer
+		exists, and notes that contradict each other. You get two lists: mechanical
+		fixes first, then judgement calls with the evidence. It never deletes a note
+		unasked.
+	</li>
+	<li>
+		<code>/limitcast:memory-split</code> splits one oversized file into a short hub
+		plus topic files. First it decides whether a split is worth it: a file that is
+		one continuous procedure stays whole, because splitting would turn one read into
+		two. If it is worth it, it shows you the table of contents and waits. Then it
+		moves the text verbatim, keeps the hub's filename so nothing that links to it
+		breaks, and checks that whatever cited the old file still finds what it cited.
+	</li>
+</ul>
+
+<h2>On my own memory folder</h2>
+<p>
+	I ran it on mine: 300 topic files, and an index of 54 of 200 lines and 7.0 of 25
+	KB, so nothing is cut off. It also lists 116 files that nothing links to with a
+	Markdown link. That comes from how I route: my index points at a few catalog files,
+	and the notes behind them are found by filename pattern. So the list is a prompt to
+	check, not a verdict. It is why the audit command searches for references before
+	it calls a file an orphan, and why only the index cap makes
+	<code>doctor</code> fail.
+</p>
+
+<h2>Free and MIT</h2>
+<p>
+	Since 0.15.0 all of limitcast is free and MIT licensed, and the commands above
+	need no key. The <a href="https://github.com/SamStull9007/limitcast/releases/tag/v0.16.0">0.16.0
+	release</a> has the tarball, and <code>npm install -g limitcast</code> gets it.
+</p>
+
+<h2>Measure your own numbers</h2>
+<pre>npm install -g limitcast
+cd your-project
+limitcast memory
+limitcast doctor</pre>
+<p>
+	In Claude Code, run <code>/plugin marketplace add SamStull9007/limitcast</code>,
+	then <code>/plugin install limitcast@limitcast</code>, and try
+	<code>/limitcast:memory-audit</code> in the project. The <a href="/guide/">guide</a>
+	has the rest, and the <a href="/blog/limitcast-0-14/">0.14 post</a> covers the
+	previous release.
+</p>
+
+        <div class="cta">
+					<p>
+          limitcast forecasts when each Claude Code, Codex and Grok window runs out, and holds runaway subagents before they burn the rest of it. It is free and MIT licensed.
+        </p>
+					<p>
+						<a href="/">See what limitcast does</a>
+						· <a href="/blog/">More posts</a> ·
+						<a href="/blog/claude-code-usage-limits/"
+							>How the 5-hour and weekly limits work</a
+						>
+					</p>
+				</div>
+      </article>
+
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
