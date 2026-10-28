@@ -48,7 +48,7 @@
   },
   "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
   "isAccessibleForFree": true,
-  "softwareVersion": "0.16.0"
+  "softwareVersion": "0.17.0"
 }
 </script>
 		<script type="application/ld+json">
@@ -497,7 +497,8 @@
 			</div>
 			<p class="pro-note">
 				Your code and prompts stay on your machine. No AI account credentials
-				required. Protection and configuration changes remain optional.
+				required, unless you turn on Grok's weekly usage, which is off by
+				default. Protection and configuration changes remain optional.
 			</p>
 			<pre
 				id="quick-install"
@@ -653,7 +654,7 @@ limitcast: ⇄ other account 5h 12% · 7d 30% · ctx 162k · /compact</pre>
 					<h3>Runout forecast <span class="badge">Free</span></h3>
 					<p>
 						Burn rate and the clock time each 5-hour and weekly window runs out,
-						for Claude Code and Codex, and for Grok once you set a dollar cap.
+						for Claude Code and Codex, and for Grok once you set a dollar cap or turn on its weekly usage.
 						The weekly window is paced over the last full day, nights included,
 						so one busy hour doesn't cry wolf. <b>NEAR</b> at 95%, even before
 						there's a rate.
@@ -962,9 +963,21 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 						cap, limitcast forecasts that window and the guard blocks new Grok
 						subagents when it is on pace to run out.
 					</p>
+					<p>
+						<b>New in 0.17:</b>
+						<code>limitcast grok-usage on</code>
+						shows Grok's real weekly percentage. About every 5 minutes limitcast
+						asks grok.com for your billing cycle with the login Grok already keeps
+						in <code>~/.grok/auth.json</code>, the same request Grok Build makes.
+						It is off by default, because it is the one place limitcast uses a
+						login: the login goes only to grok.com and is never stored or logged.
+						<code>status</code>, Grok's status line and the guard then forecast the
+						weekly window like the Claude and Codex ones.
+					</p>
 				</div>
 				<pre>$ limitcast install --guard
-$ limitcast budget grok 20
+$ limitcast grok-usage on
+Grok weekly: 9% used, resets 11/1/2026, 7:34:33 PM
 $ limitcast trim --grok</pre>
 			</section>
 
@@ -1325,7 +1338,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 						<tr>
 							<td>Stops subagents before you run out</td>
 							<td>
-								Yes, Claude Code, Codex and Grok (with a dollar cap); on a tight
+								Yes, Claude Code, Codex and Grok (with a dollar cap or its weekly usage on); on a tight
 								window, moves new Claude subagents to Sonnet; optional subagent
 								budget per 5-hour window
 							</td>

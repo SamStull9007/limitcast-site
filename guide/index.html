@@ -1214,6 +1214,17 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 						forecasts that window and the guard blocks new Grok subagents when
 						it is on pace to run out.
 					</li>
+					<li>
+						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real weekly
+						percentage instead. About every 5 minutes limitcast reads the login Grok
+						keeps in <code>~/.grok/auth.json</code> and asks grok.com for your billing
+						cycle, the same request Grok Build makes. The login goes only to grok.com
+						(redirects are refused) and is never stored or logged. The readings feed
+						<code>status</code>, Grok's status line, the guard and <code>doctor</code>,
+						and a weekly dollar cap steps aside for them.
+						<code>limitcast grok-usage off</code> stops it. It is off by default, and
+						it tracks weekly plans only.
+					</li>
 				</ul>
 				<p class="gain">
 					<strong>Benefit:</strong>
@@ -1294,6 +1305,12 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					Phone and webhook notifications are off by default. When enabled,
 					notification text is sent to the configured service.
 				</li>
+				<li>
+					Grok's weekly usage is off by default. When enabled with
+					<code>limitcast grok-usage on</code>, the login in
+					<code>~/.grok/auth.json</code> is sent to grok.com, and nowhere else, to
+					ask for your usage.
+				</li>
 				<li>Hooks do not wait for notification delivery.</li>
 			</ul>
 			<h2>Free and open source</h2>
@@ -1320,13 +1337,13 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 							<td>Runout forecast</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Spend only; forecast after a dollar cap</td>
+							<td class="muted">Spend; forecast after a dollar cap, or the real weekly % with grok-usage on</td>
 						</tr>
 						<tr>
 							<td>Subagent guard</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Blocks once a dollar cap is set</td>
+							<td class="muted">Blocks once a dollar cap is set or grok-usage is on</td>
 						</tr>
 						<tr>
 							<td>Burn report</td>
