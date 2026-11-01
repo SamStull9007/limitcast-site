@@ -117,8 +117,10 @@
 			margin: 0 0 28px;
 		}
 		.answer {
-			border-left: 3px solid var(--accent);
-			padding: 4px 0 4px 16px;
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
 			font-size: 1.15rem;
 			margin: 24px 0;
 		}
@@ -198,6 +200,11 @@
 		.bar .new {
 			background: var(--accent);
 			color: #fff;
+		}
+		@media (prefers-color-scheme: dark) {
+			.bar .new {
+				color: #1d1c1a;
+			}
 		}
 		.bar .cached {
 			background: var(--cached);
