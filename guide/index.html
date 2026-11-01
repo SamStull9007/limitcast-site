@@ -629,6 +629,13 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 						<code>LIMITCAST_GUARD_MINUTES</code>.
 					</li>
 					<li>
+						New in 0.18. A second subagent of the same type and the same prompt
+						is held while the first is still running in that session. Claude's
+						stop hook clears it. A record older than 30 minutes is dropped, so
+						a missed stop on Codex or Grok cannot hold the prompt all day.
+						<code>LIMITCAST_ALLOW=1</code> still spawns.
+					</li>
+					<li>
 						While a Claude window is tight (NEAR or AT_RISK) but not about to
 						run out, a new subagent that would run on your main model (or Opus)
 						runs on Sonnet instead. An explicit Sonnet or Haiku is left alone.
@@ -799,8 +806,13 @@ Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. On
 						<code>/compact</code>
 						or
 						<code>/clear</code>. If the hook fails, the message goes through.
-						<strong>Free</strong>
-						installs record what it would have held.
+						Codex and Grok do not get this warning.
+					</li>
+					<li>
+						New in 0.18. After 5 idle minutes
+						(<code>LIMITCAST_CACHE_NOTICE_MINUTES</code>) that same large
+						session's next message is announced and still sent. The hold stays
+						at 60 minutes.
 					</li>
 				</ul>
 				<pre
@@ -978,6 +990,12 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 						the same job's warm ones.
 					</li>
 					<li>
+						New in 0.18. When the earliest and latest run of a job both recorded
+						a startup breakdown, the report names the piece that changed:
+						SessionStart hooks, MCP instructions, tool names, skills, and the
+						rest of what the session loaded before you typed.
+					</li>
+					<li>
 						It ends with how to launch a job leaner. Prompt text is shown on
 						your machine only: don't paste the report publicly unredacted.
 					</li>
@@ -1056,6 +1074,40 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 					<strong>Benefit:</strong>
 					one oversized result is easy to miss; this names it the moment it
 					happens, and what to ask for instead.
+				</p>
+			</section>
+
+			<section class="feature">
+				<div class="feature-head">
+					<h3>Fat tool limit check</h3>
+
+					<span class="cmd">limitcast install --alerts</span>
+				</div>
+				<ul>
+					<li>
+						New in 0.18. Before a call runs, a PreToolUse hook holds a Read,
+						Grep, or MCP tool whose recent results averaged at least 5k tokens
+						over 3 or more calls, when that call sets no limit. A limit above
+						the cap is lowered: 400 lines for Read, 100 for MCP. A fat Grep
+						with no path and no glob is held.
+					</li>
+					<li>
+						The averages come from the last
+						<code>limitcast report --why</code> or
+						<code>limitcast report --jobs</code>. Until one of those has run,
+						the check does nothing. Bash and WebFetch are left alone.
+					</li>
+					<li>
+						Shown as a deny or a rewritten limit before the tool runs, so the
+						model can ask for less. <code>LIMITCAST_ALLOW=1</code> skips it.
+						Re-run <code>limitcast install --alerts</code> to add the hook to
+						an existing install, then restart Claude Code.
+					</li>
+				</ul>
+				<p class="gain">
+					<strong>Benefit:</strong>
+					the tools that usually return several thousand tokens are capped
+					before they land in the session, instead of after.
 				</p>
 			</section>
 

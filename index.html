@@ -48,7 +48,7 @@
   },
   "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
   "isAccessibleForFree": true,
-  "softwareVersion": "0.17.1"
+  "softwareVersion": "0.18.0"
 }
 </script>
 		<script type="application/ld+json">
@@ -684,6 +684,8 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.</pre>
 						you set a dollar cap). While a Claude window is merely tight, new
 						subagents run on Sonnet instead of your main model. Once you're past
 						100% it steps aside, so paid extra usage keeps working.
+						<b>New in 0.18:</b> a second subagent of the same type and the same
+						prompt is held while the first is still running.
 					</p>
 					<p class="pro-note">
 						Available to everyone. Install with
@@ -815,10 +817,10 @@ Once it's spent, the guard holds new subagents until the window resets.</pre>
 							>LIMITCAST_CACHE_MINUTES</code
 						>).
 					</p>
-					<p class="pro-note">
-						Free installs record what it would have held;
-						<code>results</code>
-						shows it.
+					<p>
+						<b>New in 0.18:</b> after 5 idle minutes the same large session's
+						next message is announced and still sent. The hold stays at 60
+						minutes. Codex and Grok do not get this warning.
 					</p>
 				</div>
 				<pre
@@ -1126,6 +1128,8 @@ cost $1,240 (about $2,325 a month at this pace), against $200 for your plan.</pr
 						prompt was, how many starts were cold (the prompt cache didn't have
 						them) and whether starting a job's runs closer together would help.
 						It ends with how to launch a job leaner.
+						<b>New in 0.18:</b> when two runs of a job both recorded a startup
+						breakdown, the report names the piece that changed between them.
 					</p>
 					<p class="pro-note">
 						The example's job names are changed. The report shows the first 45
@@ -1185,6 +1189,15 @@ guard blocked 3 subagents, moved 5 to Sonnet, 1.9M tokens not re-sent.</pre>
 					<p class="pro-note">
 						It runs on Bash, Read, Grep, WebFetch and MCP tools, and adds about
 						30 ms per call.
+					</p>
+					<p>
+						<b>New in 0.18:</b> the same
+						<code>install --alerts</code> also checks before the call. After
+						<code>report --why</code> or <code>report --jobs</code>, a Read,
+						Grep, or MCP tool whose results averaged at least 5k tokens is held
+						when the call sets no limit, or its limit is lowered when it is too
+						high. Bash and WebFetch are left alone. Re-run
+						<code>install --alerts</code> to add the check.
 					</p>
 				</div>
 				<pre
