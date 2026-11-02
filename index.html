@@ -3,10 +3,10 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>limitcast: get more work from your AI coding plan</title>
+		<title>Claude Code usage limits: forecast Codex and Grok too</title>
 		<meta
 			name="description"
-			content="Forecast usage limits, control subagent burn, and trim unused starting context across Claude Code, Codex and Grok. Runs locally. Start free, no card."
+			content="See when your Claude Code usage limits run out, including the 5-hour and weekly windows, and forecast Codex and Grok the same way. Local, free, no card."
 		>
 		<link rel="canonical" href="https://limitcast.dev/">
 		<link rel="icon" type="image/png" href="/icon.png">
@@ -15,11 +15,11 @@
 		<meta property="og:url" content="https://limitcast.dev/">
 		<meta
 			property="og:title"
-			content="limitcast: stop getting locked out of Claude Code"
+			content="Claude Code usage limits: forecast Codex and Grok too"
 		>
 		<meta
 			property="og:description"
-			content="Forecasts when each usage limit runs out, stops runaway subagents, and shows what drains your plan. Local only, free tier."
+			content="See when your Claude Code usage limits run out, including the 5-hour and weekly windows, and forecast Codex and Grok the same way. Local, free, no card."
 		>
 		<meta property="og:image" content="https://limitcast.dev/og.png">
 		<meta property="og:image:width" content="1200">
@@ -37,7 +37,7 @@
   "url": "https://limitcast.dev/",
   "applicationCategory": "DeveloperApplication",
   "operatingSystem": "macOS, Linux",
-  "description": "Forecasts when each Claude Code and Codex usage limit runs out, measures and trims the context every session loads, stops runaway subagents, and shows where your tokens go. Also covers Grok. Runs locally.",
+  "description": "Claude Code usage limits: see when the 5-hour and weekly windows run out, and forecast Codex and Grok the same way. Measures and trims starting context, and the subagent guard is included. Runs locally. Free.",
   "image": "https://limitcast.dev/og.png",
   "downloadUrl": "https://www.npmjs.com/package/limitcast",
   "offers": {
@@ -181,6 +181,12 @@
 		.pro-note {
 			color: var(--muted);
 			font-size: 0.95rem;
+		}
+		.search-links {
+			color: var(--muted);
+			font-size: 0.95rem;
+			max-width: 640px;
+			margin: 0 0 8px;
 		}
 		.badge {
 			display: inline-block;
@@ -495,6 +501,20 @@
 					>View on GitHub</a
 				>
 			</div>
+			<p class="search-links">
+				<a href="/blog/claude-code-usage-limits/"
+					>Claude Code usage limit reached: how the 5-hour and weekly limits
+					work</a
+				>
+				·
+				<a href="/blog/tokens-per-percent/"
+					>How many tokens is 1% of your Claude Code limit?</a
+				>
+				·
+				<a href="/blog/subagents/"
+					>Do subagents burn your Claude Code limit faster?</a
+				>
+			</p>
 			<p class="pro-note">
 				Your code and prompts stay on your machine. No AI account credentials
 				required, unless you turn on Grok's weekly usage, which is off by
