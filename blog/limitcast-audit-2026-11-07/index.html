@@ -241,7 +241,7 @@
 					silently ignored, settings were written in place, and
 					<code>results</code>
 					walked my transcripts twice, and a cold <code>report --why</code> ran
-					26 seconds in silence. All four are addressed on main. The speedup
+					26 seconds in silence. All four are fixed in 0.18.2. The speedup
 					turned out smaller than I first measured.
 				</p>
 
@@ -367,12 +367,15 @@
 					directories would be faster, but it could miss a subagent file that
 					was appended to after its folder last changed, so I left it. Two
 					commands changing the same setting at the same instant can still lose
-					one update, because that needs a lock, not a rename. The fixes are on
-					main (<a
-						href="https://github.com/SamStull9007/limitcast/commit/38b3302"
+					one update, because that needs a lock, not a rename. The fixes shipped
+					in
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.18.2"
+						>0.18.2</a
+					>
+					(<a href="https://github.com/SamStull9007/limitcast/commit/38b3302"
 						>commit 38b3302</a
-					>) and go out with the next release; the 228 tests, six of them new,
-					pass.
+					>); the 228 tests, six of them new, pass.
 				</p>
 
 				<h2>Measure your own numbers</h2>
