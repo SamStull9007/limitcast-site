@@ -40,6 +40,7 @@
       "@type": "BlogPosting",
       "headline": "I audited my own tool: what limitcast got wrong and what I fixed",
       "datePublished": "2026-11-07",
+      "dateModified": "2026-11-08",
       "author": { "@type": "Person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/" },
       "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
       "image": "https://limitcast.dev/og.png",
@@ -365,10 +366,8 @@
 					About 0.6 seconds of every <code>report --why</code> is the transcript
 					walk itself, roughly 5,400 directory reads per pass here. Skipping old
 					directories would be faster, but it could miss a subagent file that
-					was appended to after its folder last changed, so I left it. Two
-					commands changing the same setting at the same instant can still lose
-					one update, because that needs a lock, not a rename. The fixes shipped
-					in
+					was appended to after its folder last changed, so I left it. The fixes
+					above shipped in
 					<a
 						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.18.2"
 						>0.18.2</a
@@ -376,6 +375,21 @@
 					(<a href="https://github.com/SamStull9007/limitcast/commit/38b3302"
 						>commit 38b3302</a
 					>); the 228 tests, six of them new, pass.
+				</p>
+				<p>
+					<b>Update, 8 November:</b>
+					the other thing I left out here, two commands changing the same
+					setting at the same instant losing one update, is fixed in
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.18.3"
+						>0.18.3</a
+					>. A rename cannot fix that, so every settings write now takes a short
+					lock, re-reads the file inside it and writes through a temp file. A
+					lock left by a killed command is broken after two seconds. A new test
+					changes settings from parallel processes, through both the setters and
+					the real command. On 0.18.2 it kept between 3 and 28 of 250 changes;
+					on 0.18.3 it keeps all of them. <code>trim keep</code> had its own
+					read-then-write and went onto the same lock. 234 tests pass.
 				</p>
 
 				<h2>Measure your own numbers</h2>
