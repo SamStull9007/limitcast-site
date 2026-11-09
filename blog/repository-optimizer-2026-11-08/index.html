@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Beyond the meter: building Limitcast’s repository optimizer</title>
+		<meta
+			name="description"
+			content="A development update on local failure-loop detection, evidence-backed command learning, reversible capability pruning and bounded repository maps."
+		>
+		<link
+			rel="canonical"
+			href="https://limitcast.dev/blog/repository-optimizer-2026-11-08/"
+		>
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/repository-optimizer-2026-11-08/"
+		>
+		<meta
+			property="og:title"
+			content="Beyond the meter: building Limitcast’s repository optimizer"
+		>
+		<meta
+			property="og:description"
+			content="A development update on local failure-loop detection, evidence-backed command learning, reversible capability pruning and bounded repository maps."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-11-08">
+		<script
+			type="application/ld+json"
+		>{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Beyond the meter: building Limitcast’s repository optimizer", "description": "A development update on local failure-loop detection, evidence-backed command learning, reversible capability pruning and bounded repository maps.", "datePublished": "2026-11-08", "dateModified": "2026-11-08", "author": {"@type": "Person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/"}, "publisher": {"@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/"}, "image": "https://limitcast.dev/og.png", "mainEntityOfPage": "https://limitcast.dev/blog/repository-optimizer-2026-11-08/"}</script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+
+			<article>
+				<h1>Beyond the meter: building Limitcast’s repository optimizer</h1>
+				<p class="byline">
+					<a href="/sam-stull/">Sam Stull</a>
+					· 8 November 2026
+				</p>
+				<p>
+					Limitcast already forecasts usage windows, budgets subagents and helps
+					trim context. I wanted it to address another source of waste: the work
+					an agent keeps doing after it has stopped making progress.
+				</p>
+				<p>
+					After comparing Limitcast with
+					<a href="https://github.com/microsoft/TokenEconomizer"
+						>Microsoft’s TokenEconomizer</a
+					>, I added a local repository optimizer to the Limitcast source. It
+					covers failure-loop detection, learning successful check-command
+					alternatives, pruning unused built-in capabilities and building a
+					small source map.
+				</p>
+				<p class="answer">
+					<strong>This is a development update, not a new npm release.</strong>
+					The additions are in the source repository; npm’s released version
+					remains 0.18.3. They are opt-in. I have not established that Limitcast
+					saves more than TokenEconomizer or that these changes reduce real
+					subscription usage.
+				</p>
+				<h2>A check on repeated failures</h2>
+				<p>
+					The loop detector watches repeated failures and edits to the same
+					files within a turn. It also uses productive turn lengths once a
+					repository has enough evidence. Passing a recognized check clears
+					earlier failure evidence; a long turn or changing errors alone does
+					not trigger it.
+				</p>
+				<p>
+					When the evidence crosses the threshold, the agent gets a short
+					redirect to revisit its hypothesis before editing again. Continued
+					repetition produces a notice. Limitcast does not stop the running
+					turn, and this implementation adds no judge-model calls.
+				</p>
+				<h2>Learn a command only when the evidence repeats</h2>
+				<p>
+					Repository learning starts off. When enabled, it can learn a narrow
+					fact such as bare <code>pytest</code> being unavailable while
+					<code>python3 -m pytest</code>
+					works. Three independent sessions must confirm the replacement before
+					it is injected into a later session. A contradictory missing-command
+					or module result retires it.
+				</p>
+				<p>
+					Ordinary assertion failures do not teach environment facts. Commands
+					come from a small whitelist. Raw output and prompts are not stored as
+					learned instructions, and Limitcast does not execute a learned command
+					itself. This is narrower than a model synthesizing general repository
+					knowledge, but it avoids adding an automatic paid proposer.
+				</p>
+				<h2>Trim built-in capabilities with a way back</h2>
+				<p>
+					Existing MCP trimming remains. The optimizer adds proposals for unused
+					Codex collaboration, goals and image-viewing packages, and individual
+					Claude tools when their declarations are available in the transcript.
+					Core reading, editing, search and question tools are protected.
+				</p>
+				<p>
+					Applying a named proposal is explicit. Tracked files, symlinks,
+					conflicting settings and insufficient evidence cause a refusal. A
+					receipt is written before changing a configuration. Undo restores the
+					original bytes only if the resulting file still matches; later user
+					edits are preserved for manual reconciliation.
+				</p>
+				<p>
+					The native Codex check caught a useful integration bug during
+					development: on 0.167, <code>features list</code> ignores
+					<code>-C</code>
+					when choosing project settings. Validation now runs from the
+					repository’s actual working directory and checks that the requested
+					features really turned off.
+				</p>
+				<h2>A source map with a fixed budget</h2>
+				<p>
+					The map lists tracked source files and recognizable declaration names
+					within a 6,000-character default budget. It excludes hidden,
+					credential-shaped, generated and vendor paths, and skips symlinks.
+					Clean trees reuse a commit-keyed cache; dirty trees regenerate it.
+					Injection is off until enabled for a repository.
+				</p>
+				<p>
+					This is a lightweight declaration map, not a full dependency graph. It
+					adds context of its own, so it belongs in repositories where reduced
+					searching can justify that cost.
+				</p>
+				<h2>What the checks establish</h2>
+				<ul>
+					<li>
+						The full suite passed 249 tests, including concurrent hook delivery,
+						contradictory learning, privacy filtering, rollback and user-edit
+						preservation.
+					</li>
+					<li>
+						Six deterministic Promptfoo replay cases passed: repeated loops,
+						productive work, changing failures, exploration, duplicate delivery
+						and ambiguous status.
+					</li>
+					<li>
+						An isolated native Codex 0.167 fixture disabled all three selected
+						controls and restored them. Rendered prompt-input JSON fell from
+						85,121 to 84,441 characters. Those are character counts in one
+						fixture, not measured token or subscription savings.
+					</li>
+					<li>
+						The packaged CLI contains the new modules. Live optimizer-hook
+						delivery in existing user sessions and comparative real-model task
+						outcomes remain separate checks.
+					</li>
+				</ul>
+				<p>
+					The first adapters cover Claude Code, Codex and Grok. Grok receives
+					startup context with its first tool result. Copilot and Pi are not
+					integrated yet. Capability pruning remains explicit, and no
+					model-backed judge or general fact proposer is included.
+				</p>
+				<p>
+					That leaves a clear next test: equivalent real tasks, with and without
+					each mechanism, counting the mechanism’s own overhead and checking
+					whether the work still gets done. A feature list cannot answer that.
+				</p>
+				<div class="cta">
+					<p>
+						<a
+							href="https://github.com/SamStull9007/limitcast/blob/main/docs/optimizer.md"
+							>Read the optimizer guide and its safeguards</a
+						>, or inspect the
+						<a href="https://github.com/SamStull9007/limitcast"
+							>source and tests</a
+						>.
+					</p>
+				</div>
+			</article>
+
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
