@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Limitcast 0.19.2: safer learned checks and clean source maps</title>
+		<meta
+			name="description"
+			content="Two optimizer correctness fixes, a Codex plugin icon, and 258 passing tests. Limitcast 0.19.2 is available on npm, GitHub and Homebrew."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-19-2/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/limitcast-0-19-2/"
+		>
+		<meta
+			property="og:title"
+			content="Limitcast 0.19.2: safer learned checks and clean source maps"
+		>
+		<meta
+			property="og:description"
+			content="Two optimizer correctness fixes, a Codex plugin icon, and 258 passing tests. Limitcast 0.19.2 is available on npm, GitHub and Homebrew."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-11-12">
+		<script
+			type="application/ld+json"
+		>{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Limitcast 0.19.2: safer learned checks and clean source maps", "description": "Two optimizer correctness fixes, a Codex plugin icon, and 258 passing tests. Limitcast 0.19.2 is available on npm, GitHub and Homebrew.", "datePublished": "2026-11-12", "dateModified": "2026-11-12", "author": {"@type": "Person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/"}, "publisher": {"@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/"}, "image": "https://limitcast.dev/og.png", "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-19-2/"}</script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+
+			<article>
+				<h1>Limitcast 0.19.2: safer learned checks and clean source maps</h1>
+				<p class="byline">
+					By <a href="/sam-stull/">Sam Stull</a> · 12 November 2026
+				</p>
+				<p>
+					An optimizer should preserve the checks you intended to run and the
+					source you actually have. An audit of Limitcast found two places where
+					that could go wrong: learning an unrelated command as a replacement,
+					and reusing a source map generated during temporary edits.
+				</p>
+				<p class="answer">
+					<strong
+						>Limitcast 0.19.2 fixes both issues and is available on npm, GitHub
+						and Homebrew.</strong
+					>
+					This is a correctness release. It also adds the Limitcast icon to
+					Codex plugin settings and pins every plugin command to 0.19.2.
+				</p>
+				<h2>A successful build does not replace a lint check</h2>
+				<p>
+					The old learning logic could observe a failed
+					<code>npm run lint</code>, followed by a successful
+					<code>npm run build</code>, across three sessions and recommend the
+					build command as a replacement. Both were grouped as non-test
+					commands, even though they verify different things.
+				</p>
+				<p>
+					The fix checks the identity of the verification command before
+					learning a replacement. Equivalent launchers for the same Python test
+					framework can still qualify, as can <code>npm test</code> and
+					<code>npm run test</code>. Lint, build, type-check and unrelated test
+					runners do not substitute for one another.
+				</p>
+				<p>
+					The same compatibility check runs when saved facts are loaded. That
+					means an incompatible recommendation learned before this patch is
+					excluded from the context supplied to a later session.
+				</p>
+				<h2>Temporary edits should not survive in a cached map</h2>
+				<p>
+					Previously, a source map generated from a dirty working tree could be
+					stored against the unchanged Git commit. Restoring the original source
+					could then leave temporary function names in the map returned for the
+					clean repository.
+				</p>
+				<p>
+					Limitcast now writes map caches only for clean working trees. Maps can
+					still be generated while you work, but that output cannot overwrite
+					the clean cache. The cache format also changes, so legacy entries are
+					regenerated rather than trusted after the upgrade.
+				</p>
+				<h2>What was checked</h2>
+				<ul>
+					<li>
+						All 258 tests passed, including regression coverage for command
+						identity and map-cache behavior. Lint and privacy/plugin checks
+						passed.
+					</li>
+					<li>GitHub CI passed on Linux and macOS with Node 20, 22 and 24.</li>
+					<li>
+						Packaged and installed CLI checks confirmed that incompatible saved
+						replacements are suppressed, valid replacements still appear, and a
+						reverted source edit returns the original map.
+					</li>
+					<li>
+						Downloaded npm and GitHub packages matched the tested release
+						artifact. Installed Claude, Codex and Grok plugin files matched the
+						release commit.
+					</li>
+					<li>
+						Isolated native adapter checks passed for Claude, Codex, Grok,
+						Copilot and Pi. Fresh Codex discovery found six trusted, enabled
+						Limitcast hooks.
+					</li>
+				</ul>
+				<p>
+					Those checks establish the repaired behavior and installation state.
+					They do not measure real-world token savings or replace testing in
+					full signed-in conversations.
+				</p>
+				<h2>Why the packing algorithm stayed the same</h2>
+				<p>
+					The audit also compared the source-map selector with a knapsack
+					reference. At the default 6,000-character budget, all 89 eligible
+					files already fit. A smaller budget improved a synthetic coverage
+					score, but the score alone did not show that developers would get a
+					more useful map. The selector stays unchanged in this release.
+				</p>
+				<h2>Upgrade to 0.19.2</h2>
+				<pre><code>npm install -g limitcast@0.19.2
+limitcast --version
+limitcast doctor</code></pre>
+				<p>For an existing Homebrew installation:</p>
+				<pre><code>brew update
+brew upgrade samstull9007/limitcast/limitcast</code></pre>
+				<p>
+					Update the Limitcast plugin in your agent host too. Restart existing
+					sessions to load refreshed plugin commands and extensions; a CLI
+					upgrade alone does not reload an already-running session.
+				</p>
+				<div class="cta">
+					<p>
+						<a
+							href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.2"
+							>Read the release notes</a
+						>
+						·
+						<a href="https://www.npmjs.com/package/limitcast/v/0.19.2"
+							>Get 0.19.2 on npm</a
+						>
+						·
+						<a
+							href="https://github.com/SamStull9007/limitcast/blob/v0.19.2/docs/optimizer.md"
+							>Optimizer setup guide</a
+						>
+					</p>
+				</div>
+			</article>
+
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
