@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Limitcast weekly update, 13 November: Codex and Grok catch up</title>
+		<meta
+			name="description"
+			content="Limitcast 0.19.3 and 0.19.4 bring the optimizer, subagent receipts and alerts to Codex and Grok, with a correction to 0.19.3 Grok pruning, checked in live sessions."
+		>
+		<link
+			rel="canonical"
+			href="https://limitcast.dev/blog/weekly-update-2026-11-13/"
+		>
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/weekly-update-2026-11-13/"
+		>
+		<meta
+			property="og:title"
+			content="Limitcast weekly update, 13 November: Codex and Grok catch up"
+		>
+		<meta
+			property="og:description"
+			content="Limitcast 0.19.3 and 0.19.4 bring the optimizer, subagent receipts and alerts to Codex and Grok, with a correction to 0.19.3 Grok pruning, checked in live sessions."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-11-13">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Limitcast weekly update, 13 November: Codex and Grok catch up",
+      "datePublished": "2026-11-13",
+      "author": { "@type": "Person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/weekly-update-2026-11-13/"
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+			<article>
+				<h1>Limitcast weekly update, 13 November: Codex and Grok catch up</h1>
+				<p class="byline">
+					<a href="/sam-stull/">Sam Stull</a>
+					· <time datetime="2026-11-13">13 November 2026</time>
+				</p>
+				<p class="answer">
+					<strong>Limitcast 0.19.4 is on npm and GitHub.</strong>
+					It and 0.19.3 bring the optimizer's pruning proposals, subagent
+					receipts and alerts to Codex and Grok, and fix a Grok pruning defect
+					in 0.19.3. Both were checked in live Codex and Grok sessions.
+				</p>
+				<h2>What shipped</h2>
+				<p>
+					<strong
+						>New this week: Codex and Grok get the same optimizer, receipts and
+						alerts as Claude Code.</strong
+					>
+					Two releases,
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.3"
+						>0.19.3</a
+					>
+					and
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.4"
+						>0.19.4</a
+					>
+					(both on npm and GitHub, Nov 13 US evening), came out of an audit of
+					why the three tools were handled differently. Claude Code was built
+					first and many features read Claude-only data. The optimizer itself
+					arrived in
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.0"
+						>0.19.0</a
+					>
+					(Nov 9, GitHub only; that version never reached npm) and reached npm
+					in
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.1"
+						>0.19.1</a
+					>. Seven releases have shipped since last week's update.
+				</p>
+				<p>What changed for a Codex or Grok user:</p>
+				<ul>
+					<li>
+						<strong>Pruning proposals reach Codex and Grok.</strong>
+						The optimizer proposes MCP servers that no session in this
+						repository called, and
+						<code
+							>optimize capabilities --codex|--grok --apply &lt;server&gt;</code
+						>
+						turns one off in the project's own config file (journaled, undoable,
+						checked against <code>codex mcp list</code> /
+						<code>grok mcp list</code>
+						afterwards). Codex also keeps its three built-in candidates. Grok
+						has no persistent setting that removes a built-in tool, so it
+						proposes servers only.
+					</li>
+					<li>
+						<strong>A correction.</strong>
+						In 0.19.3 the Grok apply never took effect: Grok ignores a project
+						server entry that has no command, so the command reported an error
+						and rolled back (nothing was left changed). 0.19.4 writes an entry
+						with a stub command that never runs, and copies nothing from your
+						server's definition. Checked with the real CLI:
+						<code>grok mcp list</code>
+						shows the server off and a headless Grok session does not start it.
+					</li>
+					<li>
+						<strong>Subagent receipts for Codex and Grok</strong>, in
+						API-equivalent dollars (list prices, not a bill). Codex's is
+						computed when the subagent stops. Grok writes a subagent's usage
+						just after its stop hook, so its receipt is logged by the next hook.
+					</li>
+					<li>
+						<strong
+							>Fat-tool notice, fat-tool limit and starting-context alert for
+							Codex and Grok</strong
+						>
+						(<code>install --alerts</code>), and
+						<strong>Codex limit notifications</strong>
+						(<code>install --guard</code>, then <code>notify on</code>).
+					</li>
+					<li>
+						<strong>Fixes the audit turned up:</strong>
+						a model pinned for Grok was applied to Claude spawns; the
+						duplicate-spawn hold never fired for Codex (and Codex encrypts
+						<code>spawn_agent</code>
+						arguments, so it now compares the task name);
+						<code>results</code>
+						invented outcomes for past Grok blocks; Grok cost in
+						<code>report</code>
+						was about 1.8x too high;
+						<code>optimize capabilities --codex</code>
+						failed on Codex 0.169;
+						<code>doctor</code>
+						now asks Codex which hooks it trusts.
+					</li>
+				</ul>
+				<p>
+					To pick up the new hooks after upgrading: run
+					<code>limitcast install --guard --alerts</code>
+					again, restart Claude Code, Codex and Grok, and approve the new hooks
+					in Codex (<code>/hooks</code>).
+				</p>
+				<p>
+					Also since last week:
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.18.2"
+						>0.18.2</a
+					>
+					(mistyped options now fail with <code>Unknown option</code> instead of
+					running the plain command; settings and cache files are written
+					atomically),
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.18.3"
+						>0.18.3</a
+					>
+					(commands that change settings at the same moment no longer undo each
+					other), and
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.19.2"
+						>0.19.2</a
+					>
+					(optimizer fixes: learned command replacements keep the verification
+					check they replace, and a map from a dirty working tree no longer
+					contaminates the cached one). The optimizer is opt-in; see the
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/v0.19.4/docs/optimizer.md"
+						>optimizer guide</a
+					>.
+				</p>
+				<p>
+					<strong>Checked in live sessions.</strong>
+					I ran real Codex 0.169 and Grok 1.0.77 sessions in isolated homes with
+					limitcast's hooks recording what the tools actually send. That is how
+					the Grok defect and the Codex encryption showed up; unit tests had
+					passed. Not verified: whether Codex or Grok display a hook's message
+					to you, and interactive Grok folder trust.
+				</p>
+				<p>
+					<strong>Re-checked on Nov 13</strong>
+					with a clean checkout of the v0.19.4 tag, using isolated home and
+					state directories: all 293 tests pass when run one file at a time (in
+					one parallel run on a heavily loaded machine, a timing-sensitive lock
+					stress test timed out; it passes alone, and GitHub Actions passed on
+					the release commit on Linux and macOS, Node 20, 22 and 24). The
+					six-case deterministic replay behaves as documented on both the tag
+					and the tarball downloaded from npm:
+				</p>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Replay case (30 simulated tool calls)</th>
+								<th>Redirects</th>
+								<th>Expected</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Same failing check, repeated</td>
+								<td class="n">1</td>
+								<td class="n">1</td>
+							</tr>
+							<tr>
+								<td>Same failing check, every event delivered twice</td>
+								<td class="n">1</td>
+								<td class="n">1</td>
+							</tr>
+							<tr>
+								<td>Failures that keep changing</td>
+								<td class="n">0</td>
+								<td class="n">0</td>
+							</tr>
+							<tr>
+								<td>Passing check</td>
+								<td class="n">0</td>
+								<td class="n">0</td>
+							</tr>
+							<tr>
+								<td>Read-only exploration</td>
+								<td class="n">0</td>
+								<td class="n">0</td>
+							</tr>
+							<tr>
+								<td>Ambiguous exit status</td>
+								<td class="n">0</td>
+								<td class="n">0</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					Replay uses simulated events, not a live model. It shows when the
+					detector speaks up, not that a model follows the redirect. No token
+					savings are claimed or measured.
+				</p>
+				<h2>One example</h2>
+				<p>
+					Actual output, run on November 13, 2026 against the v0.19.4 tag in a
+					<strong>synthetic task</strong>: a real Codex 0.169 session in an
+					isolated home was asked to start one subagent that reads a three-line
+					text file. No real project, path or usage. This is the message
+					limitcast's stop hook emits for you (never for the model); whether
+					your terminal displays hook messages is one of the two things not
+					verified above:
+				</p>
+				<pre
+				><code>limitcast: that default subagent used 53k tokens, 1k of them new (2 calls): about $0.01 at API list prices.</code></pre>
+				<p>
+					Most of those tokens are cached reads, which is why only 1k are new.
+					The dollar figure is what the tokens would cost at OpenAI's list price
+					for the model, not what your plan charges. Claude Code receipts show a
+					share of your 5-hour window instead, because Claude has a calibrated
+					window; Codex and Grok have none.
+				</p>
+				<p>
+					<strong>From the maintainer's own machine.</strong>
+					One person's real usage: not synthetic, and not a user result. This is
+					<code>limitcast optimize status</code>
+					in the maintainer's main working repository on November 13, 2026,
+					counting sessions recorded since the optimizer was enabled in early
+					November. Tool names, server names, paths and project names are left
+					out.
+				</p>
+				<div class="table-wrap">
+					<table>
+						<thead>
+							<tr>
+								<th>Host</th>
+								<th>Sessions recorded</th>
+								<th>Capability-pruning proposals</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Claude Code</td>
+								<td class="n">194</td>
+								<td class="n">193</td>
+							</tr>
+							<tr>
+								<td>Codex</td>
+								<td class="n">144</td>
+								<td>2 (one built-in, one MCP server)</td>
+							</tr>
+							<tr>
+								<td>Grok</td>
+								<td class="n">122</td>
+								<td>3 (all MCP servers)</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					No proposal has been applied, and no check-command facts have been
+					learned (0), even with learning turned on. The proposals are
+					suggestions: a capability is proposed only after it was declared but
+					unused across at least five sessions in this repository. They show
+					what pruning could remove here, not what it saved. Nothing was
+					disabled, so there is no savings figure. In the home directory,
+					<code>--apply</code>
+					refuses on Codex and Grok, because the project config file there is
+					your own user config; use
+					<code>limitcast trim --codex --apply</code>
+					or
+					<code>--grok --apply</code>
+					instead.
+				</p>
+				<p>
+					Codex and Grok used to show 1 and 0 here (0.19.2): the optimizer only
+					looked at three Codex built-ins and nothing on Grok. The Claude column
+					is unchanged at 193 even though the Claude tool catalog now holds 317
+					tools (the cap was raised from 200 to 400); proposals need five
+					sessions of evidence, so newly seen tools cannot qualify yet.
+				</p>
+				<p>
+					For limitcast's own repository (140 tracked files, v0.19.4) the
+					repository map fills its 6,000-character default budget. Injection
+					stays off until you run <code>limitcast optimize map on</code>, so
+					weigh that recurring context against the searching it saves.
+				</p>
+				<h2>One useful command</h2>
+				<pre><code>limitcast optimize capabilities --grok</code></pre>
+				<p>
+					Use <code>--codex</code> for Codex. Read-only preview: it lists the
+					MCP servers (and, on Codex, built-in capabilities) the optimizer would
+					propose turning off in this repository, and nothing else changes until
+					you pass <code>--apply &lt;name&gt;</code>. Needs Node.js 20+, a Git
+					repository, and at least five recorded sessions and ten prompts with
+					the optimizer on (<code>limitcast install --optimize</code>, restart
+					your coding tool; Codex asks you to review and trust the new hooks).
+					<code>limitcast optimize status</code>
+					shows the same proposals for all hosts, plus which features are on.
+				</p>
+				<p>
+					Output from limitcast 0.19.4 on November 13, 2026, in a
+					<strong>synthetic one-file repository</strong>
+					with an isolated home and state directory, so it shows a fresh setup
+					with nothing recorded yet:
+				</p>
+				<pre><code>$ limitcast optimize capabilities --grok
+{
+  "host": "grok",
+  "proposed": [],
+  "applied": [],
+  "keep": []
+}</code></pre>
+				<p>
+					<code>proposed</code>
+					is empty here because there is no evidence yet. A preview is a
+					suggestion, not proof a hook fired live. Anything you apply can be
+					undone with <code>--undo</code>, and
+					<code>LIMITCAST_ALLOW=1</code>
+					bypasses the optimizer hooks.
+				</p>
+				<h2>One question</h2>
+				<p>
+					On Codex and Grok the optimizer now proposes idle MCP servers. If you
+					try <code>limitcast optimize capabilities --codex</code> or
+					<code>--grok</code>, did it propose servers you would really switch
+					off? And would you rather it applied per project (what
+					<code>--apply</code>
+					does) or for all projects (what
+					<code>trim</code>
+					does)? Tell us your coding tool and what made you decide, without
+					sharing prompts, logs, private names or paths.
+				</p>
+				<div class="cta">
+					<p>
+						<a href="https://github.com/SamStull9007/limitcast/discussions/11"
+							>Answer in the weekly GitHub discussion</a
+						>.
+					</p>
+					<p>
+						Follow shipped releases with
+						<strong>Watch → Custom → Releases</strong>
+						and enable email delivery in your GitHub notification settings if
+						you want release emails.
+					</p>
+					<p>
+						<a href="/guide/">Setup guide</a>
+						· <a href="/blog/">More posts</a>
+					</p>
+				</div>
+			</article>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
