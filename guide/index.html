@@ -16,7 +16,10 @@
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 		<meta property="og:type" content="article">
 		<meta property="og:url" content="https://limitcast.dev/guide/">
-		<meta property="og:title" content="Claude Code usage limits: the limitcast guide">
+		<meta
+			property="og:title"
+			content="Claude Code usage limits: the limitcast guide"
+		>
 		<meta
 			property="og:description"
 			content="How limitcast handles Claude Code usage limits, including the 5-hour and weekly windows, and the same forecast for Codex and Grok. Runout, trim, the subagent guard, and the free MIT release."
@@ -315,7 +318,8 @@
 				limitcast is a command-line tool that shows what fills your context,
 				warns you before a usage window runs out, and stops new subagents that
 				would use up the rest of it. Then it separates recorded actions from
-				estimated context reduction. It reads data already on your machine and, unless you turn on Grok's weekly usage, uses no logins.
+				estimated context reduction. It reads data already on your machine and,
+				unless you turn on Grok's weekly usage, uses no logins.
 			</p>
 
 			<pre><code><span class="dim">$</span> limitcast trim
@@ -326,8 +330,7 @@ This example Claude Code session started at 102.7k tokens before the first messa
 - Hide 66 skills from the model (~5.3k): dataviz, block-kit, ...</code></pre>
 
 			<h2>Start with your own setup</h2>
-			<pre
-			><code>npm install -g limitcast
+			<pre><code>npm install -g limitcast
 limitcast onboard</code></pre>
 			<p>
 				<code>onboard</code>
@@ -339,7 +342,8 @@ limitcast onboard</code></pre>
 				tool and complete a normal turn before expecting live readings.
 			</p>
 			<p>
-				All features are free under the MIT License, with no account, license key or trial. Protection needs
+				All features are free under the MIT License, with no account, license
+				key or trial. Protection needs
 				<code>limitcast install --guard --alerts</code>, a restart, and Codex
 				hook approval when requested. A configured hook is not proof it has
 				acted.
@@ -575,11 +579,11 @@ Kept by `trim --apply`: ego-browser</pre>
 						into every session. A note past that is never read.
 					</li>
 					<li>
-						Reads this project's memory folder
-						(<code>~/.claude/projects/&lt;project&gt;/memory</code>) and reports
-						how much of the index fits, links that point at a missing file,
-						topic files nothing links to, and files over 150 lines. It changes
-						nothing.
+						Reads this project's memory folder (<code
+							>~/.claude/projects/&lt;project&gt;/memory</code
+						>) and reports how much of the index fits, links that point at a
+						missing file, topic files nothing links to, and files over 150
+						lines. It changes nothing.
 					</li>
 					<li>
 						<code>doctor</code>
@@ -631,9 +635,10 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 					<li>
 						New in 0.18. A second subagent of the same type and the same prompt
 						is held while the first is still running in that session. Claude's
-						stop hook clears it. A record older than 30 minutes is dropped, so
-						a missed stop on Codex or Grok cannot hold the prompt all day.
-						<code>LIMITCAST_ALLOW=1</code> still spawns.
+						stop hook clears it. A record older than 30 minutes is dropped, so a
+						missed stop on Codex or Grok cannot hold the prompt all day.
+						<code>LIMITCAST_ALLOW=1</code>
+						still spawns.
 					</li>
 					<li>
 						While a Claude window is tight (NEAR or AT_RISK) but not about to
@@ -809,10 +814,10 @@ Subagent budget: 15% of each 5-hour window. Used this window so far: ≈6.4%. On
 						Codex and Grok do not get this warning.
 					</li>
 					<li>
-						New in 0.18. After 5 idle minutes
-						(<code>LIMITCAST_CACHE_NOTICE_MINUTES</code>) that same large
-						session's next message is announced and still sent. The hold stays
-						at 60 minutes.
+						New in 0.18. After 5 idle minutes (<code
+							>LIMITCAST_CACHE_NOTICE_MINUTES</code
+						>) that same large session's next message is announced and still
+						sent. The hold stays at 60 minutes.
 					</li>
 				</ul>
 				<pre
@@ -1085,23 +1090,25 @@ limitcast this week: 2 limits reached, warned ahead on 2 (avg 38 min), guard blo
 				</div>
 				<ul>
 					<li>
-						New in 0.18. Before a call runs, a PreToolUse hook holds a Read,
-						Grep, or MCP tool whose recent results averaged at least 5k tokens
-						over 3 or more calls, when that call sets no limit. A limit above
-						the cap is lowered: 400 lines for Read, 100 for MCP. A fat Grep
-						with no path and no glob is held.
+						Updated in 0.20.0. Before a call runs, a PreToolUse hook holds a
+						native Read or Grep tool whose recent results averaged at least 5k
+						tokens over 3 or more calls, when that call sets no limit. A Read
+						limit above 400 lines is lowered. A fat Grep with no path and no
+						glob is held. The generic limiter never rewrites or denies MCP
+						arguments; large-output notices remain available.
 					</li>
 					<li>
 						The averages come from the last
-						<code>limitcast report --why</code> or
+						<code>limitcast report --why</code>
+						or
 						<code>limitcast report --jobs</code>. Until one of those has run,
 						the check does nothing. Bash and WebFetch are left alone.
 					</li>
 					<li>
 						Shown as a deny or a rewritten limit before the tool runs, so the
 						model can ask for less. <code>LIMITCAST_ALLOW=1</code> skips it.
-						Re-run <code>limitcast install --alerts</code> to add the hook to
-						an existing install, then restart Claude Code.
+						Re-run <code>limitcast install --alerts</code> to add the hook to an
+						existing install, then restart Claude Code.
 					</li>
 				</ul>
 				<p class="gain">
@@ -1266,14 +1273,15 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 						it is on pace to run out.
 					</li>
 					<li>
-						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real weekly
-						percentage instead. About every 5 minutes limitcast reads the login Grok
-						keeps in <code>~/.grok/auth.json</code> and asks grok.com for your billing cycle. The login goes only to grok.com
-						(redirects are refused) and is never stored or logged. The readings feed
-						<code>status</code>, Grok's status line, the guard and <code>doctor</code>,
-						and a weekly dollar cap steps aside for them.
-						<code>limitcast grok-usage off</code> stops it. It is off by default, and
-						it tracks weekly plans only.
+						New in 0.17. <code>limitcast grok-usage on</code> shows Grok's real
+						weekly percentage instead. About every 5 minutes limitcast reads the
+						login Grok keeps in <code>~/.grok/auth.json</code> and asks grok.com
+						for your billing cycle. The login goes only to grok.com (redirects
+						are refused) and is never stored or logged. The readings feed
+						<code>status</code>, Grok's status line, the guard and
+						<code>doctor</code>, and a weekly dollar cap steps aside for them.
+						<code>limitcast grok-usage off</code>
+						stops it. It is off by default, and it tracks weekly plans only.
 					</li>
 				</ul>
 				<p class="gain">
@@ -1358,8 +1366,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				<li>
 					Grok's weekly usage is off by default. When enabled with
 					<code>limitcast grok-usage on</code>, the login in
-					<code>~/.grok/auth.json</code> is sent to grok.com, and nowhere else, to
-					ask for your usage.
+					<code>~/.grok/auth.json</code>
+					is sent to grok.com, and nowhere else, to ask for your usage.
 				</li>
 				<li>Hooks do not wait for notification delivery.</li>
 			</ul>
@@ -1368,7 +1376,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 				All features are included at no charge under the
 				<a href="https://github.com/SamStull9007/limitcast/blob/main/LICENSE"
 					>MIT License</a
-				>, with no trial, subscription, activation key or device limit. Created by
+				>, with no trial, subscription, activation key or device limit. Created
+				by
 				<a href="/sam-stull/">Sam Stull</a>.
 			</p>
 			<h2>What works with which tool</h2>
@@ -1387,13 +1396,18 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 							<td>Runout forecast</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Spend; forecast after a dollar cap, or the real weekly % with grok-usage on</td>
+							<td class="muted">
+								Spend; forecast after a dollar cap, or the real weekly % with
+								grok-usage on
+							</td>
 						</tr>
 						<tr>
 							<td>Subagent guard</td>
 							<td class="yes">✓</td>
 							<td class="yes">✓</td>
-							<td class="muted">Blocks once a dollar cap is set or grok-usage is on</td>
+							<td class="muted">
+								Blocks once a dollar cap is set or grok-usage is on
+							</td>
 						</tr>
 						<tr>
 							<td>Burn report</td>
@@ -1448,7 +1462,7 @@ limitcast install --guard    <span class="dim"># the subagent guard, free for ev
 limitcast doctor
 limitcast results            <span class="dim"># what limitcast did for you</span></code></pre>
 			<p class="muted">
-				Requires Node 20 or later on macOS or Linux. Homebrew 7 and later asks
+				Requires Node 22 or later on macOS or Linux. Homebrew 7 and later asks
 				you to trust a third-party tap before installing from it, hence the
 				<code>brew trust</code>. Restart Claude Code after installing. To add
 				the slash commands, run

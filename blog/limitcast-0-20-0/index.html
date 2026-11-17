@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			Limitcast 0.20.0: safer configuration and clearer optimizer overhead
+		</title>
+		<meta
+			name="description"
+			content="Limitcast 0.20.0 adds recoverable configuration changes, safer MCP handling and visible optimizer overhead. Requires Node.js 22+."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-20-0/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/limitcast-0-20-0/"
+		>
+		<meta
+			property="og:title"
+			content="Limitcast 0.20.0: safer configuration and clearer optimizer overhead"
+		>
+		<meta
+			property="og:description"
+			content="Limitcast 0.20.0 adds recoverable configuration changes, safer MCP handling and visible optimizer overhead. Requires Node.js 22+."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-11-16">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Limitcast 0.20.0: safer configuration and clearer optimizer overhead",
+      "datePublished": "2026-11-16",
+      "author": { "@type": "Person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-20-0/"
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+			<article>
+				<h1>
+					Limitcast 0.20.0: safer configuration and clearer optimizer overhead
+				</h1>
+				<p class="byline">
+					<a href="/sam-stull/">Sam Stull</a>
+					· <time datetime="2026-11-16">16 November 2026</time>
+				</p>
+				<p class="answer">
+					<strong>Limitcast 0.20.0 is available on npm and GitHub.</strong>
+					This release focuses on what happens when a coding tool sends an
+					unfamiliar argument, a settings write is interrupted, or an optimizer
+					has incomplete evidence. It also makes optimizer overhead easier to
+					inspect.
+				</p>
+				<p>
+					Limitcast forecasts usage limits and provides optional controls for
+					Claude Code, Codex and Grok. All features remain free under the MIT
+					License.
+					<strong
+						>Version 0.20.0 requires Node.js 22 or later on macOS or
+						Linux.</strong
+					>
+					Upgrade Node 20 before installing it.
+				</p>
+				<h2 id="mcp-calls-keep-their-original-arguments">
+					MCP calls keep their original arguments
+				</h2>
+				<p>
+					The generic result limiter previously tried to enforce output limits
+					on MCP calls. That is unsafe across tools with different schemas: a
+					parameter named <code>limit</code> does not always mean the same
+					thing, and some tools do not accept one.
+				</p>
+				<p>
+					In 0.20.0, the generic limiter never rewrites or denies MCP arguments.
+					Large-output notices remain available, while enforcement is limited to
+					supported native Read and Grep controls. This correction lets an MCP
+					tool receive the arguments its caller supplied.
+				</p>
+				<h2 id="interrupted-configuration-changes-have-a-recovery-record">
+					Interrupted configuration changes have a recovery record
+				</h2>
+				<p>
+					Trimming changes configuration, so the order of operations matters.
+					Claude, Codex and Grok trim apply and undo now persist a recovery
+					record
+					<strong>before</strong>
+					changing configuration. An interrupted operation can be recovered, and
+					conflicting user edits are preserved for reconciliation.
+				</p>
+				<p>
+					Settings locks also check ownership more carefully. A lock held by a
+					live process cannot be removed just because it is old. Recovery from a
+					dead owner and lock release check the unique owner. If an existing
+					settings file is malformed, Limitcast preserves it and refuses to
+					overwrite it.
+				</p>
+				<p>
+					Drift checks now preserve explicit choices, including fully disabled
+					skills and servers you deliberately re-enabled. The point is to keep
+					configuration changes recoverable without treating your later
+					decisions as something to undo.
+				</p>
+				<h2 id="missing-evidence-cannot-justify-pruning">
+					Missing evidence cannot justify pruning
+				</h2>
+				<p>
+					Codex usage parsing now accepts both flat and namespaced tool-call
+					records, regardless of JSON whitespace. Missing or incomplete usage
+					history cannot authorize pruning.
+				</p>
+				<p>
+					That matters because “no call found” can mean either that a capability
+					was unused or that the history could not be read completely. The
+					optimizer must preserve that distinction before proposing a
+					configuration change.
+				</p>
+				<h2 id="see-the-optimizers-own-overhead">
+					See the optimizer's own overhead
+				</h2>
+				<p>
+					<code>limitcast optimize status</code>
+					now reports injected context overhead alongside actual model-usage
+					receipts when available. Injected-token estimates use characters
+					divided by four; they are separate from model-reported usage. The
+					injection counters begin with this version, so older injections remain
+					unknown.
+				</p>
+				<p>
+					Optional Codex-backed model calls consume your Codex plan. They remain
+					off by default, and the privacy disclosure now describes that optional
+					path. The deterministic optimizer adds no model calls. Source-map
+					injection and learning remain separate opt-in choices.
+				</p>
+				<p>
+					These measurements help you inspect the cost of the optimizer itself.
+					They do not establish that a task succeeded, that a model followed a
+					redirect, or that Limitcast produced net token or cash savings. Both
+					injected context and optional model calls add overhead.
+				</p>
+				<h2 id="what-was-checked-for-this-release">
+					What was checked for this release
+				</h2>
+				<p>
+					The release records 307 passing tests, lint, focused Semgrep, privacy
+					checks and isolated packed-artifact smoke checks. GitHub Actions
+					passed on the release commit, with a test matrix covering Node 22, 24
+					and 26 on macOS and Linux.
+				</p>
+				<p>
+					Regression coverage includes persistence, lock ownership, schema
+					safety and native model subprocess behavior, including timeout and
+					cancelled-worker cases. Those checks support the specific fixes above;
+					they are not a comparative real-world savings study.
+				</p>
+				<h2 id="upgrade-to-0200">Upgrade to 0.20.0</h2>
+				<p>Check your runtime, then install the exact release:</p>
+				<div class="sourceCode" id="cb1">
+					<pre
+						class="sourceCode sh"
+					><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">node</span> <span class="at">--version</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">npm</span> install <span class="at">-g</span> limitcast@0.20.0</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">limitcast</span> onboard</span></code></pre>
+				</div>
+				<p>
+					Use Node.js 22 or later. <code>onboard</code> gives read-only setup
+					guidance. If you already enabled the guard, alerts and optimizer,
+					refresh those integrations after upgrading:
+				</p>
+				<div class="sourceCode" id="cb2">
+					<pre
+						class="sourceCode sh"
+					><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">limitcast</span> install <span class="at">--guard</span> <span class="at">--alerts</span> <span class="at">--optimize</span></span></code></pre>
+				</div>
+				<p>
+					Enable only the features you want. Restart your coding-tool sessions
+					and review any Codex hook approval requests. If you installed the
+					Copilot or Pi optimizer adapter, refresh it with
+					<code>limitcast optimize install --copilot</code>
+					or
+					<code>limitcast optimize install --pi</code>.
+				</p>
+				<p>For an existing optimizer setup, inspect its measurements with:</p>
+				<div class="sourceCode" id="cb3">
+					<pre
+						class="sourceCode sh"
+					><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">limitcast</span> optimize status</span></code></pre>
+				</div>
+				<p>
+					A configuration check confirms setup; observing a hook in a fresh
+					session is what confirms it ran.
+				</p>
+				<p>
+					Read the
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.20.0"
+						>0.20.0 release notes</a
+					>,
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/v0.20.0/docs/optimizer.md"
+						>optimizer guide for this version</a
+					>
+					and
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/v0.20.0/CHANGELOG.md"
+						>changelog</a
+					>.
+				</p>
+				<p>
+					If you try the update, which is more useful to inspect first: recovery
+					from an interrupted change, or the optimizer's recurring context
+					overhead? Share the coding tool you use and a sanitized observation,
+					without prompts, logs, credentials or private paths.
+				</p>
+			</article>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
