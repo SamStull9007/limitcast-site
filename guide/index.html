@@ -318,8 +318,10 @@
 				limitcast is a command-line tool that shows what fills your context,
 				warns you before a usage window runs out, and stops new subagents that
 				would use up the rest of it. Then it separates recorded actions from
-				estimated context reduction. It reads data already on your machine and,
-				unless you turn on Grok's weekly usage, uses no logins.
+				estimated context reduction. Usage analysis reads local data. Optional
+				Grok usage uses your Grok login; optional optimizer model calls use your
+				authenticated Codex CLI and consume your Codex allowance. Both are off
+				by default.
 			</p>
 
 			<pre><code><span class="dim">$</span> limitcast trim
@@ -517,9 +519,8 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.
 						<code>--undo</code>
 						reverses exactly what changed. Plugin skills, and servers whose
 						exact name it can't confirm, are listed for <code>/plugin</code> and
-						<code>/mcp</code>. If Claude Code later writes over those settings,
-						the cuts are put back at the next session start; anything you turn
-						back on yourself stays on.
+						<code>/mcp</code>. Later settings changes, including removed
+						overrides, are preserved when the next session starts.
 					</li>
 					<li>
 						<code>--share</code>
@@ -532,7 +533,8 @@ You'll hit Claude 5h first (16:40). Codex 5h has 78% left.
 						and the MCP servers in <code>~/.codex/config.toml</code> you haven't
 						used. <code>--apply</code> turns them off (<code
 							>enabled = false</code
-						>) and <code>--undo</code> restores the file exactly.
+						>) and <code>--undo</code> reverses Limitcast's changes while
+						preserving unrelated edits.
 					</li>
 					<li>
 						<code>trim keep &lt;name&gt;[,&lt;name&gt;]</code>
@@ -1259,7 +1261,7 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 						measures Grok's system prompt and tool definitions and the MCP
 						servers in <code>~/.grok/config.toml</code> you haven't used. Names
 						each unused server and can turn it off (<code>--undo</code>
-						restores the file).
+						reverses Limitcast's changes while preserving unrelated edits).
 					</li>
 					<li>
 						Grok stores what you spent, not a percentage, so the status line
@@ -1306,7 +1308,8 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					</li>
 					<li>
 						<code>uninstall</code>
-						restores your original settings exactly.
+						removes Limitcast's hooks and restores your original status line
+						while preserving unrelated settings.
 					</li>
 					<li>
 						<code>doctor</code>
@@ -1368,6 +1371,12 @@ Will run at 17:00 (after the claude 5h reset), in the background.</pre>
 					<code>limitcast grok-usage on</code>, the login in
 					<code>~/.grok/auth.json</code>
 					is sent to grok.com, and nowhere else, to ask for your usage.
+				</li>
+				<li>
+					Optional optimizer model learning/judging is off by default. It uses
+					your authenticated Codex CLI and consumes your Codex allowance. Only
+					allowlisted check commands, counts and hashed identities are sent; raw
+					prompts, code, transcripts and tool output are excluded.
 				</li>
 				<li>Hooks do not wait for notification delivery.</li>
 			</ul>

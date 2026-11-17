@@ -61,7 +61,7 @@
       "name": "Does it send my code or prompts anywhere?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Limitcast reads usage and session logs locally, needs no license key or payment-service connection, and does not upload code or prompts. Optional phone or webhook notifications send notification text to the service you configure; they are off by default. Grok's weekly usage is also off by default; when you turn it on, your Grok login goes to grok.com, and nowhere else, to ask for your usage."
+        "text": "Limitcast reads usage and session logs locally, needs no license key or payment-service connection, and does not upload code or prompts. Optional phone or webhook notifications send notification text to the service you configure; they are off by default. Grok's weekly usage is also off by default; when you turn it on, your Grok login goes to grok.com, and nowhere else, to ask for your usage. Optional optimizer model learning/judging uses your authenticated Codex CLI, sends only allowlisted check commands, counts and hashed identities, and consumes your Codex allowance. It is off by default."
       }
     },
     {
@@ -69,7 +69,7 @@
       "name": "Does it use my Claude login?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "No. It never touches your subscription credentials, so it can't put your account at risk."
+        "text": "Limitcast does not read your Claude login. Optional Grok usage uses Grok's existing login, and optional optimizer model calls use your authenticated Codex CLI. Both are off by default."
       }
     },
     {
@@ -516,9 +516,10 @@
 				>
 			</p>
 			<p class="pro-note">
-				Your code and prompts stay on your machine. No AI account credentials
-				required, unless you turn on Grok's weekly usage, which is off by
-				default. Protection and configuration changes remain optional.
+				Your code and prompts stay on your machine. Optional Grok usage uses
+				your Grok login; optional optimizer model calls use your authenticated
+				Codex CLI and consume your Codex allowance. Both are off by default.
+				Protection and configuration changes remain optional.
 			</p>
 			<pre id="quick-install"><code>npm install -g limitcast
 limitcast onboard</code></pre>
@@ -992,8 +993,8 @@ Over 150 lines or 24 KB (1): api-conventions.md (312 lines, 31 KB)</pre>
 						shows Grok's real weekly percentage. About every 5 minutes limitcast
 						asks grok.com for your billing cycle with the login Grok already
 						keeps in <code>~/.grok/auth.json</code>. It is off by default,
-						because it is the one place limitcast uses a login: the login goes
-						only to grok.com and is never stored or logged.
+						because it uses your Grok login: the login goes only to grok.com and
+						is never stored or logged.
 						<code>status</code>, Grok's status line and the guard then forecast
 						the weekly window like the Claude and Codex ones.
 					</p>
@@ -1409,7 +1410,7 @@ Will run at 17:00 (after the claude 5h reset), in the background. Output: ~/.loc
 						</tr>
 						<tr>
 							<td>Uses your logins</td>
-							<td>No</td>
+							<td>Optional Grok usage and Codex model calls</td>
 							<td>No</td>
 							<td>Yes, for its usage API probe</td>
 							<td>Yes, reuses provider sessions (OAuth, cookies)</td>
@@ -1517,14 +1518,18 @@ limitcast install          # backs up settings and adds the recorder</pre>
 					Optional phone or webhook notifications send notification text to the
 					service you configure; they are off by default. Grok's weekly usage is
 					also off by default; when you turn it on, your Grok login goes to
-					grok.com, and nowhere else, to ask for your usage.
+					grok.com, and nowhere else, to ask for your usage. Optional optimizer
+					model learning/judging uses your authenticated Codex CLI, sends only
+					allowlisted check commands, counts and hashed identities, and consumes
+					your Codex allowance. It is off by default.
 				</p>
 			</details>
 			<details>
 				<summary>Does it use my Claude login?</summary>
 				<p>
-					No. It never touches your subscription credentials, so it can't put
-					your account at risk.
+					Limitcast does not read your Claude login. Optional Grok usage uses
+					Grok's existing login, and optional optimizer model calls use your
+					authenticated Codex CLI. Both are off by default.
 				</p>
 			</details>
 			<details>
