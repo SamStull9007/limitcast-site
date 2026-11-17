@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Limitcast 0.20.1: safer trimming and fresher forecasts</title>
+		<meta
+			name="description"
+			content="Limitcast 0.20.1 makes trimming safer, fixes stale forecast holds, and adds clearer optimizer diagnostics. Available on npm and Homebrew."
+		>
+		<link rel="canonical" href="https://limitcast.dev/blog/limitcast-0-20-1/">
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/limitcast-0-20-1/"
+		>
+		<meta
+			property="og:title"
+			content="Limitcast 0.20.1: safer trimming and fresher forecasts"
+		>
+		<meta
+			property="og:description"
+			content="Limitcast 0.20.1 makes trimming safer, fixes stale forecast holds, and adds clearer optimizer diagnostics. Available on npm and Homebrew."
+		>
+		<meta property="og:image" content="https://limitcast.dev/og.png">
+		<meta property="og:image:width" content="1200">
+		<meta property="og:image:height" content="630">
+		<meta name="twitter:card" content="summary_large_image">
+		<meta property="article:published_time" content="2026-11-17">
+		<script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "Limitcast 0.20.1: safer trimming and fresher forecasts",
+      "datePublished": "2026-11-17",
+      "author": { "@type": "Person", "@id": "https://limitcast.dev/sam-stull/#person", "name": "Sam Stull", "url": "https://limitcast.dev/sam-stull/" },
+      "publisher": { "@type": "Organization", "name": "limitcast", "url": "https://limitcast.dev/" },
+      "image": "https://limitcast.dev/og.png",
+      "mainEntityOfPage": "https://limitcast.dev/blog/limitcast-0-20-1/"
+    }
+    </script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+			<article>
+				<h1>Limitcast 0.20.1: safer trimming and fresher forecasts</h1>
+				<p class="byline">
+					<a href="/sam-stull/">Sam Stull</a>
+					· <time datetime="2026-11-17">17 November 2026</time>
+				</p>
+				<p class="answer">
+					<strong
+						>Limitcast 0.20.1 is available on npm, GitHub and Homebrew.</strong
+					>
+					This patch fixes cases where incomplete activity logs could produce
+					unsafe trim decisions, and where an old forecast could keep holding
+					new subagents after an idle period. It also adds clearer evidence for
+					MCP pruning and optimizer learning.
+				</p>
+				<p>
+					Limitcast forecasts usage limits and provides optional controls for
+					Claude Code, Codex and Grok. All features remain free under the MIT
+					License. Version 0.20.1 requires
+					<strong>Node.js 22 or later</strong>
+					on macOS or Linux.
+				</p>
+
+				<h2 id="trimming-needs-readable-evidence">
+					Trimming needs readable evidence
+				</h2>
+				<p>
+					A tool that changes your configuration needs to distinguish an unused
+					server from a server whose activity history could not be read. The
+					latest audit found that Claude activity parsing could miss calls when
+					JSON used different spacing. Incomplete logs could also leave too
+					little evidence to justify a cut.
+				</p>
+				<p>
+					Version 0.20.1 parses the records structurally and tracks whether
+					activity was observed and read completely, including when results come
+					from the cache. It also recognizes slash commands in both string
+					messages and array-based text blocks.
+				</p>
+				<p>
+					When history is missing or incomplete,
+					<code>trim --apply</code>
+					refuses to change configuration. Unverified servers and skills stay
+					on. Unsupported nested settings and malformed undo entries are
+					rejected before writing, so the command cannot report a successful
+					change that the settings format could not save.
+				</p>
+
+				<h2 id="idle-time-should-not-preserve-an-old-hold">
+					Idle time should not preserve an old hold
+				</h2>
+				<p>
+					An unchanged usage percentage is still a fresh observation.
+					Previously, discarding repeated readings could leave an old burst of
+					activity looking current. A forecast based on that burst could
+					continue holding new subagents after work had gone quiet.
+				</p>
+				<p>
+					Limitcast now retains one latest timestamped observation for each
+					usage series without appending every unchanged reading to history.
+					Short-window burn rates require recent observations, and a predicted
+					runout time already in the past cannot authorize a forecast hold. A
+					genuine fresh burst can still trigger the guard.
+				</p>
+
+				<h2 id="each-server-needs-its-own-observation-history">
+					Each server needs its own observation history
+				</h2>
+				<p>
+					A newly configured MCP server should not inherit an unused verdict
+					from sessions that happened before it was available. Codex and Grok
+					proposals now require five distinct completed sessions that observed
+					that particular server as available at both the beginning and end of
+					the session, alongside the existing usage and keep-list protections.
+				</p>
+				<p>
+					When removal is observed, the server's evidence is reset; re-adding it
+					starts a new observation window. Duplicate stop events do not count as
+					additional sessions.
+				</p>
+				<p>
+					Claude transcript ingestion now shares the optimizer's 400-tool
+					catalog limit. It reports incomplete bounded reads, and partial
+					catalogs do not count as complete observations toward pruning
+					eligibility. Used tools remain protected when the bounded usage
+					history fills up.
+				</p>
+
+				<h2 id="see-why-learning-has-no-facts">
+					See why learning has no facts
+				</h2>
+				<p>
+					If learning has produced no facts, it helps to know what evidence it
+					actually saw. From your repository, run:
+				</p>
+				<pre><code>limitcast optimize status</code></pre>
+				<p>
+					The report now includes per-host counts for eligible, passed, failed,
+					unsupported and ambiguous verification checks, plus the number of
+					active facts. These counters begin with 0.20.1; earlier observations
+					are not backfilled. Excluded command text is not retained.
+				</p>
+				<p>
+					The safety rules remain in place: learning uses allowlisted checks and
+					requires evidence from three independent sessions before activating a
+					fact. Optional model learning and judging use your authenticated Codex
+					CLI, consume your Codex allowance, and remain off by default.
+				</p>
+				<p>
+					These diagnostics explain an evidence gap. They do not establish task
+					success or net token savings.
+				</p>
+
+				<h2 id="what-was-verified">What was verified</h2>
+				<p>
+					The release passed <strong>316 tests</strong> and all eight
+					<a
+						href="https://github.com/SamStull9007/limitcast/actions/runs/44094989156"
+						>GitHub CI jobs</a
+					>. The matrix covers Node 22, 24 and 26 on macOS and Linux, alongside
+					lint and focused Semgrep checks. A production-only coverage gate now
+					enforces floors of 95% lines, 82% branches and 91% functions.
+				</p>
+				<p>
+					Packed-package checks exercise the installed Claude, Codex and Grok
+					hooks, the Copilot executable contract and the Pi extension. Release
+					verification also compared the published npm and GitHub downloads with
+					the tested tarball and checked the Homebrew installation.
+				</p>
+				<p>
+					Those checks verify specific behavior and adapter contracts. They do
+					not replace signed-in model conversations or a real-world savings
+					study.
+				</p>
+
+				<h2 id="upgrade-to-0201">Upgrade to 0.20.1</h2>
+				<p>
+					Check your Node version, then use the package manager you installed
+					Limitcast with. For npm:
+				</p>
+				<pre><code>node --version
+npm install -g limitcast@0.20.1</code></pre>
+				<p>For an existing Homebrew installation:</p>
+				<pre><code>brew update
+brew upgrade samstull9007/limitcast/limitcast</code></pre>
+				<p>Check the result with:</p>
+				<pre><code>limitcast --version
+limitcast doctor</code></pre>
+				<p>
+					If <code>doctor</code> reports a moved launcher,
+					<code>limitcast doctor --fix</code>
+					refreshes the integration using your existing feature choices.
+				</p>
+				<p>
+					If you already installed the plugin, update it in each host you use.
+					For Claude Code:
+				</p>
+				<pre><code>claude plugin marketplace update limitcast
+claude plugin update limitcast@limitcast --scope user</code></pre>
+				<p>For Codex:</p>
+				<pre><code>codex plugin marketplace upgrade limitcast
+codex plugin add limitcast@limitcast</code></pre>
+				<p>For Grok:</p>
+				<pre><code>grok plugin update limitcast</code></pre>
+				<p>
+					<strong>Restart open Claude Code, Codex and Grok sessions</strong>
+					to load the refreshed plugin definitions and version-pinned commands.
+					If you use the separate Copilot or Pi optimizer adapter, refresh its
+					installed reference with
+					<code>limitcast optimize install --copilot</code>
+					or
+					<code>limitcast optimize install --pi</code>, then restart that host.
+				</p>
+				<p>
+					Read the
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.20.1"
+						>0.20.1 release notes</a
+					>, the
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/v0.20.1/docs/optimizer.md"
+						>optimizer guide</a
+					>, and the
+					<a href="/blog/limitcast-0-20-0/">previous 0.20.0 update</a>
+					for more context.
+				</p>
+			</article>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
