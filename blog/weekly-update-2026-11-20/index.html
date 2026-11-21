@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>
+			This week in Limitcast: safer trims, fresher forecasts and hooks that stay
+			intact
+		</title>
+		<meta
+			name="description"
+			content="The November 16–20 update: five patches covering trim evidence, forecast freshness, large tool results, installation safety and Grok receipts."
+		>
+		<link
+			rel="canonical"
+			href="https://limitcast.dev/blog/weekly-update-2026-11-20/"
+		>
+		<link rel="icon" type="image/png" href="/icon.png">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<meta property="og:type" content="article">
+		<meta
+			property="og:url"
+			content="https://limitcast.dev/blog/weekly-update-2026-11-20/"
+		>
+		<meta
+			property="og:title"
+			content="This week in Limitcast: safer trims, fresher forecasts and hooks that stay intact"
+		>
+		<meta
+			property="og:description"
+			content="The November 16–20 update: five patches covering trim evidence, forecast freshness, large tool results, installation safety and Grok receipts."
+		>
+		<meta property="og:image" content="https://limitcast.dev/icon.png">
+		<meta name="twitter:card" content="summary">
+		<meta property="article:published_time" content="2026-11-20">
+		<meta property="article:modified_time" content="2026-11-20">
+		<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "This week in Limitcast: safer trims, fresher forecasts and hooks that stay intact",
+  "description": "The November 16–20 update: five patches covering trim evidence, forecast freshness, large tool results, installation safety and Grok receipts.",
+  "datePublished": "2026-11-20",
+  "dateModified": "2026-11-20",
+  "author": {
+    "@type": "Person",
+    "@id": "https://limitcast.dev/sam-stull/#person",
+    "name": "Sam Stull",
+    "url": "https://limitcast.dev/sam-stull/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "limitcast",
+    "url": "https://limitcast.dev/"
+  },
+  "image": "https://limitcast.dev/icon.png",
+  "mainEntityOfPage": "https://limitcast.dev/blog/weekly-update-2026-11-20/"
+}</script>
+		<script
+			data-goatcounter="https://limitcast.goatcounter.com/count"
+			async
+			src="https://gc.zgo.at/count.v4.js"
+			integrity="sha384-nRw6qfbWyJha9LhsOtSb2YJDyZdKvvCFh0fJYlkquSFjUxp9FVNugbfy8q1jdxI+"
+			crossorigin="anonymous"
+		></script>
+		<style>
+		:root {
+			--bg: #fbfaf7;
+			--fg: #1d1c1a;
+			--muted: #5f5c55;
+			--line: #e4e0d8;
+			--card: #ffffff;
+			--accent: #c2410c;
+			--cached: #a8a399;
+			--code-bg: #1d1c1a;
+			--code-fg: #f3efe6;
+		}
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--bg: #141312;
+				--fg: #eeeae2;
+				--muted: #a8a399;
+				--line: #2c2a27;
+				--card: #1b1a18;
+				--accent: #f97316;
+				--cached: #5f5c55;
+				--code-bg: #0c0b0a;
+				--code-fg: #eeeae2;
+			}
+		}
+		* {
+			box-sizing: border-box;
+		}
+		body {
+			margin: 0;
+			background: var(--bg);
+			color: var(--fg);
+			font:
+				18px / 1.65 ui-sans-serif,
+				system-ui,
+				-apple-system,
+				"Segoe UI",
+				sans-serif;
+		}
+		main {
+			max-width: 720px;
+			margin: 0 auto;
+			padding: 0 16px 72px;
+		}
+		header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 8px 16px;
+			flex-wrap: wrap;
+			padding: 20px 0;
+			font-size: 0.95rem;
+		}
+		header a {
+			color: var(--muted);
+			text-decoration: none;
+		}
+		header .logo {
+			color: var(--fg);
+			font-weight: 700;
+			letter-spacing: -0.02em;
+		}
+		h1 {
+			font-size: clamp(1.9rem, 5vw, 2.6rem);
+			line-height: 1.12;
+			letter-spacing: -0.03em;
+			margin: 40px 0 10px;
+			text-wrap: balance;
+		}
+		h2 {
+			font-size: 1.35rem;
+			letter-spacing: -0.02em;
+			margin: 44px 0 10px;
+			text-wrap: balance;
+		}
+		.byline {
+			color: var(--muted);
+			font-size: 0.95rem;
+			margin: 0 0 28px;
+		}
+		.answer {
+			padding: 16px 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			font-size: 1.15rem;
+			margin: 24px 0;
+		}
+		a {
+			color: var(--accent);
+		}
+		code {
+			font-family: ui-monospace, Menlo, monospace;
+			font-size: 0.88em;
+		}
+		pre {
+			background: var(--code-bg);
+			color: var(--code-fg);
+			padding: 16px 18px;
+			border-radius: 10px;
+			overflow-x: auto;
+			font:
+				14px / 1.55 ui-monospace,
+				SFMono-Regular,
+				Menlo,
+				monospace;
+		}
+		.table-wrap {
+			overflow-x: auto;
+		}
+		table {
+			border-collapse: collapse;
+			width: 100%;
+			font-size: 0.95rem;
+			font-variant-numeric: tabular-nums;
+		}
+		th,
+		td {
+			text-align: left;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--line);
+		}
+		td.n,
+		th.n {
+			text-align: right;
+		}
+		figure {
+			margin: 28px 0;
+			padding: 18px;
+			background: var(--card);
+			border: 1px solid var(--line);
+			border-radius: 12px;
+		}
+		figcaption {
+			color: var(--muted);
+			font-size: 0.9rem;
+			margin-top: 12px;
+		}
+		.cta {
+			margin-top: 48px;
+			padding: 20px;
+			border: 1px solid var(--line);
+			border-radius: 12px;
+			background: var(--card);
+		}
+		.cta p {
+			margin: 0 0 10px;
+		}
+		footer {
+			margin-top: 48px;
+			color: var(--muted);
+			font-size: 0.9rem;
+		}
+		</style>
+	</head>
+	<body>
+		<main>
+			<header>
+				<a class="logo" href="/">limitcast</a>
+				<nav>
+					<a href="/#how">Features</a>
+					· <a href="/guide/">Guide</a> · <a href="/blog/">Blog</a> ·
+					<a href="https://github.com/SamStull9007/limitcast">GitHub</a>
+				</nav>
+			</header>
+			<article>
+				<h1>
+					This week in Limitcast: safer trims, fresher forecasts and hooks that
+					stay intact
+				</h1>
+				<p class="byline">
+					<a href="/sam-stull/">Sam Stull</a>
+					· <time datetime="2026-11-20">20 November 2026</time>
+				</p>
+				<p class="answer">
+					An AI coding tool can load too much context, run out of capacity
+					halfway through a task, or leave you wondering what its subagents
+					consumed. Limitcast helps make those things visible across Claude
+					Code, Codex and Grok, with optional controls and reversible context
+					trimming.
+				</p>
+				<p>
+					This week I focused on the decisions behind those controls: when there
+					is enough evidence to trim, when a forecast is still current, and how
+					an upgrade can preserve the rest of your setup.
+				</p>
+				<p>
+					Five patches shipped during November 16–20:
+					<strong>0.20.1 through 0.20.5</strong>. Here is the full update.
+				</p>
+				<h2>Require complete evidence before trimming</h2>
+				<p>
+					“I didn't find a tool call” and “this tool was unused” are different
+					findings.
+				</p>
+				<p>
+					Version 0.20.1 fixes activity parsing that could miss calls because of
+					JSON spacing. It also recognizes slash commands in both plain messages
+					and text-block arrays. Cached history carries its completeness
+					information forward, so reading from a cache does not turn incomplete
+					evidence into permission to cut.
+				</p>
+				<p>
+					When activity history is missing or incomplete, Claude trimming
+					refuses to apply changes. Unsupported nested settings and malformed
+					undo records are rejected before writing.
+				</p>
+				<p>
+					Codex and Grok MCP proposals also need evidence about the specific
+					server: five distinct completed sessions that observed it as available
+					at both session start and finish. Observing its removal resets that
+					history; re-adding it starts a new evidence window. Duplicate
+					completion events do not count as extra sessions.
+				</p>
+				<p>
+					Claude transcript ingestion now uses the shared 400-tool catalog
+					bound. Incomplete reads and partial catalogs cannot qualify as
+					complete pruning observations.
+				</p>
+				<p>
+					<a href="https://limitcast.dev/blog/limitcast-0-20-1/"
+						>Details: 0.20.1</a
+					>
+				</p>
+				<h2>A forecast should age when the activity does</h2>
+				<p>
+					A usage percentage that has not changed is still a new observation.
+				</p>
+				<p>
+					Previously, dropping repeated readings could leave an earlier burst
+					looking current and keep holding new subagents after an idle period.
+					Limitcast now retains the latest observation for each series without
+					filling history with duplicate readings.
+				</p>
+				<p>
+					Short-window burn rates need recent observations. A predicted runout
+					time already in the past cannot authorize a forecast hold. Fresh
+					activity can still trigger protection when the evidence supports it.
+				</p>
+				<h2>See what the optimizer actually observed</h2>
+				<p>
+					<code>limitcast optimize status</code>
+					now reports verification-check observations by host, including
+					eligible, passed, failed, unsupported and ambiguous checks, alongside
+					active facts.
+				</p>
+				<p>
+					These counters start with 0.20.1. Older observations are not
+					reconstructed, and excluded command text is not retained. The report
+					makes an evidence gap easier to diagnose; a counter does not prove
+					that a task improved.
+				</p>
+				<h2>One shared hook, broader large-result notices</h2>
+				<p>
+					Versions 0.20.3 and 0.20.4 address the work that happens after a tool
+					returns.
+				</p>
+				<p>
+					When both the repository optimizer and large-result alerts are
+					installed, one PostToolUse process handles both. That shared process
+					now checks every tool result, including writes, edits, searches and
+					directory listings. A qualifying large result gets a notice once per
+					tool per session, with guidance for narrowing a later call.
+				</p>
+				<p>
+					Codex and Grok also record observed result sizes. An alerts-only
+					installation retains its existing hook matcher; the broader coverage
+					applies to the shared optimizer process.
+				</p>
+				<p>
+					The optimizer now locks its own state independently of the settings
+					lock and does not read <code>config.json</code> for these updates.
+					Trimming or malformed settings cannot stall or skip that state update.
+					If the state has not changed, the file is left alone.
+				</p>
+				<p>
+					Combining the hooks removes a second process start where both
+					previously ran. It does not establish an overall speed or
+					token-savings improvement.
+				</p>
+				<p>
+					<a href="https://limitcast.dev/blog/limitcast-0-20-4/"
+						>Details: 0.20.3 and 0.20.4</a
+					>
+				</p>
+				<h2>An upgrade should preserve your other hooks</h2>
+				<p>
+					Hook groups can contain commands from several tools. Version 0.20.5
+					makes install, reinstall, notice folding and uninstall preserve
+					unrelated commands and group metadata instead of replacing the whole
+					group.
+				</p>
+				<p>
+					If Grok's dedicated Limitcast hook file contains another tool's
+					commands, installation refuses to overwrite it.
+				</p>
+				<p>
+					Installation also stages host settings and the launcher before
+					committing changes. Invalid settings on a later host leave earlier
+					hosts unchanged. Atomic writes and the existing recovery journal
+					support reconciliation after interruption, while conflicting later
+					edits are preserved.
+				</p>
+				<h2>Concurrent Grok receipts keep their place</h2>
+				<p>
+					Two subagents finishing together could previously read the same
+					pending queue and overwrite one another's additions. Atomic writes
+					kept the file readable but could still lose an update.
+				</p>
+				<p>
+					Queue changes and receipt settlement now share a lock. Native identity
+					aliases are retained, and repeated pending or completed receipts are
+					ignored. Regression coverage exercises concurrent completion and
+					settlement so distinct receipts survive and repeated events do not
+					count twice.
+				</p>
+				<p>
+					<a href="https://limitcast.dev/blog/limitcast-0-20-5/"
+						>Details: 0.20.5</a
+					>
+				</p>
+				<h2>The small patch and the website work</h2>
+				<p>
+					Version 0.20.2 changes package metadata, with a public maintainer
+					contact and a link to
+					<a href="https://limitcast.dev/sam-stull/">my project profile</a>. It
+					changes no runtime behavior.
+				</p>
+				<p>
+					Website updates this week added release explanations, clearer
+					disclosure of optional Codex-backed model usage, and author and
+					article structured data. Those are documentation and discoverability
+					changes, not new optimizer capabilities.
+				</p>
+				<p>
+					The
+					<a href="https://limitcast.dev/blog/limitcast-0-20-0/"
+						>0.20.0 article</a
+					>
+					also appeared November 16. That package predates this week's five
+					patches. Its foundation includes recoverable trim/apply/undo changes,
+					stronger lock ownership, preservation of explicit configuration
+					choices, and a generic limiter that leaves MCP arguments untouched. It
+					also makes optimizer context overhead and optional model usage
+					visible.
+				</p>
+				<h2>Release checks and the next measurement</h2>
+				<p>
+					The 0.20.5 release validation records 332 passing tests and all eight
+					CI jobs. Its macOS Node 24 line coverage was 95.39%, above the
+					unchanged 95% floor. The preceding 0.20.4 release missed that floor;
+					this update adds regression coverage without lowering it.
+				</p>
+				<p>
+					Publication now requires a clean checkout and completed, successful
+					push CI for the exact release commit. Missing, pending or failed
+					checks block npm publication. <code>limitcast doctor</code> also
+					requires Node 22+, matching the package.
+				</p>
+				<p>
+					There is a new
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/a03ac4b536be9585909aa8bbd473b8f0e186b7c3/docs/optimizer-measurement.md"
+						>optimizer measurement protocol</a
+					>: compare three synthetic tasks with the optimizer off and on, three
+					repeats per condition. It separates task success, actual token
+					categories, optimizer overhead, time and interventions.
+				</p>
+				<p>
+					That is a protocol, not a completed experiment. These releases
+					establish specific correctness fixes and validation results. They do
+					not establish net token savings, lower subscription costs or improved
+					real-world task success.
+				</p>
+				<h2>Try 0.20.5</h2>
+				<p>For an npm installation, use Node.js 22 or later:</p>
+				<pre><code class="language-sh">node --version
+npm install -g limitcast@0.20.5
+limitcast --version
+limitcast onboard
+</code></pre>
+				<p>
+					<code>onboard</code>
+					provides read-only setup guidance. For an existing installation,
+					<code>limitcast doctor --fix</code>
+					refreshes the hook launcher for installed features. Update any
+					installed host plugins and restart open sessions to load refreshed
+					commands. Review any host hook-approval requests.
+				</p>
+				<p>
+					The npm release is verified at 0.20.5. The GitHub release notes still
+					list Homebrew at 0.20.4 pending a formula update, so check the
+					installed version if you use Homebrew.
+				</p>
+				<p>
+					Limitcast remains free and open source under the MIT License. Optional
+					model-backed learning and judging use your authenticated Codex CLI and
+					consume that allowance; those features remain off by default.
+				</p>
+				<p>
+					If you try it, which part of your AI coding setup is hardest to
+					understand: starting context, usage limits or subagent activity?
+				</p>
+				<p>
+					<a href="https://limitcast.dev/">Website</a>
+					·
+					<a
+						href="https://github.com/SamStull9007/limitcast/blob/a03ac4b536be9585909aa8bbd473b8f0e186b7c3/CHANGELOG.md"
+						>Full changelog</a
+					>
+					·
+					<a
+						href="https://github.com/SamStull9007/limitcast/releases/tag/v0.20.5"
+						>GitHub release</a
+					>
+					·
+					<a
+						href="https://github.com/SamStull9007/limitcast/actions/runs/44834923713"
+						>Release CI</a
+					>
+				</p>
+				<p>
+					Disclosure: I used AI assistance to prepare this article from
+					Limitcast's changelog, repository history and release documentation.
+				</p>
+			</article>
+			<footer>
+				limitcast is an independent tool and is not affiliated with Anthropic.
+				Questions or your own numbers: support@limitcast.dev
+			</footer>
+		</main>
+	</body>
+</html>
