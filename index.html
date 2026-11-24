@@ -48,7 +48,7 @@
   },
   "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
   "isAccessibleForFree": true,
-  "softwareVersion": "0.20.5",
+  "softwareVersion": "0.20.8",
   "author": {
     "@type": "Person",
     "@id": "https://limitcast.dev/sam-stull/#person",
@@ -867,7 +867,7 @@ ahead, or run /compact first to shrink it.</pre>
 						and one when it resets after a HIT, so you can step away and come
 						back at the right time. On macOS they come from limitcast's own
 						notifier app, listed under its name in System Settings. Linux uses
-						notify-send.
+						notify-send. Windows uses PowerShell notifications.
 					</p>
 					<p>
 						<b>New in 0.11:</b>
@@ -1470,7 +1470,8 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				</li>
 			</ol>
 			<p>
-				Requires Node 22+, macOS or Linux. Keep essentials with
+				Requires Node.js 22 or later on macOS, Linux, and Windows. Windows
+				also needs Git for Windows; WSL is optional. Keep essentials with
 				<code>limitcast trim keep &lt;name&gt;</code>. Reverse cuts with
 				<code>limitcast trim --undo</code>
 				(add the matching provider flag).
