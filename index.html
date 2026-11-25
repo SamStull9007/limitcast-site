@@ -36,7 +36,7 @@
   "name": "limitcast",
   "url": "https://limitcast.dev/",
   "applicationCategory": "DeveloperApplication",
-  "operatingSystem": "macOS, Linux",
+  "operatingSystem": "macOS, Linux, Windows",
   "description": "Claude Code usage limits: see when the 5-hour and weekly windows run out, and forecast Codex and Grok the same way. Measures and trims starting context, and the subagent guard is included. Runs locally. Free.",
   "image": "https://limitcast.dev/og.png",
   "downloadUrl": "https://www.npmjs.com/package/limitcast",
@@ -48,7 +48,7 @@
   },
   "license": "https://github.com/SamStull9007/limitcast/blob/main/LICENSE",
   "isAccessibleForFree": true,
-  "softwareVersion": "0.20.9",
+  "softwareVersion": "0.20.10",
   "author": {
     "@type": "Person",
     "@id": "https://limitcast.dev/sam-stull/#person",
@@ -1470,8 +1470,8 @@ limitcast install          # backs up settings and adds the recorder</pre>
 				</li>
 			</ol>
 			<p>
-				Requires Node.js 22 or later on macOS, Linux, and Windows. Windows
-				also needs Git for Windows; WSL is optional. Keep essentials with
+				Requires Node.js 22 or later on macOS, Linux, and Windows. Windows also
+				needs Git for Windows; WSL is optional. Keep essentials with
 				<code>limitcast trim keep &lt;name&gt;</code>. Reverse cuts with
 				<code>limitcast trim --undo</code>
 				(add the matching provider flag).
